@@ -1,0 +1,36 @@
+{
+  "name": "tariff_fetch",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/guiyomh/features/just:0.1.0": { "version": "1.42.4" },
+    "ghcr.io/devcontainers/features/python:1": { "version": "os-provided" }
+  },
+  "postCreateCommand": "bash ./.devcontainer/postCreateCommand.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "tamasfe.even-better-toml",
+        "nefrob.vscode-just-syntax",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "astral-sh.ty"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/workspaces/tariff_fetch/.venv/bin/python",
+        "python.testing.pytestArgs": ["tests"],
+        "python.testing.pytestPath": "/workspaces/tariff_fetch/.venv/bin/pytest",
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestEnabled": true,
+        "ruff.nativeServer": "on",
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+          }
+        }
+      }
+    }
+  }
+}
