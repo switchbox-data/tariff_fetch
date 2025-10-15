@@ -11,4 +11,3 @@ Invoke-RestMethod https://github.com/j178/prek/releases/download/v0.2.2/prek-ins
 
 # Install pre-commit hooks
 prek install --install-hooks
-

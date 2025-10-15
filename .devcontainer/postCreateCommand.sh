@@ -13,4 +13,3 @@ curl --proto '=https' --tlsv1.2 -LsSf https://github.com/j178/prek/releases/down
 
 # Install pre-commit hooks
 prek install --install-hooks
-
