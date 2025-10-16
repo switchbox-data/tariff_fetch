@@ -1205,6 +1205,10 @@ wheels = [
 name = "tariff-fetch"
 version = "0.0.1"
 source = { editable = "." }
+dependencies = [
+    { name = "requests" },
+    { name = "typing-extensions" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -1220,6 +1224,10 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [
+    { name = "requests", specifier = ">=2.32.5" },
+    { name = "typing-extensions", specifier = ">=4.15.0" },
+]
 
 [package.metadata.requires-dev]
 dev = [

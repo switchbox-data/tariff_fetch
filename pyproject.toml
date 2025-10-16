@@ -7,6 +7,8 @@ readme = "README.md"
 keywords = ['python']
 requires-python = ">=3.9,<4.0"
 dependencies = [
+    "requests>=2.32.5",
+    "typing-extensions>=4.15.0",
 ]
 classifiers = [
     "Intended Audience :: Developers",
@@ -47,7 +49,7 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py310"
 line-length = 120
 fix = true
 
