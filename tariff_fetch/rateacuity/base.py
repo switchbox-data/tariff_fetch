@@ -47,7 +47,7 @@ def create_driver_(download_path: str) -> webdriver.Chrome:
     return webdriver.Chrome(options=options, service=service)
 
 
-def get_electric_tariffs(context: ScrapingContext, state: str, utility: str, schedule: str):
+def get_electric_tariffs(context: ScrapingContext, state: str, utility: str, schedule: str) -> pl.DataFrame:
     driver, _ = context
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     driver.get("https://secure.rateacuity.com/RateAcuity/ElecEntry/IndexViews")
