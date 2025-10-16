@@ -1,3 +1,4 @@
+import datetime
 from typing import Any
 from urllib.parse import urljoin
 
@@ -11,12 +12,17 @@ def convert_params(input: dict[str, Any]) -> dict[str, Any]:
 
 
 def _convert_param(value):
-    return {True: "true", False: "false"}.get(value, value)
+    if isinstance(value, datetime.datetime):
+        return int(value.timestamp())
+    return value
+    # return {True: "true", False: "false"}.get(value, value)
 
 
 def api_request_json(path: str, api_key: str, **params) -> dict | list:
     params_ = {"api_key": api_key, **convert_params(params)}
     url = urljoin(BASE_URL, path)
+    print(url)
+    print(params_)
     response = requests.get(url, params=params_)
     response.raise_for_status()
     return response.json()

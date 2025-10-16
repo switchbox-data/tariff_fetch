@@ -1,3 +1,5 @@
+import datetime
+from collections.abc import Iterator
 from typing import Any, Literal, TypeAlias, TypedDict, cast
 
 from typing_extensions import Unpack
@@ -17,6 +19,9 @@ FixedChargeUnit: TypeAlias = Literal["$/day"] | Literal["$/month"] | Literal["$/
 DistributedGenerationRule: TypeAlias = Literal[
     "Net Metering", "Net Billing Instantaneous", "Net Billing Hourly", "Buy All Sell All"
 ]
+UtilityRateSector: TypeAlias = (
+    Literal["Residential"] | Literal["Commercial"] | Literal["Industrial"] | Literal["Lighting"]
+)
 ScheduleMatrix: TypeAlias = list[list[int]]
 AttributeList: TypeAlias = list[dict[str, Any]]
 
@@ -56,36 +61,58 @@ EnergyRateStructure: TypeAlias = list[list[EnergyRateTier]]
 class UtilityRatesParams(TypedDict, total=False):
     """Parameters for utility rates api"""
 
+    modified_after: datetime.datetime | int
+    "Modified after, datetime or seconds since 1970-01-01T00:00:00, UTC. "
     limit: int
-    " Maximum record count 500. "
+    "Maximum record count 500"
+    getpage: str
+    """
+    Get a specific page name, i.e. getpage=535aeca39bef511109580ee1.
+    This is referred to as 'label' in the results.
+    """
+    ratesforutility: str
+    """
+    Get rates for a specific utility page name, i.e. ratesforutility=Detroit Edison Co.
+    This value can be re-used from the "label" value in the utility_companies results.
+    """
     offset: int
     "The offset from which to start retrieving records."
-    getpage: str
-    """Get a specific page name, i.e. getpage=535aeca39bef511109580ee1.
-    This is referred to as 'label' in the results."""
-    ratesforutility: str
-    """Get rates for a specific utility page name, i.e. ratesforutility=Detroit Edison Co.
-    This value can be re-used from the "label" value in the utility_companies results."""
     orderby: str
-    "Field to use to sort results. Default: label"
+    "Field to use to sort results."
     direction: Literal["asc"] | Literal["desc"]
     "Direction to order results, ascending or descending."
-    sector: Literal["Residential"] | Literal["Commercial"] | Literal["Industrial"] | Literal["Lighting"]
+    effective_on_date: datetime.datetime | int
+    "Effective on date, datetime or seconds since 1970-01-01T00:00:00, UTC."
+    sector: UtilityRateSector
     "Shows only those rates matching the given sector."
     approved: bool
     "Shows only those rates whose approval status matches the given value."
+    is_default: bool
+    "Shows only those rates whose 'Is Default' status matches the given value."
+    country: str
+    "ISO 3 character country code, i.e. country=USA."
     address: str
     "Address for rate, see Google Geocoding API for details. Address or lat/lon may be used, but not both."
     lat: int
     "Latitude for rate. If set, lon must also be set and address must not."
     lon: int
     "Longitude for rate. If set, lat must also be set and address must not."
+    radius: int
+    "Radius to include surrounding search result, in miles. (min 0, max 200)"
+    co_limit: int
+    "Maximum number of companies to include in a geographic search (using lat/lon, or address)."
     eia: int
     "EIA Id to look up."
+    callback: str
+    "callback=<mycallback> - set mycallback as the json callback."
     detail: Literal["full"] | Literal["minimal"]
+    """
+    detail=full - returns every variable. Since this results in a lot of data that can time-out
+    returning to your server, use a limit=500 and set an offset (e.g. 501) if you want more data.
+    """
 
 
-class UtilityRatesResponse(TypedDict, total=False):
+class UtilityRatesResponseItem(TypedDict, total=False):
     label: str
     "Page label"
     utility: str
@@ -104,7 +131,7 @@ class UtilityRatesResponse(TypedDict, total=False):
     "End date timestamp"
     supercedes: str
     "Label of the rate this rate supercedes."
-    sector: Literal["Residential"] | Literal["Commercial"] | Literal["Industrial"] | Literal["Lighting"]
+    sector: UtilityRateSector
     "Sector"
     servicetype: ServiceType
     "Service type"
@@ -196,12 +223,33 @@ class UtilityRatesResponse(TypedDict, total=False):
     "Fixed charge attribute key/value pairs"
 
 
+class UtilityRatesResponse(TypedDict):
+    items: list[UtilityRatesResponseItem]
+
+
+def iter_utility_rates(
+    api_key: str,
+    iter_offset: int = 0,
+    format: Literal["json"] | Literal["json_plain"] | Literal["csv"] = "json",
+    version: str = "latest",
+    **kwargs: Unpack[UtilityRatesParams],
+) -> Iterator[UtilityRatesResponseItem]:
+    offset = iter_offset
+    rows = 1
+    while rows:
+        response = utility_rates(api_key, format, version, **{**kwargs, "offset": offset})
+        items = response["items"]
+        rows = len(items)
+        offset += rows
+        yield from items
+
+
 def utility_rates(
     api_key: str,
     format: Literal["json"] | Literal["json_plain"] | Literal["csv"] = "json",
     version: str = "latest",
     **kwargs: Unpack[UtilityRatesParams],
-) -> list:
+) -> UtilityRatesResponse:
     """Access utility rate structure information from the U.S. Utility Rate Database
 
     Args:
@@ -217,5 +265,6 @@ def utility_rates(
           in version 3 or greater.
     """
     return cast(
-        list, api_request_json(path=UTILITY_RATES_API_PATH, api_key=api_key, format=format, version=version, **kwargs)
+        UtilityRatesResponse,
+        api_request_json(path=UTILITY_RATES_API_PATH, api_key=api_key, format=format, version=version, **kwargs),
     )
