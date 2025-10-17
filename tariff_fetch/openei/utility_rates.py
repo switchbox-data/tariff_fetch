@@ -1,10 +1,42 @@
+import argparse
 import datetime
-from collections.abc import Iterator
+import json
+import os
+from collections.abc import Iterator, Sequence
+from pathlib import Path
 from typing import Any, Literal, TypeAlias, TypedDict, cast
 
 from typing_extensions import Unpack
 
 from .base import api_request_json
+
+__all__ = [
+    "UTILITY_RATES_API_PATH",
+    "AttributeList",
+    "CoincidentRateStructure",
+    "CoincidentRateTier",
+    "DemandRateStructure",
+    "DemandRateTier",
+    "DemandUnit",
+    "DistributedGenerationRule",
+    "EnergyRateStructure",
+    "EnergyRateTier",
+    "FixedChargeUnit",
+    "FlatDemandStructure",
+    "FlatDemandTier",
+    "PhaseWiring",
+    "ScheduleMatrix",
+    "ServiceType",
+    "UtilityRateSector",
+    "UtilityRatesParams",
+    "UtilityRatesResponse",
+    "UtilityRatesResponseItem",
+    "VoltageCategory",
+    "iter_utility_rates",
+    "main",
+    "utility_rates",
+]
+
 
 UTILITY_RATES_API_PATH = "/utility_rates"
 DemandUnit: TypeAlias = (
@@ -268,3 +300,48 @@ def utility_rates(
         UtilityRatesResponse,
         api_request_json(path=UTILITY_RATES_API_PATH, api_key=api_key, format=format, version=version, **kwargs),
     )
+
+
+def main(argv: Sequence[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Fetch OpenEI utility rates and write them to a JSON file.")
+    parser.add_argument(
+        "ratesforutility",
+        help="Utility label (see OpenEI utility companies) to request rates for.",
+    )
+    parser.add_argument(
+        "--api-key",
+        default=os.getenv("OPENEI_API_KEY"),
+        help="OpenEI API key (defaults to OPENEI_API_KEY environment variable).",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default="openai_utility_rates.json",
+        help="Path to write the fetched rates (default: %(default)s).",
+    )
+    args = parser.parse_args(list(argv) if argv is not None else None)
+
+    api_key = args.api_key
+    if not api_key:
+        parser.error("API key must be provided via --api-key or OPENEI_API_KEY environment variable.")
+
+    effective_on_date = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+    records = list(
+        iter_utility_rates(
+            api_key=api_key,
+            format="json",
+            version="latest",
+            ratesforutility=args.ratesforutility,
+            detail="minimal",
+            sector="Residential",
+            effective_on_date=effective_on_date,
+        )
+    )
+
+    output_path = Path(args.output)
+    output_path.write_text(json.dumps(records, indent=2))
+    print(f"Wrote {len(records)} records to {output_path}")
+
+
+if __name__ == "__main__":
+    main()

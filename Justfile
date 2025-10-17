@@ -80,3 +80,13 @@ install:
 # Clean generated files and caches
 clean:
     rm -rf .pytest_cache .ruff_cache site dist build tmp
+
+
+rateacuity:
+    uv run python -m tariff_fetch.rateacuity.electric
+
+openei:
+    uv run python -m tariff_fetch.openei.utility_rates "Consolidated Edison Co-NY Inc"
+
+arcadia:
+    uv run python -m tariff_fetch.genability.tariffs 2252

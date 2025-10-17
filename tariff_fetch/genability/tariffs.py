@@ -1,4 +1,9 @@
+import argparse
 import datetime
+import json
+import os
+from collections.abc import Sequence
+from pathlib import Path
 from typing import Any, Literal, TypeAlias, TypedDict
 
 from typing_extensions import Unpack
@@ -6,6 +11,16 @@ from typing_extensions import Unpack
 from .base import BASE_URL, api_request_json
 from .converters import comma_separated, true_or_false
 from .pagination import PagingParams, paging_params_converters
+
+__all__ = [
+    "TARIFFS_URL",
+    "CustomerClass",
+    "TariffType",
+    "TariffsGetPageParams",
+    "TariffsParams",
+    "tariffs_get_page",
+    "tariffs_paginate",
+]
 
 TARIFFS_URL = f"{BASE_URL}/tariffs"
 
@@ -59,3 +74,50 @@ def tariffs_get_page(auth: tuple[str, str], **params: Unpack[TariffsGetPageParam
     converters = {**_tariffs_params_converters, **paging_params_converters}
     request_params = {key: converters[key](value) for key, value in params.items()}
     return api_request_json(TARIFFS_URL, auth, request_params)
+
+
+def main(argv: Sequence[str] | None = None):
+    parser = argparse.ArgumentParser(description="Fetch Arcadia utility rates")
+    parser.add_argument("lseid", help="Utility ID")
+    parser.add_argument(
+        "--appid",
+        default=os.getenv("ARCADIA_APP_ID"),
+        help="Arcadia App Id (defaults to ARCADIA_APP_ID environment variable)",
+    )
+    parser.add_argument(
+        "--appkey",
+        default=os.getenv("ARCADIA_APP_KEY"),
+        help="Arcadia App Key (defaults to ARCADIA_APP_KEY environment variable)",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default="arcadia_utility_rates.json",
+        help="Path to write the fetched rates (default: %(default)s).",
+    )
+    args = parser.parse_args(list(argv) if argv is not None else None)
+
+    app_id = args.appid
+    if not app_id:
+        parser.error("App Id must be provided via --appid or ARCADIA_APP_ID environment variable")
+    app_key = args.appkey
+    if not app_key:
+        parser.error("App Key must be provided via --appkey or ARCADIA_APP_KEY environment variable")
+
+    tariffs = list(
+        tariffs_paginate(
+            (app_id, app_key),
+            lseId=args.lseid,
+            customerClasses=["RESIDENTIAL"],
+            tariffTypes=["DEFAULT", "ALTERNATIVE", "OPTIONAL_EXTRA"],
+            effectiveOn=datetime.datetime.now(datetime.timezone.utc),
+            populateRates=True,
+        )
+    )
+    output_path = Path(args.output)
+    output_path.write_text(json.dumps(tariffs, indent=2))
+    print(f"Wrote {len(tariffs)} records to {output_path}")
+
+
+if __name__ == "__main__":
+    main()
