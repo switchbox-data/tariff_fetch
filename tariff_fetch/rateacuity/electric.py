@@ -54,7 +54,7 @@ def get_electric_tariffs(context: ScrapingContext, filters: Iterable[TariffFilte
     if not frames:
         return pl.DataFrame()
 
-    return pl.concat(frames, how="vertical_relaxed", rechunk=True)
+    return pl.concat(frames, how="diagonal_relaxed", rechunk=True)
 
 
 def back_to_selections_if_present(driver):
@@ -185,10 +185,7 @@ def main(argv: Sequence[str] | None = None):
         ).click()
         select_state(driver, STATE)
         select_utility(driver, UTILITY)
-        try:
-            dropdown = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "ScheduleSelect")))
-        finally:
-            driver.save_screenshot("screenshot.png")
+        dropdown = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "ScheduleSelect")))
         options = dropdown.find_elements(By.TAG_NAME, "option")
         option_texts = [_.text.strip() for _ in options]
         schedules = [_ for _ in option_texts if "residential" in _.lower()]
