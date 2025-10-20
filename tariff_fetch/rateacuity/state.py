@@ -1,3 +1,30 @@
+"""State-machine style helpers for navigating the RateAcuity portal.
+
+The module exposes a small set of classes that wrap Selenium interactions and
+provide a linear flow for logging in, picking reporting parameters, and
+downloading prepared benchmark reports as Polars dataframes.
+
+Usage
+-----
+    from tariff_fetch.rateacuity.base import create_context
+    from tariff_fetch.rateacuity.state import LoginState
+
+    with create_context() as context:
+        report = (
+            LoginState(context)
+            .login(username, password)
+            .electric()
+            .benchmark()
+            .select_state("NY")
+            .select_utility("Consolidated Edison Company of New York")
+            .select_schedule("Residential Service")
+        )
+        df = report.as_dataframe()
+
+The resulting ``df`` contains the cleaned benchmark data for the selected
+schedule.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -19,28 +46,36 @@ logger = logging.getLogger(__name__)
 
 
 class State:
+    """Shared Selenium helpers as the base for the strongly-typed state objects."""
+
     def __init__(self, context: ScrapingContext):
+        """Store the scraping context that contains the shared webdriver."""
         self._context = context
 
     @property
     def driver(self) -> Chrome:
+        """Expose the underlying Selenium driver used for navigation."""
         return self._context.driver
 
     def _logged_in(self) -> bool:
+        """Return True if the login link is absent, indicating an authenticated session."""
         return not self.driver.find_elements(By.ID, "loginLink")
 
     def _wait(self) -> WebDriverWait:
+        """Create a wait helper bound to the current driver instance."""
         return WebDriverWait(self.driver, 10)
 
 
 class LoginState(State):
     def login(self, username: str, password: str) -> PortalState:
+        """Authenticate with RateAcuity and transition into the portal state."""
         login(self._context.driver, username, password)
         return PortalState(self._context)
 
 
 class PortalState(State):
     def electric(self) -> ElectricState:
+        """Navigate to the Electric entry point of the portal."""
         logger.info("Going to electric")
         self.driver.get("https://secure.rateacuity.com/RateAcuity/ElecEntry/IndexViews")
         return ElectricState(self._context)
@@ -48,10 +83,12 @@ class PortalState(State):
 
 class ElectricState(State):
     def benchmark(self) -> ElectricBenchmarkStateDropdown:
+        """Switch the Electric report type to Benchmark and expose the state dropdown."""
         self._select_report("benchmark")
         return ElectricBenchmarkStateDropdown(self._context)
 
     def _select_report(self, report: str):
+        """Click the given radio report selector if it is not already active."""
         radio = self._wait().until(
             EC.presence_of_element_located((By.XPATH, f'//input[@id="report" and @value="{report}"]'))
         )
@@ -64,11 +101,13 @@ class ElectricBenchmarkStateDropdown(State):
         return self._wait().until(EC.presence_of_element_located((By.ID, "StateSelect")))
 
     def get_states(self) -> list[str]:
+        """Return all available states visible in the State dropdown."""
         dropdown = self._wait_for_element()
         options = dropdown.find_elements(By.TAG_NAME, "option")
         return [_.text for _ in options]
 
     def select_state(self, state: str) -> ElectricBenchmarkUtilityDropdown:
+        """Select the provided state and transition to the utility dropdown."""
         dropdown = self._wait_for_element()
         options = [_.text.strip() for _ in dropdown.find_elements(By.TAG_NAME, "option")]
         if state not in options:
@@ -86,11 +125,13 @@ class ElectricBenchmarkUtilityDropdown(ElectricBenchmarkStateDropdown):
         return self._wait().until(EC.presence_of_element_located((By.ID, "UtilitySelect")))
 
     def get_utilities(self) -> list[str]:
+        """Return all available utilities for the previously chosen state."""
         dropdown = self._wait_for_element()
         options = dropdown.find_elements(By.TAG_NAME, "option")
         return [_.text for _ in options]
 
     def select_utility(self, utility: str):
+        """Select the provided utility and expose the schedule dropdown."""
         dropdown = self._wait_for_element()
         options = [_.text.strip() for _ in dropdown.find_elements(By.TAG_NAME, "option")]
         if utility not in options:
@@ -108,11 +149,13 @@ class ElectricBenchmarkScheduleDropdown(ElectricBenchmarkUtilityDropdown):
         return self._wait().until(EC.presence_of_element_located((By.ID, "ScheduleSelect")))
 
     def get_schedules(self) -> list[str]:
+        """Return all schedules associated with the selected utility."""
         dropdown = self._wait_for_element()
         options = dropdown.find_elements(By.TAG_NAME, "option")
         return [_.text for _ in options]
 
     def select_schedule(self, schedule: str):
+        """Select a schedule and produce a report interface that can fetch data."""
         dropdown = self._wait_for_element()
         options = [_.text.strip() for _ in dropdown.find_elements(By.TAG_NAME, "option")]
         if schedule not in options:
@@ -127,10 +170,12 @@ class ElectricBenchmarkScheduleDropdown(ElectricBenchmarkUtilityDropdown):
 
 class ElectricBenchmarkReport(State):
     def back_to_selections(self) -> ElectricBenchmarkScheduleDropdown:
+        """Return to the selections page so additional schedules can be fetched."""
         self._wait().until(EC.presence_of_element_located((By.LINK_TEXT, "Back To Selections"))).click()
         return ElectricBenchmarkScheduleDropdown(self._context)
 
     def download_excel(self) -> Path:
+        """Trigger the report download and return the path once it appears."""
         self._wait().until(EC.presence_of_element_located((By.XPATH, '//a[text()="Create Excel Spreadsheet"]'))).click()
         download_path = self._context.download_path
         initial_state = _get_xlsx(download_path)
@@ -145,6 +190,7 @@ class ElectricBenchmarkReport(State):
         return Path(download_path, filename)
 
     def as_dataframe(self) -> pl.DataFrame:
+        """Convert a freshly downloaded Excel report into a cleaned Polars dataframe."""
         filepath = self.download_excel()
         logger.info(f"Reading excel file {filepath}")
         raw_data = pl.read_excel(filepath, engine="calamine", has_header=False)
@@ -162,10 +208,12 @@ class ElectricBenchmarkReport(State):
 
 
 def _get_xlsx(folder) -> set[str]:
+    """Return the set of .xlsx filenames currently present in the provided folder."""
     return {_ for _ in os.listdir(folder) if _.endswith(".xlsx")}
 
 
 def main(argv: Sequence[str] | None = None):
+    """Fetch residential benchmark schedules for a hard-coded utility and state."""
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser(description="Fetch RateAcuity utility rates")
