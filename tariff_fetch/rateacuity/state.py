@@ -114,7 +114,7 @@ class ElectricBenchmarkStateDropdown(State):
             raise ValueError(f"State {state} is invalid. Available options are: {options}")
         select = Select(dropdown)
         current = select.first_selected_option.text.strip() if select.first_selected_option else None
-        if current != select:
+        if current != state:
             logger.info(f"Selecting state {state}")
             select.select_by_visible_text(state)
         return ElectricBenchmarkUtilityDropdown(self._context)
@@ -138,7 +138,7 @@ class ElectricBenchmarkUtilityDropdown(ElectricBenchmarkStateDropdown):
             raise ValueError(f"Utility {utility} is invalid. Available options are: {options}")
         select = Select(dropdown)
         current = select.first_selected_option.text.strip() if select.first_selected_option else None
-        if current != select:
+        if current != utility:
             logger.info(f"Selecting utility {utility}")
             select.select_by_visible_text(utility)
         return ElectricBenchmarkScheduleDropdown(self._context)
@@ -162,7 +162,7 @@ class ElectricBenchmarkScheduleDropdown(ElectricBenchmarkUtilityDropdown):
             raise ValueError(f"Schedule {schedule} is invalid. Available options are: {options}")
         select = Select(dropdown)
         current = select.first_selected_option.text.strip() if select.first_selected_option else None
-        if current != select:
+        if current != schedule:
             logger.info(f"Selecting schedule {schedule}")
             select.select_by_visible_text(schedule)
         return ElectricBenchmarkReport(self._context)
