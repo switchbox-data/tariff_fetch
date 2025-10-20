@@ -174,13 +174,13 @@ class ElectricBenchmarkReport(State):
         self._wait().until(EC.presence_of_element_located((By.LINK_TEXT, "Back To Selections"))).click()
         return ElectricBenchmarkScheduleDropdown(self._context)
 
-    def download_excel(self) -> Path:
+    def download_excel(self, timeout: int = 20) -> Path:
         """Trigger the report download and return the path once it appears."""
         self._wait().until(EC.presence_of_element_located((By.XPATH, '//a[text()="Create Excel Spreadsheet"]'))).click()
         download_path = self._context.download_path
         initial_state = _get_xlsx(download_path)
 
-        n = 20
+        n = timeout
         while _get_xlsx(download_path) == initial_state and n:
             sleep(1)
             n -= 1
@@ -189,9 +189,9 @@ class ElectricBenchmarkReport(State):
         print("Filename:", filename)
         return Path(download_path, filename)
 
-    def as_dataframe(self) -> pl.DataFrame:
+    def as_dataframe(self, timeout: int = 20) -> pl.DataFrame:
         """Convert a freshly downloaded Excel report into a cleaned Polars dataframe."""
-        filepath = self.download_excel()
+        filepath = self.download_excel(timeout)
         logger.info(f"Reading excel file {filepath}")
         raw_data = pl.read_excel(filepath, engine="calamine", has_header=False)
         header_row_index = next(i for i, row in enumerate(raw_data.iter_rows()) if "Component Description" in row[0])
@@ -260,7 +260,7 @@ def main(argv: Sequence[str] | None = None):
 
         frames = []
 
-        for schedule in filtered[:3]:
+        for schedule in filtered:
             if "residential" not in schedule.lower():
                 continue
             state = state.select_schedule(schedule)
