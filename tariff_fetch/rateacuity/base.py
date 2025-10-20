@@ -23,7 +23,13 @@ class ScrapingContext(NamedTuple):
 @contextmanager
 def create_context() -> Generator[ScrapingContext]:
     with TemporaryDirectory() as temp_dir:
-        yield ScrapingContext(create_driver_(temp_dir), temp_dir)
+        driver = create_driver_(temp_dir)
+        driver.set_window_size(1920, 1080)
+        try:
+            yield ScrapingContext(driver, temp_dir)
+        except Exception as e:
+            driver.save_screenshot("selenium_error.png")
+            raise e from None
 
 
 def create_driver_(download_path: str) -> webdriver.Chrome:

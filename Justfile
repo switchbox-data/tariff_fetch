@@ -83,7 +83,7 @@ clean:
 
 
 rateacuity:
-    uv run python -m tariff_fetch.rateacuity.electric
+    uv run python -m tariff_fetch.rateacuity.state
 
 openei:
     uv run python -m tariff_fetch.openei.utility_rates "Consolidated Edison Co-NY Inc"
