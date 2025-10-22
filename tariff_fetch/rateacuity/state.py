@@ -186,7 +186,6 @@ class ElectricBenchmarkReport(State):
             n -= 1
 
         filename = next(iter(_get_xlsx(download_path) ^ initial_state))
-        print("Filename:", filename)
         return Path(download_path, filename)
 
     def as_dataframe(self, timeout: int = 20) -> pl.DataFrame:

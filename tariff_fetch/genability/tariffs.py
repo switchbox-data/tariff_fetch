@@ -24,12 +24,14 @@ __all__ = [
 
 TARIFFS_URL = f"{BASE_URL}/tariffs"
 
+
 CustomerClass: TypeAlias = Literal["RESIDENTIAL"] | Literal["GENERAL"] | Literal["SPECIAL_USE"]
 TariffType: TypeAlias = Literal["DEFAULT"] | Literal["ALTERNATIVE"] | Literal["OPTIONAL_EXTRA"] | Literal["RIDER"]
 
 
 class TariffsParams(TypedDict, total=False):
     lseId: int
+    fields: Literal["min", "ext"]
     effectiveOn: datetime.date
     customerClasses: list[CustomerClass]
     tariffTypes: list[TariffType]
@@ -56,7 +58,7 @@ class TariffsGetPageParams(PagingParams, TariffsParams):
 
 
 def tariffs_paginate(
-    auth: tuple[str, str],
+    auth: tuple[str, str] | None = None,
     start: int = 0,
     page_count: int = 25,
     **params: Unpack[TariffsParams],
@@ -70,10 +72,10 @@ def tariffs_paginate(
         yield from page["results"]
 
 
-def tariffs_get_page(auth: tuple[str, str], **params: Unpack[TariffsGetPageParams]) -> dict[str, Any]:
+def tariffs_get_page(auth: tuple[str, str] | None = None, **params: Unpack[TariffsGetPageParams]) -> dict[str, Any]:
     converters = {**_tariffs_params_converters, **paging_params_converters}
-    request_params = {key: converters[key](value) for key, value in params.items()}
-    return api_request_json(TARIFFS_URL, auth, request_params)
+    request_params = {key: converters.get(key, lambda _: _)(value) for key, value in params.items()}
+    return api_request_json(TARIFFS_URL, auth, **request_params)
 
 
 def main(argv: Sequence[str] | None = None):

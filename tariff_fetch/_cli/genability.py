@@ -1,0 +1,97 @@
+from datetime import datetime, timezone
+from pathlib import Path
+
+import questionary
+from dotenv import load_dotenv
+
+from tariff_fetch.genability.lse import get_lses_page
+from tariff_fetch.genability.tariffs import CustomerClass, TariffType, tariffs_paginate
+
+from . import console
+from .types import Utility
+
+
+def _find_utility_lse_id(utility: Utility) -> int | None:
+    lses = get_lses_page(
+        fields="min",
+        searchOn=["code"],
+        search=str(utility.eia_id),
+        startsWith=True,
+        endsWith=True,
+    )["results"]
+    if len(lses) == 0:
+        # No utilities found with this eia id
+        console.print(
+            f'Utility "{utility.name}" with EIA Id {utility.eia_id} not found in arcadia database', style="bold red"
+        )
+        return None
+    if len(lses) == 1:
+        # Found one utility
+        utility_lse_id = lses[0]["lseId"]
+        utility_lse_name = lses[0]["name"]
+        proceed = questionary.confirm(f"Found utility with EIA Id={utility.eia_id}: {utility_lse_name}. Proceed?").ask()
+        return utility_lse_id if proceed else None
+    else:
+        # Nothing found; this should *theoretically* never happen but let's keep it just in case
+        choices = [questionary.Choice(title=_["name"], value=_["lseId"]) for _ in lses]
+        choices.append(questionary.Separator())
+        choices.append(questionary.Choice(title="None of these", value=None))
+        utility_lse_id: int | None = questionary.select(
+            message=f"Found multiple utilities with lse id = {utility.eia_id}. Select one.", choices=choices
+        ).ask()
+        if utility_lse_id is None:
+            console.print("No utility chosen")
+            return None
+        return utility_lse_id
+
+
+def _select_tariffs(lse_id: int, customer_classes: list[CustomerClass], tariff_types: list[TariffType]) -> list[int]:
+    tariffs = tariffs_paginate(
+        lseId=lse_id,
+        fields="min",
+        effectiveOn=datetime.now(timezone.utc),
+        customerClasses=customer_classes,
+        tariffTypes=tariff_types,
+    )
+    return questionary.checkbox(
+        message="Select tariffs",
+        choices=[questionary.Choice(title=_["tariffName"], value=_["tariffId"], checked=True) for _ in tariffs],
+        use_search_filter=True,
+        use_jk_keys=False,
+    ).ask()
+
+
+def _select_customer_classes() -> list[CustomerClass]:
+    return questionary.checkbox(
+        message="Select customer classes",
+        choices=[
+            questionary.Choice(title="Residential", value="RESIDENTIAL"),
+            questionary.Choice(title="General", value="GENERAL"),
+            questionary.Choice(title="Special Use", value="SPECIAL_USE"),
+        ],
+        validate=lambda _: True if _ else "Select at least one customer class",
+    ).ask()
+
+
+def _select_tariff_types() -> list[TariffType]:
+    return questionary.checkbox(
+        message="Select tariff types",
+        choices=[
+            questionary.Choice(title="Default", value="DEFAULT"),
+            questionary.Choice(title="Alternative", value="ALTERNATIVE"),
+            questionary.Choice(title="Optional extra", value="OPTIONAL_EXTRA"),
+            questionary.Choice(title="Rider", value="RIDER"),
+        ],
+        validate=lambda _: bool(_) or "Select at least one tariff type",
+    ).ask()
+
+
+def process_genability(utility: Utility, output_folder: Path):
+    load_dotenv()
+    lse_id = _find_utility_lse_id(utility)
+    if lse_id is None:
+        return
+    customer_classes = _select_customer_classes()
+    tariff_types = _select_tariff_types()
+    tariff_ids = _select_tariffs(lse_id, customer_classes, tariff_types)
+    print(tariff_ids)

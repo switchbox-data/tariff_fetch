@@ -144,7 +144,7 @@ class UtilityRatesParams(TypedDict, total=False):
     """
 
 
-class UtilityRatesResponseItem(TypedDict, total=False):
+class UtilityRatesResponseItem(TypedDict):
     label: str
     "Page label"
     utility: str

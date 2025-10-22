@@ -90,3 +90,6 @@ openei:
 
 arcadia:
     uv run python -m tariff_fetch.genability.tariffs 2252
+
+cli:
+    uv run python -m tariff_fetch.cli
