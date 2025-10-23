@@ -33,6 +33,7 @@ class TariffsParams(TypedDict, total=False):
     lseId: int
     fields: Literal["min", "ext"]
     effectiveOn: datetime.date
+    masterTariffId: int
     customerClasses: list[CustomerClass]
     tariffTypes: list[TariffType]
     populateProperties: bool
