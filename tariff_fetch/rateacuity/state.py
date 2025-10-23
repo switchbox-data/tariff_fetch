@@ -33,12 +33,15 @@ import os
 from collections.abc import Sequence
 from pathlib import Path
 from time import sleep
+from typing import TypeVar
 
 import polars as pl
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
+
+from tariff_fetch.rateacuity.report_tables import SectionJson, sections_to_json
 
 from .base import ScrapingContext, create_context, login
 
@@ -64,6 +67,9 @@ class State:
     def _wait(self) -> WebDriverWait:
         """Create a wait helper bound to the current driver instance."""
         return WebDriverWait(self.driver, 10)
+
+
+S = TypeVar("S", bound=State)
 
 
 class LoginState(State):
@@ -96,83 +102,108 @@ class ElectricState(State):
             radio.click()
 
 
-class ElectricBenchmarkStateDropdown(State):
-    def _wait_for_element(self):
-        return self._wait().until(EC.presence_of_element_located((By.ID, "StateSelect")))
+class DropdownState(State):
+    """Shared behavior for dropdown-driven selections on the benchmark workflow."""
+
+    element_id: str
+
+    def _dropdown(self):
+        return self._wait().until(EC.presence_of_element_located((By.ID, self.element_id)))
+
+    def _visible_options(self) -> list[str]:
+        dropdown = self._dropdown()
+        return [option.text for option in dropdown.find_elements(By.TAG_NAME, "option")]
+
+    def _select(self, choice: str, *, category: str, next_state: S) -> S:
+        raw_options = self._visible_options()
+        normalized = {option.strip(): option for option in raw_options}
+        stripped_choice = choice.strip()
+
+        if choice in raw_options:
+            visible_choice = choice
+            normalized_choice = stripped_choice
+        elif stripped_choice in normalized:
+            visible_choice = normalized[stripped_choice]
+            normalized_choice = stripped_choice
+        else:
+            raise ValueError(f"{category} {choice} is invalid. Available options are: {list(normalized)}")
+
+        dropdown = self._dropdown()
+        select = Select(dropdown)
+        current = select.first_selected_option.text.strip() if select.first_selected_option else None
+        if current != normalized_choice:
+            logger.info(f"Selecting {category.lower()} {normalized_choice}")
+            select.select_by_visible_text(visible_choice)
+        return next_state
+
+
+class ElectricBenchmarkAllStateDropdown(DropdownState):
+    element_id = "StateSelect"
+
+    def get_states(self) -> list[str]:
+        return self._visible_options()
+
+    def select_state(self, state: str) -> ElectricBenchmarkAllUtilityDropdown:
+        return self._select(state, category="State", next_state=ElectricBenchmarkAllUtilityDropdown(self._context))
+
+
+class ElectricBenchmarkAllUtilityDropdown(ElectricBenchmarkAllStateDropdown):
+    element_id = "UtilitySelect"
+
+    def get_utilities(self) -> list[str]:
+        return self._visible_options()
+
+    def select_utility(self, utility: str) -> ElectricBenchmarkAllScheduleDropdown:
+        return self._select(utility, category="Utility", next_state=ElectricBenchmarkAllScheduleDropdown(self._context))
+
+
+class ElectricBenchmarkAllScheduleDropdown(ElectricBenchmarkAllUtilityDropdown):
+    element_id = "ScheduleSelect"
+
+    def get_schedules(self) -> list[str]:
+        return self._visible_options()
+
+
+class ElectricBenchmarkStateDropdown(DropdownState):
+    element_id = "StateSelect"
 
     def get_states(self) -> list[str]:
         """Return all available states visible in the State dropdown."""
-        dropdown = self._wait_for_element()
-        options = dropdown.find_elements(By.TAG_NAME, "option")
-        return [_.text for _ in options]
+        return self._visible_options()
 
     def select_state(self, state: str) -> ElectricBenchmarkUtilityDropdown:
         """Select the provided state and transition to the utility dropdown."""
-        dropdown = self._wait_for_element()
-        options = [_.text.strip() for _ in dropdown.find_elements(By.TAG_NAME, "option")]
-        if state not in options:
-            raise ValueError(f"State {state} is invalid. Available options are: {options}")
-        select = Select(dropdown)
-        current = select.first_selected_option.text.strip() if select.first_selected_option else None
-        if current != state:
-            logger.info(f"Selecting state {state}")
-            select.select_by_visible_text(state)
-        return ElectricBenchmarkUtilityDropdown(self._context)
+        return self._select(state, category="State", next_state=ElectricBenchmarkUtilityDropdown(self._context))
 
 
 class ElectricBenchmarkUtilityDropdown(ElectricBenchmarkStateDropdown):
-    def _wait_for_element(self):
-        return self._wait().until(EC.presence_of_element_located((By.ID, "UtilitySelect")))
+    element_id = "UtilitySelect"
 
     def get_utilities(self) -> list[str]:
         """Return all available utilities for the previously chosen state."""
-        dropdown = self._wait_for_element()
-        options = dropdown.find_elements(By.TAG_NAME, "option")
-        return [_.text for _ in options]
+        return self._visible_options()
 
-    def select_utility(self, utility: str):
+    def select_utility(self, utility: str) -> ElectricBenchmarkScheduleDropdown:
         """Select the provided utility and expose the schedule dropdown."""
-        dropdown = self._wait_for_element()
-        options = [_.text.strip() for _ in dropdown.find_elements(By.TAG_NAME, "option")]
-        if utility not in options:
-            raise ValueError(f"Utility {utility} is invalid. Available options are: {options}")
-        select = Select(dropdown)
-        current = select.first_selected_option.text.strip() if select.first_selected_option else None
-        if current != utility:
-            logger.info(f"Selecting utility {utility}")
-            select.select_by_visible_text(utility)
-        return ElectricBenchmarkScheduleDropdown(self._context)
+        return self._select(utility, category="Utility", next_state=ElectricBenchmarkScheduleDropdown(self._context))
 
 
 class ElectricBenchmarkScheduleDropdown(ElectricBenchmarkUtilityDropdown):
-    def _wait_for_element(self):
-        return self._wait().until(EC.presence_of_element_located((By.ID, "ScheduleSelect")))
+    element_id = "ScheduleSelect"
 
     def get_schedules(self) -> list[str]:
         """Return all schedules associated with the selected utility."""
-        dropdown = self._wait_for_element()
-        options = dropdown.find_elements(By.TAG_NAME, "option")
-        return [_.text for _ in options]
+        return self._visible_options()
 
-    def select_schedule(self, schedule: str):
+    def select_schedule(self, schedule: str) -> ElectricBenchmarkReport:
         """Select a schedule and produce a report interface that can fetch data."""
-        dropdown = self._wait_for_element()
-        options = [_.text.strip() for _ in dropdown.find_elements(By.TAG_NAME, "option")]
-        if schedule not in options:
-            raise ValueError(f"Schedule {schedule} is invalid. Available options are: {options}")
-        select = Select(dropdown)
-        current = select.first_selected_option.text.strip() if select.first_selected_option else None
-        if current != schedule:
-            logger.info(f"Selecting schedule {schedule}")
-            select.select_by_visible_text(schedule)
-        return ElectricBenchmarkReport(self._context)
+        return self._select(schedule, category="Schedule", next_state=ElectricBenchmarkReport(self._context))
 
 
-class ElectricBenchmarkReport(State):
-    def back_to_selections(self) -> ElectricBenchmarkScheduleDropdown:
-        """Return to the selections page so additional schedules can be fetched."""
+class ReportState(State):
+    def _back_to_selections(self, state: S) -> S:
         self._wait().until(EC.presence_of_element_located((By.LINK_TEXT, "Back To Selections"))).click()
-        return ElectricBenchmarkScheduleDropdown(self._context)
+        return state
 
     def download_excel(self, timeout: int = 20) -> Path:
         """Trigger the report download and return the path once it appears."""
@@ -187,6 +218,9 @@ class ElectricBenchmarkReport(State):
 
         filename = next(iter(_get_xlsx(download_path) ^ initial_state))
         return Path(download_path, filename)
+
+    def as_sections(self) -> list[SectionJson]:
+        return sections_to_json(self._context.driver)
 
     def as_dataframe(self, timeout: int = 20) -> pl.DataFrame:
         """Convert a freshly downloaded Excel report into a cleaned Polars dataframe."""
@@ -204,6 +238,12 @@ class ElectricBenchmarkReport(State):
         df = df.filter(pl.col(df.columns[0]).is_not_null() & pl.col(df.columns[1]).is_not_null())
         filepath.unlink()
         return df
+
+
+class ElectricBenchmarkReport(ReportState):
+    def back_to_selections(self) -> ElectricBenchmarkScheduleDropdown:
+        """Return to the selections page so additional schedules can be fetched."""
+        return self._back_to_selections(ElectricBenchmarkScheduleDropdown(self._context))
 
 
 def _get_xlsx(folder) -> set[str]:

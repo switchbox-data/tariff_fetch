@@ -1,7 +1,7 @@
+import json
 import os
 from pathlib import Path
 
-import polars as pl
 import questionary
 import tenacity
 from dotenv import load_dotenv
@@ -23,7 +23,7 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
 
     selected_utility = None
     tariffs_to_include = None
-    frames = []
+    results = []
 
     for attempt in tenacity.Retrying(
         stop=tenacity.stop_after_attempt(3), retry=tenacity.retry_if_exception_type(WebDriverException)
@@ -70,15 +70,12 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
                     tariff = tariffs_to_include.pop(0)
                     console.log(f"Fetching {tariff}")
                     scraping_state = scraping_state.select_schedule(tariff)
-                    df = scraping_state.as_dataframe()
-                    df = df.with_columns(pl.lit(tariff).alias("Schedule"))
-                    df = df.select(["Schedule", *[name for name in df.columns if name != "Schedule"]])
-                    frames.append(df)
+                    sections = scraping_state.as_sections()
+                    results.append({"schedule": tariff, "sections": sections})
                     scraping_state = scraping_state.back_to_selections()
 
     assert selected_utility
     suggested_filename = f"rateacuity_{selected_utility}"
-    filename = prompt_filename(output_folder, suggested_filename, "csv")
+    filename = prompt_filename(output_folder, suggested_filename, "json")
     filename.parent.mkdir(exist_ok=True)
-    combined_df = pl.concat(frames, how="diagonal_relaxed", rechunk=True) if frames else pl.DataFrame()
-    combined_df.write_csv(filename)
+    filename.write_text(json.dumps(results, indent=2))
