@@ -87,12 +87,7 @@ class PortalState(State):
         return ElectricState(self._context)
 
 
-class ElectricState(State):
-    def benchmark(self) -> ElectricBenchmarkStateDropdown:
-        """Switch the Electric report type to Benchmark and expose the state dropdown."""
-        self._select_report("benchmark")
-        return ElectricBenchmarkStateDropdown(self._context)
-
+class SelectReportState(State):
     def _select_report(self, report: str):
         """Click the given radio report selector if it is not already active."""
         radio = self._wait().until(
@@ -100,6 +95,17 @@ class ElectricState(State):
         )
         if not radio.is_selected():
             radio.click()
+
+
+class ElectricState(SelectReportState):
+    def benchmark(self) -> ElectricBenchmarkStateDropdown:
+        """Switch the Electric report type to Benchmark and expose the state dropdown."""
+        self._select_report("benchmark")
+        return ElectricBenchmarkStateDropdown(self._context)
+
+    def benchmark_all(self) -> ElectricBenchmarkAllStateDropdown:
+        self._select_report("benchall")
+        return ElectricBenchmarkAllStateDropdown(self._context)
 
 
 class DropdownState(State):
@@ -162,6 +168,10 @@ class ElectricBenchmarkAllScheduleDropdown(ElectricBenchmarkAllUtilityDropdown):
 
     def get_schedules(self) -> list[str]:
         return self._visible_options()
+
+    def select_schedule(self, schedule: str) -> ElectricBenchmarkAllReport:
+        """Select a schedule and produce a report interface that can fetch data."""
+        return self._select(schedule, category="Schedule", next_state=ElectricBenchmarkReport(self._context))
 
 
 class ElectricBenchmarkStateDropdown(DropdownState):
@@ -244,6 +254,12 @@ class ElectricBenchmarkReport(ReportState):
     def back_to_selections(self) -> ElectricBenchmarkScheduleDropdown:
         """Return to the selections page so additional schedules can be fetched."""
         return self._back_to_selections(ElectricBenchmarkScheduleDropdown(self._context))
+
+
+class ElectricBenchmarkAllReport(ReportState):
+    def back_to_selections(self) -> ElectricBenchmarkAllScheduleDropdown:
+        """Return to the selections page so additional schedules can be fetched."""
+        return self._back_to_selections(ElectricBenchmarkAllScheduleDropdown(self._context))
 
 
 def _get_xlsx(folder) -> set[str]:

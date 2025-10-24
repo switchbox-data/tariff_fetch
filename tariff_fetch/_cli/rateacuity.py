@@ -31,7 +31,7 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
         with attempt, create_context() as context:
             with console.status("Fetching list of utilities..."):
                 scraping_state = (
-                    LoginState(context).login(username, password).electric().benchmark().select_state(state.upper())
+                    LoginState(context).login(username, password).electric().benchmark_all().select_state(state.upper())
                 )
                 utilities = [_ for _ in scraping_state.get_utilities() if _]
 
