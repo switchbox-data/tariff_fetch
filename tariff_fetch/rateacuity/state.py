@@ -86,6 +86,11 @@ class PortalState(State):
         self.driver.get("https://secure.rateacuity.com/RateAcuity/ElecEntry/IndexViews")
         return ElectricState(self._context)
 
+    def gas(self) -> GasState:
+        logger.info("Going to gas")
+        self.driver.get("https://secure.rateacuity.com/RateAcuityGasReports/ViewData")
+        return GasState(self._context)
+
 
 class SelectReportState(State):
     def _select_report(self, report: str):
@@ -106,6 +111,12 @@ class ElectricState(SelectReportState):
     def benchmark_all(self) -> ElectricBenchmarkAllStateDropdown:
         self._select_report("benchall")
         return ElectricBenchmarkAllStateDropdown(self._context)
+
+
+class GasState(SelectReportState):
+    def benchmark_all(self) -> GasBenchmarkAllStateDropDown:
+        self._select_report("benchall")
+        return GasBenchmarkAllStateDropDown(self._context)
 
 
 class DropdownState(State):
@@ -141,6 +152,37 @@ class DropdownState(State):
             logger.info(f"Selecting {category.lower()} {normalized_choice}")
             select.select_by_visible_text(visible_choice)
         return next_state
+
+
+class GasBenchmarkAllStateDropDown(DropdownState):
+    element_id = "StateSelect"
+
+    def get_states(self) -> list[str]:
+        return self._visible_options()
+
+    def select_state(self, state: str) -> GasBenchmarkAllUtiltyDropdown:
+        return self._select(state, category="State", next_state=GasBenchmarkAllUtiltyDropdown(self._context))
+
+
+class GasBenchmarkAllUtiltyDropdown(GasBenchmarkAllStateDropDown):
+    element_id = "UtilitySelect"
+
+    def get_utilities(self) -> list[str]:
+        return self._visible_options()
+
+    def select_utility(self, utility: str) -> GasBenchmarkAllScheduleDropdown:
+        return self._select(utility, category="Utility", next_state=GasBenchmarkAllScheduleDropdown(self._context))
+
+
+class GasBenchmarkAllScheduleDropdown(GasBenchmarkAllUtiltyDropdown):
+    element_id = "ScheduleSelect"
+
+    def get_schedules(self) -> list[str]:
+        return self._visible_options()
+
+    def select_schedule(self, schedule: str) -> GasBenchmarkAllReport:
+        """Select a schedule and produce a report interface that can fetch data."""
+        return self._select(schedule, category="Schedule", next_state=GasBenchmarkAllReport(self._context))
 
 
 class ElectricBenchmarkAllStateDropdown(DropdownState):
@@ -260,6 +302,12 @@ class ElectricBenchmarkAllReport(ReportState):
     def back_to_selections(self) -> ElectricBenchmarkAllScheduleDropdown:
         """Return to the selections page so additional schedules can be fetched."""
         return self._back_to_selections(ElectricBenchmarkAllScheduleDropdown(self._context))
+
+
+class GasBenchmarkAllReport(ReportState):
+    def back_to_selections(self) -> GasBenchmarkAllScheduleDropdown:
+        """Return to the selections page so additional schedules can be fetched."""
+        return self._back_to_selections(GasBenchmarkAllScheduleDropdown(self._context))
 
 
 def _get_xlsx(folder) -> set[str]:
