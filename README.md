@@ -1,6 +1,6 @@
 # Tariff Fetch
 
-The project provides a CLI tool that retrieves electric utility tariff data from multiple providers.
+The project provides a CLI tool that retrieves electric and gas utility tariff data from multiple providers.
 
 ## Requirements
 - Python 3.11+
@@ -52,6 +52,20 @@ Options:
 
 Omitted options will trigger interactive prompts.
 
+### Gas benchmark CLI
+
+RateAcuity natural gas benchmarks use a separate entry point:
+
+```bash
+uv run python -m tariff_fetch.cli_gas [OPTIONS]
+```
+
+`just cligas` runs the same command.
+
+Options:
+- `--state` / `-s`: two-letter state abbreviation (default: prompt)
+- `--output-folder` / `-o`: directory for exports (default: `./outputs`)
+
 ### Examples
 
 ```bash
@@ -72,5 +86,6 @@ can accept or override them.
 ## Provider notes
 - **Genability**: choose customer classes and tariff types before selecting tariffs. Requires Arcadia credentials.
 - **OpenEI**: pick the sector and detail level, then select the returned tariffs. Requires `OPENEI_API_KEY`.
-- **RateAcuity**: Selenium session that logs in, picks a state, utility, and schedules. Stores the scraped sections as
+- **RateAcuity (electric)**: Selenium session that logs in, picks a state, utility, and schedules. Stores the scraped sections as
   JSON. A failure produces `selenium_error.png` for inspection.
+- **RateAcuity (gas)**: Uses the gas benchmark workflow and exports the selected schedules in the same JSON format. Credentials are identical to the electric flow.
