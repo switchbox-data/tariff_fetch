@@ -93,3 +93,6 @@ arcadia:
 
 cli:
     uv run python -m tariff_fetch.cli
+
+cligas:
+    uv run python -m tariff_fetch.cli_gas
