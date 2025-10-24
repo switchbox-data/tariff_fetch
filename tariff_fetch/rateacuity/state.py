@@ -171,7 +171,7 @@ class ElectricBenchmarkAllScheduleDropdown(ElectricBenchmarkAllUtilityDropdown):
 
     def select_schedule(self, schedule: str) -> ElectricBenchmarkAllReport:
         """Select a schedule and produce a report interface that can fetch data."""
-        return self._select(schedule, category="Schedule", next_state=ElectricBenchmarkReport(self._context))
+        return self._select(schedule, category="Schedule", next_state=ElectricBenchmarkAllReport(self._context))
 
 
 class ElectricBenchmarkStateDropdown(DropdownState):
