@@ -65,6 +65,11 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
                     validate=lambda _: bool(_) or "Select at least one tariff",
                 ).ask()
 
+            if not tariffs_to_include:
+                console.print("[red]No tariffs selected[/]")
+                console.input("Press enter to proceed...")
+                return
+
             with console.status("Fetching tariffs..."):
                 while tariffs_to_include:
                     tariff = tariffs_to_include.pop(0)

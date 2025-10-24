@@ -61,7 +61,15 @@ def process_openei(utility: Utility, output_folder: Path):
     sector = _prompt_sector()
     detail_level = _prompt_detail_level()
     tariffs = _get_tariffs(utility.eia_id, sector, detail_level)
+    if not tariffs:
+        console.print("[red]No tariffs found[/]")
+        console.input("Press enter to proceed...")
+        return
     tariffs = _prompt_tariffs(tariffs)
+    if not tariffs:
+        console.print("[red]No tariffs selected[/]")
+        console.input("Press enter to proceed...")
+        return
 
     suggested_filename = f"openei_{utility.name}_{sector}_{detail_level}"
     filepath = prompt_filename(output_folder, suggested_filename, "json")

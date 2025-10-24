@@ -30,9 +30,7 @@ def _find_utility_lse_id(utility: Utility) -> int | None:
     if len(lses) == 1:
         # Found one utility
         utility_lse_id = lses[0]["lseId"]
-        utility_lse_name = lses[0]["name"]
-        proceed = questionary.confirm(f"Found utility with EIA Id={utility.eia_id}: {utility_lse_name}. Proceed?").ask()
-        return utility_lse_id if proceed else None
+        return utility_lse_id
     else:
         # Nothing found; this should *theoretically* never happen but let's keep it just in case
         choices = [questionary.Choice(title=_["name"], value=_["lseId"]) for _ in lses]
@@ -60,6 +58,8 @@ def _select_tariffs(
                 tariffTypes=tariff_types,
             )
         )
+    if not tariffs:
+        return []
     return questionary.checkbox(
         message="Select tariffs",
         choices=[
@@ -118,10 +118,15 @@ def process_genability(utility: Utility, output_folder: Path):
     load_dotenv()
     lse_id = _find_utility_lse_id(utility)
     if lse_id is None:
+        console.input("Press enter to proceed...")
         return
     customer_classes = _select_customer_classes()
     tariff_types = _select_tariff_types()
     tariffs = _select_tariffs(lse_id, customer_classes, tariff_types)
+    if not tariffs:
+        console.print("[red]No tariffs found[/]")
+        console.input("Press enter to proceed...")
+        return
     results = _fetch_tariffs(tariffs)
     suggested_filename = f"arcadia_{utility.name}"
     filename = prompt_filename(output_folder, suggested_filename, "json")

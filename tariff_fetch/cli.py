@@ -9,7 +9,7 @@ from rich.prompt import Prompt
 from tariff_fetch._cli.genability import process_genability
 from tariff_fetch._cli.openei import process_openei
 from tariff_fetch._cli.rateacuity import process_rateacuity
-from tariff_fetch.openeia import Core_PUDL_ASSN_EIA_PUDL_UTILITIES, CoreEIA861_ASSN_UTILITY
+from tariff_fetch.openeia import CORE_EIA861_Yearly_Sales
 
 from ._cli import console
 from ._cli.types import Provider, StateCode, Utility
@@ -35,30 +35,46 @@ def prompt_providers() -> list[Provider]:
 
 def prompt_utility(state: str) -> Utility:
     with console.status("Fetching utilities..."):
-        eia861_df = (
-            pl.read_parquet(CoreEIA861_ASSN_UTILITY.https)
+        yearly_sales_df = (
+            pl.read_parquet(CORE_EIA861_Yearly_Sales.https)
             .filter(pl.col("state") == state.upper())
             .filter(pl.col("report_date") == pl.col("report_date").max().over("utility_id_eia"))
-            .group_by(pl.col("utility_id_eia"))
-            .agg(pl.col("report_date"))
-        )
-        eiaids_in_state = [_[0] for _ in eia861_df.iter_rows()]
-
-        utilities_df = pl.read_parquet(Core_PUDL_ASSN_EIA_PUDL_UTILITIES.https).filter(
-            pl.col("utility_id_eia").is_in(eiaids_in_state)
-        )
-
-        utilities = [
-            Utility(
-                row["utility_id_eia"],
-                row["utility_name_eia"],
+            .group_by("utility_id_eia")
+            .agg(
+                pl.col("utility_name_eia").last().alias("utility_name"),
+                pl.col("business_model").last().alias("business_model"),
+                pl.col("sales_mwh").sum().alias("sales_mwh"),
+                pl.col("sales_revenue").sum().alias("sales_revenue"),
+                pl.col("customers").sum().alias("customers"),
             )
-            for row in utilities_df.iter_rows(named=True)
-        ]
+            .sort("utility_name")
+        )
+
+    def fmt_number(value: float | int | None) -> str:
+        if value is None:
+            return "-"
+        return f"{value:,.0f}"
+
+    header = questionary.Separator(
+        "Utility Name                                 | Model        |  Sales (MWh) | Revenue ($) | Customers",
+    )
+
+    def build_choice(row: dict) -> questionary.Choice:
+        business_model_raw = row.get("business_model") or "-"
+        name_col = f"{row['utility_name']:<44}"
+        model_col = f"{business_model_raw:<12}"
+        sales_col = f"{fmt_number(row.get('sales_mwh')):>12}"
+        revenue_col = f"{fmt_number(row.get('sales_revenue')):>11}"
+        customers_col = f"{fmt_number(row.get('customers')):>9}"
+        title = f"{name_col} | {model_col} | {sales_col} | {revenue_col} | {customers_col}"
+        return questionary.Choice(
+            title=title,
+            value=Utility(eia_id=row["utility_id_eia"], name=row["utility_name"]),
+        )
 
     return questionary.select(
         message="Select a utility",
-        choices=[questionary.Choice(title=utility.name, value=utility) for utility in utilities],
+        choices=[header, *[build_choice(row) for row in yearly_sales_df.iter_rows(named=True)]],
         use_search_filter=True,
         use_jk_keys=False,
         use_shortcuts=False,
@@ -83,13 +99,13 @@ def main(
     if (utility := prompt_utility(state_)) is None:
         return
     if Provider.GENABILITY in providers_:
-        console.print("Processing Genability")
+        console.print("Processing [blue]Genability[/]")
         process_genability(utility=utility, output_folder=output_folder_)
     if Provider.OPENEI in providers_:
-        console.print("Processing OpenEI")
+        console.print("Processing [blue]OpenEI[/]")
         process_openei(utility, output_folder_)
     if Provider.RATEACUITY in providers_:
-        console.print("Processing RateAcuity")
+        console.print("Processing [blue]RateAcuity[/]")
         process_rateacuity(output_folder_, state_, utility)
 
 
