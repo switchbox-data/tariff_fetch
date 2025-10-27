@@ -14,6 +14,9 @@ from tariff_fetch.openeia import CORE_EIA861_Yearly_Sales
 from ._cli import console
 from ._cli.types import Provider, StateCode, Utility
 
+ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
+ENTITY_TYPES_EXCLUDE = ["Retail Power Marketer"]
+
 
 def prompt_state() -> StateCode:
     choice = Prompt.ask(
@@ -39,15 +42,27 @@ def prompt_utility(state: str) -> Utility:
             pl.read_parquet(CORE_EIA861_Yearly_Sales.https)
             .filter(pl.col("state") == state.upper())
             .filter(pl.col("report_date") == pl.col("report_date").max().over("utility_id_eia"))
+            .filter(pl.col("entity_type").is_in(ENTITY_TYPES_EXCLUDE).not_())
             .group_by("utility_id_eia")
             .agg(
                 pl.col("utility_name_eia").last().alias("utility_name"),
                 pl.col("business_model").last().alias("business_model"),
-                pl.col("sales_mwh").sum().alias("sales_mwh"),
+                pl.col("sales_mwh").filter(pl.col("customer_class") == "residential").sum().alias("sales_mwh"),
                 pl.col("sales_revenue").sum().alias("sales_revenue"),
-                pl.col("customers").sum().alias("customers"),
+                pl.col("customers").filter(pl.col("customer_class") == "residential").sum().alias("customers"),
+                pl.col("entity_type").last().alias("entity_type"),
             )
-            .sort("utility_name")
+            .sort(["entity_type", "utility_name"])
+        )
+
+        rows = list(yearly_sales_df.iter_rows(named=True))
+        rows.sort(
+            key=lambda _: (
+                ENTITY_TYPES_SORTORDER.index(_["entity_type"])
+                if _["entity_type"] in ENTITY_TYPES_SORTORDER
+                else abs(hash(_["entity_type"])) + 4,
+                _["utility_name"],
+            )
         )
 
     def fmt_number(value: float | int | None) -> str:
@@ -55,30 +70,33 @@ def prompt_utility(state: str) -> Utility:
             return "-"
         return f"{value:,.0f}"
 
-    header = questionary.Separator(
-        "Utility Name                                 | Model        |  Sales (MWh) | Revenue ($) | Customers",
+    header = questionary.Choice(
+        "Utility Name                                 | Entity Type        | Sales (MWh)  | Revenue ($) | Customers",
+        value=0,
     )
 
     def build_choice(row: dict) -> questionary.Choice:
-        business_model_raw = row.get("business_model") or "-"
         name_col = f"{row['utility_name']:<44}"
-        model_col = f"{business_model_raw:<12}"
+        entity_type = f"{(row['entity_type'] or '-')[:18]:<18}"
         sales_col = f"{fmt_number(row.get('sales_mwh')):>12}"
         revenue_col = f"{fmt_number(row.get('sales_revenue')):>11}"
         customers_col = f"{fmt_number(row.get('customers')):>9}"
-        title = f"{name_col} | {model_col} | {sales_col} | {revenue_col} | {customers_col}"
+        title = f"{name_col} | {entity_type} | {sales_col} | {revenue_col} | {customers_col}"
         return questionary.Choice(
             title=title,
             value=Utility(eia_id=row["utility_id_eia"], name=row["utility_name"]),
         )
 
-    return questionary.select(
-        message="Select a utility",
-        choices=[header, *[build_choice(row) for row in yearly_sales_df.iter_rows(named=True)]],
-        use_search_filter=True,
-        use_jk_keys=False,
-        use_shortcuts=False,
-    ).ask()
+    result = 0
+    while result == 0:
+        result = questionary.select(
+            message="Select a utility",
+            choices=[header, *[build_choice(row) for row in rows]],
+            use_search_filter=True,
+            use_jk_keys=False,
+            use_shortcuts=False,
+        ).ask()
+    return result
 
 
 def main(
