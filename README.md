@@ -83,10 +83,10 @@ Omitted options will trigger interactive prompts.
 
 ```bash
 # Fully interactive run
-uv run python -m tariff_fetch.cli
+uv run tariff-fetch
 
 # Scripted run for Genability and OpenEI
-uv run python -m tariff_fetch.cli \
+uv run tariff-fetch.cli \
   --state ca \
   --providers genability \
   --providers openei \
