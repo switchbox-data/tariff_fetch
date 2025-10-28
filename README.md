@@ -72,22 +72,12 @@ just cli
 just cligas
 ```
 
-Options:
+Options (only for electricity benchmarks):
 - `--state` / `-s`: two-letter state abbreviation (default: prompt)
 - `--providers` / `-p`: repeat per provider (`genability`, `openei`, `rateacuity`)
 - `--output-folder` / `-o`: directory for exports (default: `./outputs`)
 
 Omitted options will trigger interactive prompts.
-
-### Gas benchmark CLI
-
-RateAcuity natural gas benchmarks use a separate entry point:
-
-```bash
-uv run python -m tariff_fetch.cli_gas [OPTIONS]
-```
-
-`just cligas` runs the same command.
 
 Options:
 - `--state` / `-s`: two-letter state abbreviation (default: prompt)
