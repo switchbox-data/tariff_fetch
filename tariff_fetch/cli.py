@@ -43,6 +43,7 @@ def prompt_utility(state: str) -> Utility:
             pl.read_parquet(CORE_EIA861_Yearly_Sales.https)
             .filter(pl.col("state") == state.upper())
             .filter(pl.col("report_date") == pl.col("report_date").max().over("utility_id_eia"))
+            .filter(pl.col("entity_type").is_in(ENTITY_TYPES_SORTORDER))
             .group_by("utility_id_eia")
             .agg(
                 pl.col("utility_name_eia").last().alias("utility_name"),
