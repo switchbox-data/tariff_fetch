@@ -40,8 +40,8 @@ RATEACUITY_PASSWORD=...
 ## Running the CLI
 
 ```bash
-python -m tariff-fetch.cli [OPTIONS]
-python -m tariff-fetch.cli_gas [OPTIONS]
+python -m tariff_fetch.cli [OPTIONS]
+python -m tariff_fetch.cli_gas [OPTIONS]
 ```
 
 With uv:
