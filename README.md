@@ -10,6 +10,18 @@ The project provides a CLI tool that retrieves electric and gas utility tariff d
   - `RATEACUITY_USERNAME` and `RATEACUITY_PASSWORD`
 - Google Chrome or Chromium installed locally (for RateAcuity)
 
+## Configuration
+
+Populate a `.env` file (or export the variables manually). Only set the values you need.
+
+```
+ARCADIA_APP_ID=...
+ARCADIA_APP_KEY=...
+OPENEI_API_KEY=...
+RATEACUITY_USERNAME=...
+RATEACUITY_PASSWORD=...
+```
+
 ## Running CLI with uvx
 
 If you have [uv](https://github.com/astral-sh/uv/releases) installed, you can run the cli simply with
@@ -37,18 +49,6 @@ Alternative using plain `pip`:
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
-```
-
-## Configuration
-
-Populate a `.env` file (or export the variables manually). Only set the values you need.
-
-```
-ARCADIA_APP_ID=...
-ARCADIA_APP_KEY=...
-OPENEI_API_KEY=...
-RATEACUITY_USERNAME=...
-RATEACUITY_PASSWORD=...
 ```
 
 ## Running the CLI
