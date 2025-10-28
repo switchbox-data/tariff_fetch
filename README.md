@@ -10,6 +10,20 @@ The project provides a CLI tool that retrieves electric and gas utility tariff d
   - `RATEACUITY_USERNAME` and `RATEACUITY_PASSWORD`
 - Google Chrome or Chromium installed locally (for RateAcuity)
 
+## Running CLI with uvx
+
+If you have (https://github.com/astral-sh/uv/releases)[uv] installed, you can run the cli simply with
+
+```bash
+uvx --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch
+```
+
+Or, for gas tariffs:
+
+```bash
+uvx --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch-gas
+```
+
 ## Installation
 
 ```bash
