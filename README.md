@@ -40,10 +40,23 @@ RATEACUITY_PASSWORD=...
 ## Running the CLI
 
 ```bash
-uv run python -m tariff_fetch.cli [OPTIONS]
+python -m tariff-fetch.cli [OPTIONS]
+python -m tariff-fetch.cli_gas [OPTIONS]
 ```
 
-`just cli` runs the same command if you use the supplied Justfile.
+With uv:
+
+```bash
+uv run tariff-fetch [OPTIONS]
+uv run tariff-fetch-gas [OPTIONS]
+```
+
+With Just:
+
+```bash
+just cli
+just cligas
+```
 
 Options:
 - `--state` / `-s`: two-letter state abbreviation (default: prompt)

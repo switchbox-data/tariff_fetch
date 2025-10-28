@@ -149,5 +149,9 @@ def main(
             )
 
 
-if __name__ == "__main__":
+def main_cli():
     typer.run(main)
+
+
+if __name__ == "__main__":
+    main_cli()
