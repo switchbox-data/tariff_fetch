@@ -12,7 +12,7 @@ The project provides a CLI tool that retrieves electric and gas utility tariff d
 
 ## Running CLI with uvx
 
-If you have (https://github.com/astral-sh/uv/releases)[uv] installed, you can run the cli simply with
+If you have [uv](https://github.com/astral-sh/uv/releases) installed, you can run the cli simply with
 
 ```bash
 uvx --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch
