@@ -6,7 +6,6 @@ class Provider(str, Enum):
     GENABILITY = "Genability"
     OPENEI = "OpenEI"
     RATEACUITY = "RateAcuity"
-    PUDL = "PUDL"
 
 
 class StateCode(str, Enum):

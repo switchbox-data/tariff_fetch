@@ -15,6 +15,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 logger = logging.getLogger(__name__)
 
 
+class AuthorizationError(Exception):
+    pass
+
+
 class ScrapingContext(NamedTuple):
     driver: webdriver.Chrome
     download_path: str

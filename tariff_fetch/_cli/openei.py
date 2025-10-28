@@ -58,8 +58,16 @@ def _prompt_tariffs(tariffs: list[UtilityRatesResponseItem]) -> list[UtilityRate
 
 def process_openei(utility: Utility, output_folder: Path):
     load_dotenv()
-    sector = _prompt_sector()
-    detail_level = _prompt_detail_level()
+    if not os.getenv("OPENEI_API_KEY"):
+        console.print("[b]OPENEI_API_KEY[/] environment variable is not set")
+        console.print("Cannot use OpenEI API due to missing credentials")
+        console.input("Press enter to proceed...")
+        return
+
+    if not (sector := _prompt_sector()):
+        return
+    if not (detail_level := _prompt_detail_level()):
+        return
     tariffs = _get_tariffs(utility.eia_id, sector, detail_level)
     if not tariffs:
         console.print("[red]No tariffs found[/]")
@@ -72,7 +80,9 @@ def process_openei(utility: Utility, output_folder: Path):
         return
 
     suggested_filename = f"openei_{utility.name}_{sector}_{detail_level}"
-    filepath = prompt_filename(output_folder, suggested_filename, "json")
+    if not (filepath := prompt_filename(output_folder, suggested_filename, "json")):
+        return
+
     filepath.parent.mkdir(exist_ok=True)
     print(filepath)
     filepath.write_text(json.dumps(tariffs, indent=2))

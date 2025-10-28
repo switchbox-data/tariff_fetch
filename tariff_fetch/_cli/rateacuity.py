@@ -17,9 +17,13 @@ from . import console, prompt_filename
 def process_rateacuity_gas(output_folder: Path, state: str):
     load_dotenv()
     if not (username := os.getenv("RATEACUITY_USERNAME")):
-        raise ValueError("RATEACUITY_USERNAME variable is not set")
+        console.print("[b]RATEACUITY_USERNAME[/] environment variable is not set")
     if not (password := os.getenv("RATEACUITY_PASSWORD")):
-        raise ValueError("RATEACUITY_PASSWORD variable is not set")
+        console.print("[b]RATEACUITY_PASSWORD[/] environment variable is not set")
+    if not (username and password):
+        console.print("Cannot use RateAcuity due to missing credentials")
+        console.input("Press enter to proceed...")
+        return
 
     selected_utility = None
     tariffs_to_include = None
@@ -47,7 +51,6 @@ def process_rateacuity_gas(output_folder: Path, state: str):
                     use_shortcuts=False,
                 ).ask()
                 if not selected_utility:
-                    console.print("[red]cancelled[/]")
                     return
 
             with console.status("Fetching list of tariffs..."):
@@ -87,9 +90,13 @@ def process_rateacuity_gas(output_folder: Path, state: str):
 def process_rateacuity(output_folder: Path, state: str, utility: Utility):
     load_dotenv()
     if not (username := os.getenv("RATEACUITY_USERNAME")):
-        raise ValueError("RATEACUITY_USERNAME variable is not set")
+        console.print("[b]RATEACUITY_USERNAME[/] environment variable is not set")
     if not (password := os.getenv("RATEACUITY_PASSWORD")):
-        raise ValueError("RATEACUITY_PASSWORD variable is not set")
+        console.print("[b]RATEACUITY_PASSWORD[/] environment variable is not set")
+    if not (username and password):
+        console.print("Cannot use RateAcuity due to missing credentials")
+        console.input("Press enter to proceed...")
+        return
 
     selected_utility = None
     tariffs_to_include = None
@@ -120,7 +127,7 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
                         use_shortcuts=False,
                     ).ask()
                 if not selected_utility:
-                    console.print("[red]cancelled[/]")
+                    return
 
             with console.status("Fetching list of tariffs..."):
                 scraping_state = scraping_state.select_utility(selected_utility)
@@ -151,6 +158,7 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
 
     assert selected_utility
     suggested_filename = f"rateacuity_{selected_utility}"
-    filename = prompt_filename(output_folder, suggested_filename, "json")
+    if not (filename := prompt_filename(output_folder, suggested_filename, "json")):
+        return
     filename.parent.mkdir(exist_ok=True)
     filename.write_text(json.dumps(results, indent=2))

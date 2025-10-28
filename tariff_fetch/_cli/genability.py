@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -116,20 +117,36 @@ def _fetch_tariffs(tariffs: list[tuple[str, int]]):
 
 def process_genability(utility: Utility, output_folder: Path):
     load_dotenv()
-    lse_id = _find_utility_lse_id(utility)
-    if lse_id is None:
+    if not os.getenv("ARCADIA_APP_ID"):
+        console.print("[b]ARCADIA_APP_ID[/] environment variable is not set.")
+    if not os.getenv("ARCADIA_APP_KEY"):
+        console.print("[b]ARCADIA_APP_KEY[/] environment variable is not set.")
+    if not (os.getenv("ARCADIA_APP_ID") and os.getenv("ARCADIA_APP_KEY")):
+        console.print("Cannot use Arcadia API due to missing credentials")
         console.input("Press enter to proceed...")
         return
-    customer_classes = _select_customer_classes()
-    tariff_types = _select_tariff_types()
-    tariffs = _select_tariffs(lse_id, customer_classes, tariff_types)
-    if not tariffs:
+
+    lse_id = _find_utility_lse_id(utility)
+    if lse_id is None:
+        return
+
+    if not (customer_classes := _select_customer_classes()):
+        return
+
+    if not (tariff_types := _select_tariff_types()):
+        return
+
+    if not (tariffs := _select_tariffs(lse_id, customer_classes, tariff_types)):
         console.print("[red]No tariffs found[/]")
         console.input("Press enter to proceed...")
         return
+
     results = _fetch_tariffs(tariffs)
     suggested_filename = f"arcadia_{utility.name}"
-    filename = prompt_filename(output_folder, suggested_filename, "json")
+
+    if not (filename := prompt_filename(output_folder, suggested_filename, "json")):
+        return
+
     filename.parent.mkdir(exist_ok=True)
     filename.write_text(json.dumps(results, indent=2))
     console.print(f"Wrote [blue]{len(results)}[/] records to {filename}")

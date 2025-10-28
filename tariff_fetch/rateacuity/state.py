@@ -36,6 +36,7 @@ from time import sleep
 from typing import TypeVar
 
 import polars as pl
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -43,7 +44,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from tariff_fetch.rateacuity.report_tables import SectionJson, sections_to_json
 
-from .base import ScrapingContext, create_context, login
+from .base import AuthorizationError, ScrapingContext, create_context, login
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +77,10 @@ class LoginState(State):
     def login(self, username: str, password: str) -> PortalState:
         """Authenticate with RateAcuity and transition into the portal state."""
         login(self._context.driver, username, password)
+        try:
+            self._wait().until(EC.presence_of_element_located((By.XPATH, '//a[@class="username"]')))
+        except TimeoutException:
+            raise AuthorizationError() from None
         return PortalState(self._context)
 
 

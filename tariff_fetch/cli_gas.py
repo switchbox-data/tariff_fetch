@@ -1,10 +1,12 @@
 from pathlib import Path
 from typing import Annotated
 
+import rich
 import typer
 from rich.prompt import Prompt
 
 from tariff_fetch._cli.rateacuity import process_rateacuity_gas
+from tariff_fetch.rateacuity.base import AuthorizationError
 
 from ._cli.types import StateCode
 
@@ -31,7 +33,13 @@ def main(
     if (state_ := (state or prompt_state()).value) is None:
         return
     output_folder_ = Path(output_folder)
-    process_rateacuity_gas(output_folder_, state_)
+    try:
+        process_rateacuity_gas(output_folder_, state_)
+    except AuthorizationError:
+        rich.print("Authorization failed")
+        rich.print(
+            "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
+        )
 
 
 if __name__ == "__main__":

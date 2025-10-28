@@ -4,12 +4,14 @@ from typing import Annotated
 import polars as pl
 import questionary
 import typer
+from requests import HTTPError
 from rich.prompt import Prompt
 
 from tariff_fetch._cli.genability import process_genability
 from tariff_fetch._cli.openei import process_openei
 from tariff_fetch._cli.rateacuity import process_rateacuity
 from tariff_fetch.openeia import CORE_EIA861_Yearly_Sales
+from tariff_fetch.rateacuity.base import AuthorizationError
 
 from ._cli import console
 from ._cli.types import Provider, StateCode, Utility
@@ -118,13 +120,35 @@ def main(
         return
     if Provider.GENABILITY in providers_:
         console.print("Processing [blue]Genability[/]")
-        process_genability(utility=utility, output_folder=output_folder_)
+        try:
+            process_genability(utility=utility, output_folder=output_folder_)
+        except HTTPError as e:
+            if e.response.status_code == 401:
+                console.print("Authorization failed")
+                console.print(
+                    "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
+                )
+            else:
+                raise e from None
     if Provider.OPENEI in providers_:
         console.print("Processing [blue]OpenEI[/]")
-        process_openei(utility, output_folder_)
+        try:
+            process_openei(utility, output_folder_)
+        except HTTPError as e:
+            if e.response.status_code == 403:
+                console.print("Authorization failed")
+                console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
+            else:
+                raise e from None
     if Provider.RATEACUITY in providers_:
         console.print("Processing [blue]RateAcuity[/]")
-        process_rateacuity(output_folder_, state_, utility)
+        try:
+            process_rateacuity(output_folder_, state_, utility)
+        except AuthorizationError:
+            console.print("Authorization failed")
+            console.print(
+                "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
+            )
 
 
 if __name__ == "__main__":
