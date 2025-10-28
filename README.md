@@ -72,16 +72,12 @@ just cli
 just cligas
 ```
 
-Options (only for electricity benchmarks):
+Options:
 - `--state` / `-s`: two-letter state abbreviation (default: prompt)
-- `--providers` / `-p`: repeat per provider (`genability`, `openei`, `rateacuity`)
+- `--providers` / `-p`: (only for electricity benchmarks) repeat per provider (`genability`, `openei`, `rateacuity`)
 - `--output-folder` / `-o`: directory for exports (default: `./outputs`)
 
 Omitted options will trigger interactive prompts.
-
-Options:
-- `--state` / `-s`: two-letter state abbreviation (default: prompt)
-- `--output-folder` / `-o`: directory for exports (default: `./outputs`)
 
 ### Examples
 
