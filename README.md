@@ -5,9 +5,17 @@ The project provides a CLI tool that retrieves electric and gas utility tariff d
 ## Requirements
 - Python 3.11+
 - Credentials for the providers you intend to call:
-  - `ARCADIA_APP_ID` and `ARCADIA_APP_KEY`
-  - `OPENEI_API_KEY`
-  - `RATEACUITY_USERNAME` and `RATEACUITY_PASSWORD`
+
+  - **Genability / Arcadia Data Platform**: `ARCADIA_APP_ID`, `ARCADIA_APP_KEY`
+    [Create an account](https://dash.genability.com/signup), navigate to [Applications dashboard](https://dash.genability.com/org/applications), create an application, then copy the Application ID and Key.
+
+  - **OpenEI**: `OPENEI_API_KEY`
+    Request a key at the [OpenEI API signup](https://openei.org/services/api/signup/). The key arrives by email.
+
+  - **RateAcuity Web Portal**: `RATEACUITY_USERNAME`, `RATEACUITY_PASSWORD`
+    There is no self-serve signup. [Contact RateAcuity](https://rateacuity.com/contact-us/) to request Web Portal access. No API key is required for `tariff_fetch`.
+
+
 - Google Chrome or Chromium installed locally (for RateAcuity)
 
 ## Configuration
