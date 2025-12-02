@@ -1,6 +1,15 @@
 # Tariff Fetch
 
-The project provides a CLI tool that retrieves electric and gas utility tariff data from multiple providers.
+[![Release](https://img.shields.io/github/v/release/switchbox-data/tariff_fetch)](https://img.shields.io/github/v/release/switchbox-data/tariff_fetch)
+[![Build status](https://img.shields.io/github/actions/workflow/status/switchbox-data/tariff-fetch/main.yml?branch=main)](https://github.com/switchbox-data/tariff_fetch/actions/workflows/main.yml?query=branch%3Amain)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/switchbox-data/tariff_fetch)](https://img.shields.io/github/commit-activity/m/switchbox-data/tariff_fetch)
+[![License](https://img.shields.io/github/license/switchbox-data/tariff_fetch)](https://img.shields.io/github/license/switchbox-data/tariff_fetch)
+
+A CLI tool, and python library, to simplify downloading electric and gas utility tariff data from multiple providers in a consistent data format.
+
+- **Github repository**: <https://github.com/switchbox-data/tariff_fetch/>
+- **Documentation**: <https://switchbox-data.github.io/tariff_fetch/>
+- **PyPI page**: <https://pypi.org/project/tariff_fetch/>
 
 ## Requirements
 - Python 3.11+
