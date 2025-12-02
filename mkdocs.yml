@@ -7,6 +7,15 @@ repo_name: switchbox-data/tariff_fetch
 nav:
   - Home: index.md
   - API Reference: modules.md
+  - Data Providers:
+    - providers/index.md
+    - Arcadia (Genability):
+      - providers/arcadia/index.md
+      - Tariff JSON Structure: providers/arcadia/tariff-json-structure.md
+    - NREL / OpenEI:
+      - providers/nrel/index.md
+      - URDB JSON Structure: providers/nrel/urdb-json-structure.md
+    - Rate Acuity: providers/rateacuity/index.md
   - Tariff Wiki:
     - wiki/index.md
     - Utilities:
