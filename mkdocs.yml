@@ -7,9 +7,27 @@ repo_name: switchbox-data/tariff_fetch
 nav:
   - Home: index.md
   - API Reference: modules.md
+  - Tariff Wiki:
+    - wiki/index.md
+    - Utilities:
+      - wiki/utilities/index.md
+      - ConEd:
+        - wiki/utilities/coned/index.md
+        - Delivery Adjustments: wiki/utilities/coned/delivery-adjustments.md
+        - Supply Charges: wiki/utilities/coned/supply-charges.md
+        - Riders: wiki/utilities/coned/riders.md
+        - Variable Rates API: wiki/utilities/coned/variable-rates-api.md
+        - SC1 Residential (Default):
+          - wiki/utilities/coned/residential-el1/index.md
+        - SC3 Residential TOU:
+          - wiki/utilities/coned/residential-el1-tou/index.md
+        - SC4 Residential Demand:
+          - wiki/utilities/coned/residential-el1-demand/index.md
 
 theme:
   name: material
+  features:
+    - navigation.indexes
   palette:
     - scheme: default
       primary: blue
@@ -30,3 +48,13 @@ plugins:
       handlers:
         python:
           paths: [src]
+
+markdown_extensions:
+  - toc:
+      toc_depth: 3
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
