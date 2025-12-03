@@ -6,7 +6,11 @@ repo_name: switchbox-data/tariff_fetch
 
 nav:
   - Home: index.md
-  - API Reference: modules.md
+  - CLI Usage: cli-usage.md
+  - Provider Notes:
+      - Genability / Arcadia: providers/genability.md
+      - OpenEI: providers/openei.md
+      - RateAcuity: providers/rateacuity.md
 
 theme:
   name: material

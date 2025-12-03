@@ -38,13 +38,13 @@ RATEACUITY_PASSWORD=...
 If you have [uv](https://github.com/astral-sh/uv/releases) installed, you can run the cli simply with
 
 ```bash
-uvx --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch
 ```
 
 Or, for gas tariffs:
 
 ```bash
-uvx --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch-gas
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch-gas
 ```
 
 ## Installation
@@ -106,10 +106,3 @@ uv run tariff-fetch.cli \
 
 The CLI suggests filenames like `outputs/openei_Utility_sector_detail-0_2024-03-18.json` before writing each file so you
 can accept or override them.
-
-## Provider notes
-- **Genability**: choose customer classes and tariff types before selecting tariffs. Requires Arcadia credentials.
-- **OpenEI**: pick the sector and detail level, then select the returned tariffs. Requires `OPENEI_API_KEY`.
-- **RateAcuity (electric)**: Selenium session that logs in, picks a state, utility, and schedules. Stores the scraped sections as
-  JSON. A failure produces `selenium_error.png` for inspection.
-- **RateAcuity (gas)**: Uses the gas benchmark workflow and exports the selected schedules in the same JSON format. Credentials are identical to the electric flow.
