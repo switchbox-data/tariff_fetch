@@ -46,8 +46,8 @@ Omit variables for providers you do not intend to call; the CLI will prompt inte
 
 See the provider notes for step-by-step credential setup:
 
-- [Genability / Arcadia](providers/genability.md)
-- [OpenEI](providers/openei.md)
-- [RateAcuity](providers/rateacuity.md)
+- [Genability / Arcadia](providers/arcadia/access.md)
+- [OpenEI / NREL](providers/nrel/access.md)
+- [RateAcuity](providers/rateacuity/access.md)
 
 See the [CLI Usage Guide](cli-usage.md) for detailed command-line workflows and option reference.
