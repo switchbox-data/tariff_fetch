@@ -1,7 +1,7 @@
 # Consolidated Edison (ConEd)
 
-**LSE ID**: 2252  
-**Region**: New York City, Westchester County, NY  
+**LSE ID**: 2252
+**Region**: New York City, Westchester County, NY
 **Service Types**: Electricity, Gas
 
 ## Overview

@@ -297,10 +297,10 @@ January             February       March           April          May+
 You use power       NYISO          ConEd           PSC reviews    Adjustment
 ConEd procures      finalizes      calculates      and approves   appears on
 at real-time LMPs   settlement     variance        adjustment     your bill
-                                                                  
-You're billed at                                                  
-FORECASTED MSC                                                    
-                                                                  
+
+You're billed at
+FORECASTED MSC
+
 Gap created ────────────────────────────────────────────────────► Gap closed
 (forecast ≠ actual)                                                via adjustment
 ```
@@ -402,4 +402,3 @@ The `chargeClass: "SUPPLY,CONTRACTED"` rates in the tariff only apply to custome
 | **ESCO** | Energy Service Company — competitive retail electricity supplier |
 | **Load-weighted average** | Average where each price is weighted by the consumption during that period |
 | **Settlement** | NYISO's process of finalizing actual costs after the operating period |
-

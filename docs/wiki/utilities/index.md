@@ -26,4 +26,3 @@ When working with Arcadia/Genability data, utilities are identified by:
 - **`lseCode`**: Short code (e.g., "ConEd")
 
 You can search for utilities using the `tariff_fetch` CLI or the Arcadia LSE API.
-

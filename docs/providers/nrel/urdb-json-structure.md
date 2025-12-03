@@ -90,10 +90,10 @@ The simplest possible rate—just a monthly customer charge with no usage-based 
   "utility": "Simple Electric Co",
   "name": "Basic Service",
   "sector": "Residential",
-  
+
   "fixedchargefirstmeter": 15.00,
   "fixedchargeunits": "$/month",
-  
+
   "mincharge": 15.00,
   "minchargeunits": "$/month"
 }
@@ -120,9 +120,9 @@ The `mincharge` field sets a floor on the total bill. If energy + demand charges
 
 ## Energy Charges
 
-Energy charges are based on how many kilowatt-hours (kWh) you consume. 
+Energy charges are based on how many kilowatt-hours (kWh) you consume.
 
-> **Note:** "Energy charge" here means "volumetric charge"—it can represent **supply charges** (generation/procurement), **delivery charges** (transmission/distribution), or both bundled together. URDB doesn't distinguish between them; they're all in `energyratestructure`. 
+> **Note:** "Energy charge" here means "volumetric charge"—it can represent **supply charges** (generation/procurement), **delivery charges** (transmission/distribution), or both bundled together. URDB doesn't distinguish between them; they're all in `energyratestructure`.
 
 Energy charges can be flat, tiered, seasonal, time-of-use, or any combination.
 
@@ -140,10 +140,10 @@ A **flat rate** is the simplest electricity pricing: every kWh costs the same am
   "utility": "Simple Electric Co",
   "name": "Residential Flat",
   "sector": "Residential",
-  
+
   "fixedchargefirstmeter": 12.00,
   "fixedchargeunits": "$/month",
-  
+
   "energyratestructure": [
     [
       {
@@ -152,7 +152,7 @@ A **flat rate** is the simplest electricity pricing: every kWh costs the same am
       }
     ]
   ],
-  
+
   "energyweekdayschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -167,7 +167,7 @@ A **flat rate** is the simplest electricity pricing: every kWh costs the same am
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   ],
-  
+
   "energyweekendschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -219,7 +219,7 @@ A **tiered rate** charges different prices based on how much you use. Tiers can 
 This example shows an inclining tiered rate:
 
 - First 500 kWh: $0.08/kWh
-- Next 500 kWh (501-1000): $0.12/kWh  
+- Next 500 kWh (501-1000): $0.12/kWh
 - Over 1000 kWh: $0.15/kWh
 
 #### URDB JSON
@@ -230,10 +230,10 @@ This example shows an inclining tiered rate:
   "utility": "Conservation Electric",
   "name": "Residential Tiered",
   "sector": "Residential",
-  
+
   "fixedchargefirstmeter": 15.00,
   "fixedchargeunits": "$/month",
-  
+
   "energyratestructure": [
     [
       {
@@ -252,7 +252,7 @@ This example shows an inclining tiered rate:
       }
     ]
   ],
-  
+
   "energyweekdayschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -267,7 +267,7 @@ This example shows an inclining tiered rate:
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   ],
-  
+
   "energyweekendschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -329,10 +329,10 @@ This example has two seasons with flat (non-tiered) rates:
   "utility": "Seasonal Electric Co",
   "name": "Residential Seasonal",
   "sector": "Residential",
-  
+
   "fixedchargefirstmeter": 15.00,
   "fixedchargeunits": "$/month",
-  
+
   "energyratestructure": [
     [
       {
@@ -347,7 +347,7 @@ This example has two seasons with flat (non-tiered) rates:
       }
     ]
   ],
-  
+
   "energyweekdayschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -362,7 +362,7 @@ This example has two seasons with flat (non-tiered) rates:
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   ],
-  
+
   "energyweekendschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -442,10 +442,10 @@ This example has two periods year-round (no seasonal variation, no tiers):
   "utility": "TOU Electric Co",
   "name": "Residential TOU",
   "sector": "Residential",
-  
+
   "fixedchargefirstmeter": 15.00,
   "fixedchargeunits": "$/month",
-  
+
   "energyratestructure": [
     [
       {
@@ -460,7 +460,7 @@ This example has two periods year-round (no seasonal variation, no tiers):
       }
     ]
   ],
-  
+
   "energyweekdayschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
@@ -475,7 +475,7 @@ This example has two periods year-round (no seasonal variation, no tiers):
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0]
   ],
-  
+
   "energyweekendschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -553,10 +553,10 @@ This final example combines **all three dimensions** we've covered:
   "utility": "Modern Electric Co",
   "name": "Residential Seasonal TOU",
   "sector": "Residential",
-  
+
   "fixedchargefirstmeter": 20.00,
   "fixedchargeunits": "$/month",
-  
+
   "energyratestructure": [
     [
       { "max": 500, "rate": 0.08, "unit": "kWh" },
@@ -575,7 +575,7 @@ This final example combines **all three dimensions** we've covered:
       { "rate": 0.35, "unit": "kWh" }
     ]
   ],
-  
+
   "energyweekdayschedule": [
     [0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0],
     [0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0],
@@ -590,7 +590,7 @@ This final example combines **all three dimensions** we've covered:
     [0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0],
     [0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0]
   ],
-  
+
   "energyweekendschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -686,17 +686,17 @@ This example shows a rate with only a fixed charge plus a flat demand charge (no
   "utility": "Commercial Electric Co",
   "name": "Demand Only",
   "sector": "Commercial",
-  
+
   "fixedchargefirstmeter": 25.00,
   "fixedchargeunits": "$/month",
-  
+
   "flatdemandunit": "kW",
   "flatdemandstructure": [
     [
       { "rate": 8.50 }
     ]
   ],
-  
+
   "flatdemandmonths": [0,0,0,0,0,0,0,0,0,0,0,0]
 }
 ```
@@ -732,16 +732,16 @@ This example shows demand charges that vary by time of day. Peak demand during e
   "utility": "Commercial Electric Co",
   "name": "TOU Demand Only",
   "sector": "Commercial",
-  
+
   "fixedchargefirstmeter": 50.00,
   "fixedchargeunits": "$/month",
-  
+
   "demandrateunit": "kW",
   "demandratestructure": [
     [{ "rate": 5.00 }],
     [{ "rate": 15.00 }]
   ],
-  
+
   "demandweekdayschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
@@ -756,7 +756,7 @@ This example shows demand charges that vary by time of day. Peak demand during e
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0]
   ],
-  
+
   "demandweekendschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -836,14 +836,14 @@ Rates can combine all three charge types, and the URDB format supports this natu
   "utility": "Commercial Electric Co",
   "name": "Small Commercial Standard",
   "sector": "Commercial",
-  
+
   "fixedchargefirstmeter": 25.00,
   "fixedchargeunits": "$/month",
-  
+
   "energyratestructure": [
     [{ "rate": 0.08, "unit": "kWh" }]
   ],
-  
+
   "energyweekdayschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -858,7 +858,7 @@ Rates can combine all three charge types, and the URDB format supports this natu
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   ],
-  
+
   "energyweekendschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -873,12 +873,12 @@ Rates can combine all three charge types, and the URDB format supports this natu
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   ],
-  
+
   "flatdemandunit": "kW",
   "flatdemandstructure": [
     [{ "rate": 8.50 }]
   ],
-  
+
   "flatdemandmonths": [0,0,0,0,0,0,0,0,0,0,0,0]
 }
 ```
@@ -920,14 +920,14 @@ Fuel costs fluctuate with market prices. Rather than constantly revising base ra
   "utility": "Example Electric Co",
   "name": "Residential with Fuel Adjustment",
   "sector": "Residential",
-  
+
   "fixedchargefirstmeter": 12.00,
   "fixedchargeunits": "$/month",
-  
+
   "energyratestructure": [
     [{ "rate": 0.10, "unit": "kWh" }]
   ],
-  
+
   "energyweekdayschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -942,7 +942,7 @@ Fuel costs fluctuate with market prices. Rather than constantly revising base ra
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   ],
-  
+
   "energyweekendschedule": [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -957,7 +957,7 @@ Fuel costs fluctuate with market prices. Rather than constantly revising base ra
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   ],
-  
+
   "fueladjustmentsmonthly": [0.015, 0.012, 0.010, 0.008, 0.005, 0.018, 0.025, 0.028, 0.022, 0.012, 0.010, 0.014]
 }
 ```
@@ -1094,4 +1094,3 @@ These are typically informational—they may represent line items that are alrea
 - [OpenEI URDB API Documentation](https://openei.org/services/doc/rest/util_rates/?version=7) — Complete field reference
 - [Browse URDB Rates](https://openei.org/apps/USURDB/) — Interactive rate browser
 - [NREL Developer Network](https://developer.nrel.gov/) — API key registration
-

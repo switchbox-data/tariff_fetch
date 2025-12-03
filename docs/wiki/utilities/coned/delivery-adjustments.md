@@ -445,4 +445,3 @@ The adjustments typically add/subtract **$2-8/month** from your base delivery ch
 6. **Net effect is revenue neutrality** (ConEd recovers actual costs, no more, no less)
 
 The complexity isn't arbitrary—it's the result of decades of regulatory evolution trying to balance utility financial health, customer protection, and policy goals like decarbonization.
-

@@ -15,8 +15,8 @@ The Utility Rate Database (URDB) is a free, open dataset of US utility rates mai
 
 URDB outputs data in the an open data standard called URDB JSON. Many NREL tools already accept this standard.
 
-- **[Short guide to URDB JSON](urdb-json-structure.md)** 
-- [Official API docs on URDB JSON](https://openei.org/services/doc/rest/util_rates/?version=7) 
+- **[Short guide to URDB JSON](urdb-json-structure.md)**
+- [Official API docs on URDB JSON](https://openei.org/services/doc/rest/util_rates/?version=7)
 
 ## Key Endpoints
 
@@ -40,4 +40,3 @@ URDB outputs data in the an open data standard called URDB JSON. Many NREL tools
 | Coverage | OK, community-maintained | Comprehensive, professionally maintained |
 | Update frequency | Annual | Regular updates |
 | Variable rates | Not supported | Lookups API |
-

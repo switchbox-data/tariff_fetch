@@ -21,4 +21,3 @@
 - Historical tariff versions
 
 **Rate Acuity** provides both electricity and gas tariffs through their web portal. It is also paid Useful when you need gas rates or prefer a different data source for validation.
-

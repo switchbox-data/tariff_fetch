@@ -59,4 +59,3 @@ To add or update wiki content:
 ## Disclaimer
 
 > ⚠️ The guides in this wiki are for educational purposes. They were initially generated with AI assistance and have not been verified by utility rate experts. Verify any claims against official utility tariff books before using for business or regulatory purposes.
-

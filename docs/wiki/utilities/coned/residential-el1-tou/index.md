@@ -4,10 +4,10 @@
 
 > **Data Source**: This guide covers tariff data from the [Arcadia Signal API](https://docs.arcadia.com/v2022-12-21-Signal/reference/tariff) (formerly Genability). The JSON structure, field names, and lookup mechanisms described here are specific to Arcadia's tariff data model. The [full JSON output is included below](#full-tariff-json) for reference.
 
-**Master Tariff ID**: 3220724  
-**Tariff Code**: EL1  
-**Tariff Name**: Residential and Religious, Voluntary Time of Day  
-**Customer Class**: Residential  
+**Master Tariff ID**: 3220724
+**Tariff Code**: EL1
+**Tariff Name**: Residential and Religious, Voluntary Time of Day
+**Customer Class**: Residential
 **Tariff Type**: ALTERNATIVE (opt-in)
 
 ## Overview
@@ -188,25 +188,25 @@ Same variable-rate adjustments as SC1, applied to **total consumption** (not spl
 
 > **📘 Deep Dive**: For regulatory background and calculation details, see **[Delivery Adjustments Guide](../delivery-adjustments.md)**.
 
-**Monthly Adjustment Clause (MAC)** — *Variable*  
+**Monthly Adjustment Clause (MAC)** — *Variable*
 Umbrella adjustment for property taxes, storm costs, pension expenses.
 
-**Revenue Decoupling Mechanism (RDM) Adjustment** — *Variable*  
+**Revenue Decoupling Mechanism (RDM) Adjustment** — *Variable*
 True-up for actual vs. expected sales volume.
 
-**Delivery Revenue Surcharge** — *Variable*  
+**Delivery Revenue Surcharge** — *Variable*
 Supplemental revenue adjustment.
 
-**Clean Energy Standard Delivery Surcharge** — *Variable*  
+**Clean Energy Standard Delivery Surcharge** — *Variable*
 Grid infrastructure costs for clean energy compliance.
 
-**Reconciliation Rate** — *Variable*  
+**Reconciliation Rate** — *Variable*
 Legacy deferred costs from 1990s restructuring.
 
-**Transition Adjustment** — *Variable*  
+**Transition Adjustment** — *Variable*
 Legacy deregulation costs.
 
-**Uncollectible Bill Expense** — *Variable*  
+**Uncollectible Bill Expense** — *Variable*
 Bad debt recovery.
 
 ---
@@ -217,19 +217,19 @@ Same as SC1—charges for the electricity commodity itself. Only apply if using 
 
 > **📘 Deep Dive**: For NYISO settlement, load-weighted averaging, and reconciliation details, see **[Supply Charges Guide](../supply-charges.md)**.
 
-**MSC Rate (Market Supply Charge)** — *Variable, by zone*  
+**MSC Rate (Market Supply Charge)** — *Variable, by zone*
 Base cost of electricity, forecasted monthly from wholesale prices.
 
-**MSC I Adjustment** — *Variable, by zone*  
+**MSC I Adjustment** — *Variable, by zone*
 Reconciles actual energy costs vs. forecast.
 
-**MSC II Adjustment** — *Variable*  
+**MSC II Adjustment** — *Variable*
 Reconciles capacity costs and ancillary services.
 
-**Clean Energy Standard Supply Surcharge** — *Variable*  
+**Clean Energy Standard Supply Surcharge** — *Variable*
 RECs, ZECs, and other clean energy compliance costs.
 
-**Merchant Function Charge** — *Variable*  
+**Merchant Function Charge** — *Variable*
 ConEd's costs to administer supply service.
 
 ---

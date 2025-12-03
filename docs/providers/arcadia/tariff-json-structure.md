@@ -201,4 +201,3 @@ For bill calculations, use rates with `riderTariffId` — they have all the char
 - [Lookups API](https://docs.arcadia.com/v2022-12-21-Signal/reference/lookups) — Retrieving variable rate values
 - [Calculate API](https://docs.arcadia.com/v2022-12-21-Signal/reference/calculate) — Running bill calculations
 - [Tariff History API](https://docs.arcadia.com/v2022-12-21-Signal/reference/tariff-history) — Historical tariff versions
-

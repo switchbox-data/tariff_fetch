@@ -601,4 +601,3 @@ When processing the JSON, look for both:
 | GRT Distribution | QUANTITY | % of delivery charges | Fixed by zone |
 | GRT Supply | QUANTITY | % of supply charges | Fixed by zone |
 | VDER Cost Recovery | CONSUMPTION_BASED | Per kWh | Fixed ($0.0011) |
-

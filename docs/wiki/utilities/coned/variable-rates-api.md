@@ -77,12 +77,12 @@ import json
 def extract_variable_rate_keys(tariff_json):
     """Extract all variableRateKey values from a tariff."""
     keys = set()
-    
+
     for tariff in tariff_json:
         for rate in tariff.get('rates', []):
             if 'variableRateKey' in rate:
                 keys.add(rate['variableRateKey'])
-    
+
     return list(keys)
 
 # Load your tariff
@@ -133,7 +133,7 @@ for key in variable_keys:
         "2025-01-01T00:00:00-05:00",
         "YOUR_API_KEY"
     )
-    
+
 print(f"Retrieved data for {len(all_lookups)} variable rates")
 ```
 
@@ -143,22 +143,22 @@ print(f"Retrieved data for {len(all_lookups)} variable rates")
 def organize_by_month(all_lookups):
     """Reorganize lookup data by month."""
     monthly = {}
-    
+
     for key, entries in all_lookups.items():
         for entry in entries:
             # Extract month from fromDateTime
             month = entry['fromDateTime'][:7]  # "2024-01"
-            
+
             if month not in monthly:
                 monthly[month] = {}
-            
+
             monthly[month][key] = entry['bestValue']
-    
+
     return monthly
 
 monthly_rates = organize_by_month(all_lookups)
 
-# Result: 
+# Result:
 # {
 #   "2024-01": {"marketSupplyChargeResidentialZoneJ": 0.0823, ...},
 #   "2024-02": {"marketSupplyChargeResidentialZoneJ": 0.0791, ...},
@@ -180,13 +180,13 @@ The tariff tells you what parameters the Calculate API needs:
 def get_calculate_params(tariff_json):
     """Extract parameters needed for Calculate API from tariff."""
     tariff = tariff_json[0]  # First tariff in array
-    
+
     return {
         "masterTariffId": tariff['masterTariffId'],
         "lseId": tariff['lseId'],
         # Get available territories from properties
         "territories": [
-            choice['value'] 
+            choice['value']
             for prop in tariff.get('properties', [])
             if prop['keyName'] == 'territoryId'
             for choice in prop.get('choices', [])
@@ -228,7 +228,7 @@ monthly_results = {}
 for month in range(1, 13):
     from_date = f"2024-{month:02d}-01"
     to_date = f"2024-{month+1:02d}-01" if month < 12 else "2025-01-01"
-    
+
     result = calculate_bill(
         master_tariff_id=809,
         territory_id=3634,  # Zone J
@@ -246,12 +246,12 @@ for month in range(1, 13):
 def extract_rate_values(calculate_response):
     """Extract rate values from Calculate API response."""
     rates = {}
-    
+
     for item in calculate_response['results'][0]['items']:
         rate_name = item['tariffRateName']
         rate_amount = item['rateAmount']
         rates[rate_name] = rate_amount
-    
+
     return rates
 
 monthly_rates = {
@@ -278,22 +278,22 @@ The Calculate API returns ALL charges (fixed and variable). To get just variable
 ```python
 def filter_to_variable_rates(tariff_json, calculate_response):
     """Filter Calculate results to only variable rates."""
-    
+
     # Build set of rate names that have variableRateKey
     variable_rate_names = set()
     for tariff in tariff_json:
         for rate in tariff.get('rates', []):
             if 'variableRateKey' in rate:
                 variable_rate_names.add(rate['rateName'])
-    
+
     # Filter calculate results
     all_rates = extract_rate_values(calculate_response)
     variable_only = {
-        name: value 
+        name: value
         for name, value in all_rates.items()
         if name in variable_rate_names
     }
-    
+
     return variable_only
 ```
 
@@ -434,7 +434,7 @@ calculate_results = {}
 for month in range(1, 13):
     from_date = f"2024-{month:02d}-01"
     to_date = f"2024-{month+1:02d}-01" if month < 12 else "2025-01-01"
-    
+
     response = requests.post(
         "https://api.arcadia.com/rest/public/calculate",
         json={
@@ -488,4 +488,3 @@ for item in calculate_results["2024-01"]['results'][0]['items']:
 **Use Lookups when**: You know exactly which rates you want and need raw historical data.
 
 **Use Calculate when**: You want all applicable rates for a billing scenario without knowing the keys upfront.
-

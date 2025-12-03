@@ -4,10 +4,10 @@
 
 > **Data Source**: This guide covers tariff data from the [Arcadia Signal API](https://docs.arcadia.com/v2022-12-21-Signal/reference/tariff) (formerly Genability). The JSON structure, field names, and lookup mechanisms described here are specific to Arcadia's tariff data model. The [full JSON output is included below](#full-tariff-json) for reference.
 
-**Master Tariff ID**: 809  
-**Tariff Code**: EL1  
-**Tariff Name**: Residential and Religious  
-**Customer Class**: Residential  
+**Master Tariff ID**: 809
+**Tariff Code**: EL1
+**Tariff Name**: Residential and Religious
+**Customer Class**: Residential
 **Customer Count**: ~3 million
 
 ## Overview
@@ -87,25 +87,25 @@ The tier structure incentivizes conservation. Summer Tier 2 is higher because pe
 
 > **📘 Deep Dive**: These adjustments involve regulatory mechanisms, time lags, and reconciliation math. For a complete explanation with step-by-step examples, see **[Delivery Adjustments Guide](../delivery-adjustments.md)**.
 
-**Monthly Adjustment Clause (MAC)** — *Variable*  
+**Monthly Adjustment Clause (MAC)** — *Variable*
 Umbrella adjustment that captures various delivery cost true-ups: property taxes, storm costs, pension expenses. Changes monthly based on actual vs. forecasted costs.
 
-**Revenue Decoupling Mechanism (RDM) Adjustment** — *Variable*  
+**Revenue Decoupling Mechanism (RDM) Adjustment** — *Variable*
 Part of NY's decoupling policy: ConEd's revenue is "decoupled" from sales volume. If customers use less than expected, this adjusts upward (and vice versa). Removes utility incentive to discourage conservation. Typically reconciled annually.
 
-**Delivery Revenue Surcharge** — *Variable*  
+**Delivery Revenue Surcharge** — *Variable*
 A supplemental revenue adjustment for specific shortfalls or PSC-ordered changes outside the normal MAC/RDM mechanisms.
 
-**Clean Energy Standard Delivery Surcharge** — *Variable*  
+**Clean Energy Standard Delivery Surcharge** — *Variable*
 Recovers ConEd's costs for grid infrastructure needed to comply with NY's Clean Energy Standard (distribution upgrades, DER integration).
 
-**Reconciliation Rate** — *Variable*  
+**Reconciliation Rate** — *Variable*
 True-ups for deferred costs from NY's 1990s electricity restructuring. Legacy item, typically small.
 
-**Transition Adjustment** — *Variable*  
+**Transition Adjustment** — *Variable*
 More legacy costs from deregulation-era restructuring. Typically minimal now.
 
-**Uncollectible Bill Expense** — *Variable*  
+**Uncollectible Bill Expense** — *Variable*
 Recovers costs from customers who don't pay their bills. Spiked during COVID; now returning to normal levels.
 
 ---
@@ -120,20 +120,20 @@ These are charges for the electricity commodity itself. Only apply if you use Co
 
 The base cost of electricity. ConEd forecasts this monthly based on expected wholesale prices from NYISO. Zone-specific because NYISO prices differ by location (H, I, J).
 
-**Merchant Function Charge** — *Variable*  
+**Merchant Function Charge** — *Variable*
 Covers ConEd's costs to administer supply service: procurement staff, risk management, billing systems. Only applies to default service customers (not ESCO customers).
 
 #### Supply Adjustments
 
 > **📘 Deep Dive**: Supply adjustments involve NYISO settlement, load-weighted averaging, and 2-3 month reconciliation lags. For a complete explanation with step-by-step examples, see **[Supply Charges Guide](../supply-charges.md)**.
 
-**MSC I Adjustment** — *Variable, by zone*  
+**MSC I Adjustment** — *Variable, by zone*
 Reconciles actual **energy costs** vs. what was billed via the forecasted MSC. Applied with a 2-3 month lag after NYISO settlement finalizes. Zone-specific because wholesale energy prices differ by location.
 
-**MSC II Adjustment** — *Variable*  
+**MSC II Adjustment** — *Variable*
 Reconciles **capacity costs, ancillary services, and working capital**. Not zone-specific—averaged across ConEd's territory.
 
-**Clean Energy Standard Supply Surcharge** — *Variable*  
+**Clean Energy Standard Supply Surcharge** — *Variable*
 Recovers the cost of Renewable Energy Credits (RECs), Zero Emission Credits (ZECs), and other clean energy compliance costs on the supply side.
 
 ---
