@@ -46,8 +46,8 @@ Omit variables for providers you do not intend to call; the CLI will prompt inte
 
 See the provider notes for step-by-step credential setup:
 
-- [Genability / Arcadia](providers/arcadia/access.md)
-- [OpenEI / NREL](providers/nrel/access.md)
+- [Arcadia Signal API](providers/arcadia/access.md)
+- [NREL URDB](providers/nrel/access.md)
 - [RateAcuity](providers/rateacuity/access.md)
 
 See the [CLI Usage Guide](cli-usage.md) for detailed command-line workflows and option reference.
