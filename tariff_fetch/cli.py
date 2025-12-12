@@ -72,7 +72,7 @@ def prompt_utility(state: str) -> Utility:
         return f"{value:,.0f}"
 
     header = questionary.Choice(
-        "Utility Name                                 | Entity Type        | Sales (MWh)  | Revenue ($) | Customers",
+        "Utility Name                                 | Entity Type        | Sales (MWh)  | Revenue ($)    | Customers",
         value=0,
     )
 
@@ -80,7 +80,7 @@ def prompt_utility(state: str) -> Utility:
         name_col = f"{row['utility_name']:<44}"
         entity_type = f"{(row['entity_type'] or '-')[:18]:<18}"
         sales_col = f"{fmt_number(row.get('sales_mwh')):>12}"
-        revenue_col = f"{fmt_number(row.get('sales_revenue')):>11}"
+        revenue_col = f"{fmt_number(row.get('sales_revenue')):>14}"
         customers_col = f"{fmt_number(row.get('customers')):>9}"
         title = f"{name_col} | {entity_type} | {sales_col} | {revenue_col} | {customers_col}"
         return questionary.Choice(
