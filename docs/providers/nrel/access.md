@@ -1,4 +1,4 @@
-# URDB Access & Credentials 
+# URDB Access & Credentials
 
 ## Obtaining Access
 
