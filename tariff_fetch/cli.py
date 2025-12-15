@@ -53,7 +53,7 @@ def prompt_utility(state: str) -> Utility:
                 pl.col("customers").filter(pl.col("customer_class") == "residential").sum().alias("customers"),
                 pl.col("entity_type").last().alias("entity_type"),
             )
-            .sort(["entity_type", "utility_name"])
+            .sort(["entity_type", "customers", "utility_name"], descending=(False, True, False))
         )
 
         rows = list(yearly_sales_df.iter_rows(named=True))
@@ -62,6 +62,7 @@ def prompt_utility(state: str) -> Utility:
                 ENTITY_TYPES_SORTORDER.index(_["entity_type"])
                 if _["entity_type"] in ENTITY_TYPES_SORTORDER
                 else abs(hash(_["entity_type"])) + 4,
+                -_["customers"],
                 _["utility_name"],
             )
         )
