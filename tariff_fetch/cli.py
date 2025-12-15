@@ -71,17 +71,37 @@ def prompt_utility(state: str) -> Utility:
             return "-"
         return f"{value:,.0f}"
 
+    utility_name_header = "Utility Name"
+    entity_type_header = "Entity Type"
+    sales_header = "Sales (MWh)"
+    revenue_header = "Revenue ($)"
+    customers_header = "Customers"
+
+    largest_utility_name = max(len(utility_name_header), *(len(row["utility_name"]) for row in rows))
+    largest_entity_type = max(len(entity_type_header), *(len(row["entity_type"][:18]) for row in rows))
+    largest_sales_col = max(len(sales_header), *(len(fmt_number(row["sales_mwh"])) for row in rows))
+    largest_revenue_col = max(len(revenue_header), *(len(fmt_number(row["sales_revenue"])) for row in rows))
+    largest_customers_col = max(len(customers_header), *(len(fmt_number(row["customers"])) for row in rows))
+
+    header_str_utility_name = utility_name_header.ljust(largest_utility_name)
+    header_str_entity_type = entity_type_header.ljust(largest_entity_type)
+    header_str_sales = sales_header.ljust(largest_sales_col)
+    header_str_revenue = revenue_header.ljust(largest_revenue_col)
+    header_str_customers = customers_header.ljust(largest_customers_col)
+    header_str = f"{header_str_utility_name} | {header_str_entity_type} | {header_str_sales} | {header_str_revenue} | {header_str_customers}"
+    separator = questionary.Separator(line="-" * len(header_str))
+
     header = questionary.Choice(
-        "Utility Name                                 | Entity Type        | Sales (MWh)  | Revenue ($)    | Customers",
+        title=header_str,
         value=0,
     )
 
     def build_choice(row: dict) -> questionary.Choice:
-        name_col = f"{row['utility_name']:<44}"
-        entity_type = f"{(row['entity_type'] or '-')[:18]:<18}"
-        sales_col = f"{fmt_number(row.get('sales_mwh')):>12}"
-        revenue_col = f"{fmt_number(row.get('sales_revenue')):>14}"
-        customers_col = f"{fmt_number(row.get('customers')):>9}"
+        name_col = row["utility_name"].ljust(largest_utility_name)
+        entity_type = (row["entity_type"] or "-")[:18].ljust(largest_entity_type)
+        sales_col = fmt_number(row["sales_mwh"]).ljust(largest_sales_col)
+        revenue_col = fmt_number(row["sales_revenue"]).ljust(largest_revenue_col)
+        customers_col = fmt_number(row["customers"]).ljust(largest_customers_col)
         title = f"{name_col} | {entity_type} | {sales_col} | {revenue_col} | {customers_col}"
         return questionary.Choice(
             title=title,
@@ -92,7 +112,7 @@ def prompt_utility(state: str) -> Utility:
     while result == 0:
         result = questionary.select(
             message="Select a utility",
-            choices=[header, *[build_choice(row) for row in rows]],
+            choices=[header, separator, *[build_choice(row) for row in rows]],
             use_search_filter=True,
             use_jk_keys=False,
             use_shortcuts=False,
