@@ -30,8 +30,7 @@ def main(
     ] = "./outputs",
 ):
     # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
-    if (state_ := (state or prompt_state()).value) is None:
-        return
+    state_ = state or prompt_state()
     output_folder_ = Path(output_folder)
     try:
         process_rateacuity_gas(output_folder_, state_)
