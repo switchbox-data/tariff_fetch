@@ -16,10 +16,11 @@
       "extensions": [
         "tamasfe.even-better-toml",
         "nefrob.vscode-just-syntax",
+        "davidanson.vscode-markdownlint",
+        "christian-kohler.path-intellisense",
         "ms-python.python",
         "charliermarsh.ruff",
-        "astral-sh.ty",
-        "christian-kohler.path-intellisense"
+        "astral-sh.ty"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/workspaces/tariff_fetch/.venv/bin/python",
