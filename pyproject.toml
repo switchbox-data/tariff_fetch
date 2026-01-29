@@ -58,9 +58,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["tariff_fetch"]
 
-[tool.pytest.ini_options]
+[tool.pytest]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = ["-q"]
 
 [tool.ruff]
 target-version = "py310"
