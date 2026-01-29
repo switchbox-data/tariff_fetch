@@ -4,9 +4,13 @@
   "features": {
     "ghcr.io/guiyomh/features/just:0.1.0": { "version": "1.42.4" },
     "ghcr.io/devcontainers/features/python:1": { "version": "os-provided" },
-    "ghcr.io/kreemer/features/chrometesting:1": {}
+    "ghcr.io/kreemer/features/chrometesting:1": {},
+    "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
+      "plugins": "git colored-man-pages colorize history zsh-autosuggestions fast-syntax-highlighting zsh-autocomplete",
+      "theme": "bira"
+    }
   },
-  "postCreateCommand": "bash ./.devcontainer/postCreateCommand.sh",
+  "postCreateCommand": "bash -c '.devcontainer/install-python-deps.sh && .devcontainer/install-prek.sh && .devcontainer/install-ohmyzsh-plugins.sh && .devcontainer/install-prek-deps.sh'",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -14,10 +18,12 @@
         "nefrob.vscode-just-syntax",
         "ms-python.python",
         "charliermarsh.ruff",
-        "astral-sh.ty"
+        "astral-sh.ty",
+        "christian-kohler.path-intellisense"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/workspaces/tariff_fetch/.venv/bin/python",
+        "python.terminal.activateEnvironment": false,
         "python.testing.pytestArgs": ["tests"],
         "python.testing.pytestPath": "/workspaces/tariff_fetch/.venv/bin/pytest",
         "python.testing.unittestEnabled": false,
