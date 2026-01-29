@@ -27,6 +27,7 @@ uv run tariff-fetch-gas --state tx --output-folder outputs
 ```
 
 Other entry points:
+
 - `python -m tariff_fetch.cli` / `python -m tariff_fetch.cli_gas`
 - `just cli` / `just cligas` (from the repo root)
 

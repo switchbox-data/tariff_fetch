@@ -17,6 +17,7 @@ COMING SOON.
 ## Features
 
 Rate Acuity offers:
+
 - Electricity and gas tariff data (unlike Arcadia/NREL which are electricity-only)
 - Web-based interface for browsing rates
 - Export functionality for rate data
@@ -24,6 +25,7 @@ Rate Acuity offers:
 ## Use Cases
 
 Rate Acuity is useful when:
+
 - You need gas tariff data (not available in Arcadia or NREL)
 - You want a second source to validate electricity rates
 - You want a web portal interface for manual lookups

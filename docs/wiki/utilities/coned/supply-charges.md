@@ -10,6 +10,7 @@ When you pay for electricity in New York, your bill includes two main categories
 2. **Supply Charges** — Cost of the actual electricity (variable, changes monthly)
 
 This explainer focuses on **supply charges** and explains:
+
 - How real-time wholesale prices become a single monthly rate
 - Why there's a forecast + adjustment structure
 - How the averaging and reconciliation math works
@@ -62,6 +63,7 @@ ConEd serves all three zones, so they track prices for each separately.
 ### The Challenge
 
 ConEd must set a **single $/kWh rate** for the upcoming month before knowing:
+
 - What the weather will be
 - What demand will be
 - What generation will be available
@@ -372,6 +374,7 @@ MSC_billed + MSC_I_adjustments + MSC_II_adjustments = Actual_procurement_cost
 ### Load-Weighting Matters
 
 Both the **forecast** and the **adjustment** use load-weighted averages because:
+
 - Electricity consumption isn't uniform throughout the day
 - More power is consumed during expensive peak hours
 - A simple average would understate true costs

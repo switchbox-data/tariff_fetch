@@ -46,6 +46,7 @@ The `rateAmount: 0.0` is a placeholder. The actual values change over time (mont
 ### When Results Match
 
 If you:
+
 1. Query Lookups for only the `variableRateKey` values that apply to your scenario
 2. Use Calculate with the same scenario parameters
 
@@ -347,6 +348,7 @@ def filter_to_variable_rates(tariff_json, calculate_response):
 **Default date behavior**: Last 72 hours if not specified.
 
 **Response fields**:
+
 - `bestValue`: Use this (best available value)
 - `actualValue`: Finalized value (may be null)
 - `forecastValue`: Arcadia's forecast
@@ -368,6 +370,7 @@ def filter_to_variable_rates(tariff_json, calculate_response):
 | `propertyInputs` | Yes | At minimum, consumption |
 
 **Response structure**:
+
 - `results[0].items[]`: Array of line items
 - Each item has `tariffRateName`, `rateAmount`, `itemQuantity`, `cost`
 

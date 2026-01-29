@@ -35,6 +35,7 @@ Riders have a **two-part structure** in the tariff:
 ### When to Query the Rider Tariff Separately
 
 You typically don't need to. The main tariff includes resolved rider rates. However, you might query `GET /tariffs/{riderId}` to:
+
 - See which other base tariffs reference this rider
 - Check the rider's own effective dates or applicability rules
 - Audit or document the rider structure independently
@@ -66,6 +67,7 @@ Utility rates include assumptions about tax costs (property taxes, federal incom
 **2017: Federal Tax Reform**
 
 The Tax Cuts and Jobs Act of 2017 slashed the corporate tax rate from 35% to 21%. ConEd's rates had been set assuming 35%, meaning:
+
 - Customers were overpaying for taxes ConEd no longer owed
 - PSC ordered utilities to pass savings back to customers
 - Tax Sur-Credit rider was created/expanded to handle this
@@ -121,6 +123,7 @@ NY launched REV to modernize the grid and integrate distributed resources. Deman
 **2018: ConEd's Brooklyn-Queens Demand Management Program**
 
 Rather than build a $1 billion substation in Brooklyn, ConEd invested $200 million in:
+
 - Battery storage
 - Demand response programs
 - Distributed solar
@@ -131,6 +134,7 @@ The program proved demand-side solutions could defer infrastructure investment.
 **2019+: DLM Programs Expanded**
 
 ConEd now runs multiple demand response programs:
+
 - **Commercial System Relief Program (CSRP)**: Large customers curtail during emergencies
 - **Distribution Load Relief Program (DLRP)**: Targeted local relief
 - **Smart AC Program**: Residential AC cycling
@@ -152,6 +156,7 @@ DLM Surcharge = Annual DLM Program Costs / Annual kWh Sales
 ```
 
 The surcharge is per-kWh because:
+
 1. All customers benefit from avoided infrastructure
 2. Larger users (more kWh) benefit proportionally more
 
@@ -188,6 +193,7 @@ The surcharge exists because demand response creates **system-wide benefits** (l
 ### The Problem It Solves
 
 Solar customers use the grid differently than non-solar customers:
+
 - They export power during the day (grid must absorb it)
 - They draw power at night and cloudy times (grid must serve them)
 - They still need the grid as backup (full capacity must be maintained)
@@ -199,6 +205,7 @@ Under old net metering, solar customers avoided paying most delivery charges but
 **2017: Value of Distributed Energy Resources (VDER) Order**
 
 The NY PSC overhauled solar compensation:
+
 - Replaced retail net metering with "Value Stack" compensation
 - Solar exports are valued based on actual grid benefits (energy, capacity, environmental)
 - Created the CBC to ensure solar customers pay for grid services they use
@@ -231,6 +238,7 @@ CBC = 8 kW × $1.84/kW = $14.72/month
 ### The Intuition
 
 Think of CBC as a **"grid access fee"** for solar customers:
+
 - You're using the grid as a giant battery (export midday, import evening)
 - You need grid capacity for cloudy days and nights
 - The fee ensures you pay something toward that infrastructure
@@ -238,6 +246,7 @@ Think of CBC as a **"grid access fee"** for solar customers:
 ### Why It's Based on System Size (kW), Not Usage (kWh)
 
 The grid must be sized to handle your **maximum possible export or import**, which correlates with system size:
+
 - 4 kW system → grid must handle 4 kW flows
 - 12 kW system → grid must handle 12 kW flows
 
@@ -264,6 +273,7 @@ New York is pushing aggressive EV adoption to meet climate goals. EVs need charg
 **2020: NY PSC EV Make-Ready Order**
 
 The PSC ordered utilities to fund "make-ready" infrastructure for EV charging:
+
 - ConEd must spend ~$300 million over several years
 - Covers costs up to the charger (not the charger itself)
 - Targets public charging, fleet depots, and multi-family buildings
@@ -321,6 +331,7 @@ Make-ready approach:
 ### The Problem It Solves
 
 During COVID-19, millions of New Yorkers fell behind on utility bills. NY imposed a moratorium on shutoffs, and debt accumulated. When moratoriums lifted, utilities faced:
+
 - Massive unpaid balances
 - Customers who couldn't pay without hardship
 - Need to maintain service while recovering costs
@@ -334,6 +345,7 @@ NY banned utility disconnections during the pandemic. Customers who couldn't pay
 **2021-2022: Arrears Forgiveness Programs**
 
 The PSC and legislature created programs to:
+
 - Forgive portions of low-income customer debt
 - Create extended payment plans for others
 - Provide state/federal funds to cover some arrears
@@ -378,6 +390,7 @@ For 500 kWh customer: ~$0.50/month
 ### Why It's Separate from Uncollectible Bill Expense
 
 The regular "Uncollectible Bill Expense" adjustment handles **normal** bad debt (typically 1-2% of bills). COVID created **extraordinary** bad debt that would distort the normal mechanism. A separate rider provides:
+
 - Transparency (customers see it as a distinct line item)
 - Time-limited recovery (will eventually sunset)
 - Regulatory accountability (PSC monitors specifically)
@@ -399,6 +412,7 @@ NY municipalities have taxed utilities for decades. Rates vary by jurisdiction b
 **Why It Varies by Zone**
 
 ConEd serves three distinct areas with different tax authorities:
+
 - **Zone J (NYC)**: NYC's tax rates
 - **Zone I (Lower Westchester)**: Various Westchester municipalities
 - **Zone H (Upper Westchester)**: Different Westchester municipalities
@@ -412,6 +426,7 @@ GRT = (Applicable Charges) × GRT Rate
 ```
 
 It's split into two components:
+
 - **GRT Distribution**: Applied to delivery charges
 - **GRT Supply**: Applied to supply charges (if using ConEd supply)
 
@@ -438,6 +453,7 @@ Total GRT = $5.04
 ### Why Separate Distribution and Supply?
 
 Different tax rules may apply to:
+
 - **Distribution**: Charges for using ConEd's wires (always ConEd)
 - **Supply**: Charges for electricity commodity (ConEd or ESCO)
 
@@ -476,6 +492,7 @@ Traditional net metering gave solar customers retail-rate credit for exports—o
 **2017: Value of Distributed Energy Resources (VDER) Order**
 
 The PSC replaced net metering with the "Value Stack":
+
 - Solar exports are valued based on actual grid benefits
 - Components: Energy, Capacity, Environmental, Demand Reduction, Locational
 
@@ -523,10 +540,12 @@ For 500 kWh customer: ~$0.63/month
 ### Relationship to CBC
 
 These two riders are **complementary**:
+
 - **CBC**: Solar customers pay for using the grid
 - **VDER Cost Recovery**: All customers pay for solar exports to the grid
 
 Together, they create a balanced framework where:
+
 - Solar is fairly compensated for grid benefits
 - Solar pays for grid services it uses
 - Non-solar customers share clean energy transition costs
@@ -584,6 +603,7 @@ Riders have a two-part structure:
 ```
 
 When processing the JSON, look for both:
+
 - Rates with `riderId` (reference to rider)
 - Rates with `riderTariffId` (implementation details)
 

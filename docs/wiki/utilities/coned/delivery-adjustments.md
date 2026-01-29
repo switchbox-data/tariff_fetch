@@ -43,6 +43,7 @@ The MAC is an **umbrella mechanism** that captures cost changes the PSC has pre-
 
 #### What's Included
 The MAC typically includes:
+
 - Property tax changes
 - Environmental compliance costs
 - Storm damage recovery
@@ -158,6 +159,7 @@ Customers get money back when they use more than expected!
 
 #### Why This Matters for Clean Energy
 Revenue decoupling is foundational to NY's climate policy. Without it:
+
 - ConEd would fight rooftop solar (reduces sales)
 - ConEd would oppose efficiency programs (reduces sales)
 - ConEd would resist electrification messaging (complicated)
@@ -198,6 +200,7 @@ The Reconciliation Rate handles **true-ups for deferred costs** from NY's electr
 
 #### Historical Context
 When NY deregulated electricity in 1996-2000:
+
 - Utilities sold off power plants
 - Some sold at losses ("stranded costs")
 - PSC allowed utilities to recover these over time
@@ -205,6 +208,7 @@ When NY deregulated electricity in 1996-2000:
 
 #### Why It Still Exists
 Even decades later, there are ongoing reconciliations for:
+
 - Legacy power purchase contracts
 - Deferred regulatory assets
 - Long-term debt from restructuring
@@ -267,6 +271,7 @@ Uncollectible Expense Adjustment = $20 million / 40 billion kWh
 
 #### COVID-19 Impact
 This adjustment spiked during COVID when:
+
 - Moratoriums prevented disconnections
 - Many customers fell behind on bills
 - Bad debt rates exceeded historical norms
@@ -297,6 +302,7 @@ NY's Clean Energy Standard (CES) mandates that utilities procure increasing amou
 
 #### The Supply Side Counterpart
 There's also a "Clean Energy Standard Supply Surcharge" that covers:
+
 - Renewable Energy Credit (REC) purchases
 - Zero Emission Credit (ZEC) purchases for nuclear
 - Tier 4 (offshore wind/transmission) costs
@@ -411,6 +417,7 @@ You might wonder: why not just set these adjustments at fixed levels?
 | Variable adjustments | Allow continuous true-up within PSC-approved framework |
 
 The variable adjustment mechanism is a regulatory compromise:
+
 - **Utilities** get timely cost recovery
 - **Customers** pay actual costs (no more, no less)
 - **PSC** maintains oversight through filing requirements
