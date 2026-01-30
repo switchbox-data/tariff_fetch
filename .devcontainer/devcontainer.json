@@ -14,13 +14,14 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "tamasfe.even-better-toml",
+        "tombi-toml.tombi",
         "nefrob.vscode-just-syntax",
         "davidanson.vscode-markdownlint",
         "christian-kohler.path-intellisense",
         "ms-python.python",
         "charliermarsh.ruff",
-        "astral-sh.ty"
+        "astral-sh.ty",
+        "tekumara.typos-vscode"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/workspaces/tariff_fetch/.venv/bin/python",
