@@ -75,10 +75,13 @@ build-and-publish: build publish
 # =============================================================================
 # These commands help you set up your development environment
 
-# Install the virtual environment and install the pre-commit hooks
+# Install uv, python packages, r packages, prek, and pre-commit hooks
 install:
-    echo "🚀 Creating virtual environment using uv"
-    .devcontainer/postCreateCommand.sh
+    @echo "🚀 Setting up development environment\n"
+    @.devcontainer/install-python-deps.sh .
+    @.devcontainer/install-prek.sh
+    @.devcontainer/install-prek-deps.sh
+    @echo "✨ Development environment ready!\n"
 
 # Clean generated files and caches
 clean:
