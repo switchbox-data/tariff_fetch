@@ -11,6 +11,7 @@ Riders are **modular tariff components** that can be attached to multiple base t
 Riders have a **two-part structure** in the tariff:
 
 **1. Rider Reference** (placeholder with `riderId`):
+
 ```json
 {
   "rateName": "CBC Rider",
@@ -21,6 +22,7 @@ Riders have a **two-part structure** in the tariff:
 ```
 
 **2. Rider Implementation** (actual rate with `riderTariffId`):
+
 ```json
 {
   "rateName": "Customer Benefit Contribution",
@@ -44,15 +46,15 @@ You typically don't need to. The main tariff includes resolved rider rates. Howe
 
 ## Overview of ConEd Riders
 
-| Rider | What It Funds | Who Pays | Typical Impact |
-|-------|---------------|----------|----------------|
-| Tax Sur-Credit | Tax over/under-collection | All customers | ±$0-2/month |
-| DLM Surcharge | Demand response programs | All customers | ~$0.50/month |
-| CBC | Solar customer grid costs | Solar customers only | $1.84/kW/month |
-| EV Make Ready | EV charging infrastructure | All customers | ~$0.40/month |
-| Arrears Management | COVID debt forgiveness | All customers | ~$0.60/month |
-| GRT | Municipal gross receipts taxes | All customers | 4-9% of bill |
-| VDER Cost Recovery | Solar compensation payments | All customers | ~$0.55/month |
+| Rider              | What It Funds                  | Who Pays             | Typical Impact |
+| ------------------ | ------------------------------ | -------------------- | -------------- |
+| Tax Sur-Credit     | Tax over/under-collection      | All customers        | ±$0-2/month    |
+| DLM Surcharge      | Demand response programs       | All customers        | ~$0.50/month   |
+| CBC                | Solar customer grid costs      | Solar customers only | $1.84/kW/month |
+| EV Make Ready      | EV charging infrastructure     | All customers        | ~$0.40/month   |
+| Arrears Management | COVID debt forgiveness         | All customers        | ~$0.60/month   |
+| GRT                | Municipal gross receipts taxes | All customers        | 4-9% of bill   |
+| VDER Cost Recovery | Solar compensation payments    | All customers        | ~$0.55/month   |
 
 ---
 
@@ -102,6 +104,7 @@ For a 500 kWh/month customer: **-$0.63/month credit**
 Post-2017, customers received significant credits. As rate cases catch up to the new tax reality, this rider trends toward zero but still captures ongoing property tax variances.
 
 ### Variable Rate Key
+
 ```json
 "variableRateKey": "taxSurCreditSC1"
 ```
@@ -142,12 +145,12 @@ ConEd now runs multiple demand response programs:
 
 ### What the Surcharge Funds
 
-| Program Component | Purpose |
-|-------------------|---------|
-| Customer incentive payments | Pay participants to reduce load |
-| Battery dispatch payments | Compensate storage for discharging |
-| Program administration | ConEd staff, technology platforms |
-| Evaluation & measurement | Verify demand reductions actually occurred |
+| Program Component           | Purpose                                    |
+| --------------------------- | ------------------------------------------ |
+| Customer incentive payments | Pay participants to reduce load            |
+| Battery dispatch payments   | Compensate storage for discharging         |
+| Program administration      | ConEd staff, technology platforms          |
+| Evaluation & measurement    | Verify demand reductions actually occurred |
 
 ### How It Works
 
@@ -179,9 +182,11 @@ With DLM:
 The surcharge exists because demand response creates **system-wide benefits** (lower costs, fewer emissions, more reliability) that all customers share.
 
 ### Current Typical Value
+
 ~$0.001/kWh → ~$0.50/month for typical residential customer
 
 ### Variable Rate Key
+
 ```json
 "variableRateKey": "dynamicLoadManagementSurcharge2252SC1"
 ```
@@ -253,7 +258,9 @@ The grid must be sized to handle your **maximum possible export or import**, whi
 Larger systems create more grid capacity needs, hence the $/kW structure.
 
 ### Fixed Rate (Not Variable)
+
 Unlike most riders, CBC has a fixed rate in the tariff:
+
 ```json
 "rateAmount": 1.84,
 "rateUnit": "COST_PER_UNIT",
@@ -284,11 +291,11 @@ Remove infrastructure as a barrier to EV adoption. Property owners install charg
 
 ### What It Funds
 
-| Component | What ConEd Pays For |
-|-----------|---------------------|
-| Utility-side work | Transformer upgrades, new service drops |
-| Customer-side work | Conduit, wiring, panels (to the charger location) |
-| Program administration | Application processing, inspections |
+| Component              | What ConEd Pays For                               |
+| ---------------------- | ------------------------------------------------- |
+| Utility-side work      | Transformer upgrades, new service drops           |
+| Customer-side work     | Conduit, wiring, panels (to the charger location) |
+| Program administration | Application processing, inspections               |
 
 ### How It Works
 
@@ -356,11 +363,11 @@ Even with assistance programs, utilities were left with unrecoverable debt beyon
 
 ### What It Funds
 
-| Component | Description |
-|-----------|-------------|
-| Forgiven debt | Balances written off under hardship programs |
-| State program administration | Processing assistance applications |
-| Extended payment plan losses | Time value of money on payment plans |
+| Component                    | Description                                  |
+| ---------------------------- | -------------------------------------------- |
+| Forgiven debt                | Balances written off under hardship programs |
+| State program administration | Processing assistance applications           |
+| Extended payment plan losses | Time value of money on payment plans         |
 
 ### How It Works
 
@@ -432,11 +439,11 @@ It's split into two components:
 
 ### Current Rates
 
-| Zone | GRT Distribution | GRT Supply | Total |
-|------|------------------|------------|-------|
-| H (Upper Westchester) | 3.3322% | 1.0101% | 4.34% |
-| I (Lower Westchester) | 5.5127% | 3.0928% | 8.61% |
-| J (NYC) | 4.7940% | 2.4066% | 7.20% |
+| Zone                  | GRT Distribution | GRT Supply | Total |
+| --------------------- | ---------------- | ---------- | ----- |
+| H (Upper Westchester) | 3.3322%          | 1.0101%    | 4.34% |
+| I (Lower Westchester) | 5.5127%          | 3.0928%    | 8.61% |
+| J (NYC)               | 4.7940%          | 2.4066%    | 7.20% |
 
 ### Example
 
@@ -462,6 +469,7 @@ If you use an ESCO, you don't pay ConEd's supply charges, so GRT Supply doesn't 
 ### The QUANTITY Charge Type
 
 In the JSON, GRT uses `chargeType: "QUANTITY"` with `rateUnit: "PERCENTAGE"`:
+
 ```json
 {
   "rateName": "GRT Distribution - Zone J",
@@ -498,13 +506,13 @@ The PSC replaced net metering with the "Value Stack":
 
 **The Value Stack Components**
 
-| Component | What It Values | Typical Value |
-|-----------|----------------|---------------|
-| Energy | Avoided wholesale energy cost | ~$0.03-0.08/kWh |
-| Capacity | Avoided generation capacity | ~$0.02-0.04/kWh |
-| Environmental (E) | Social cost of carbon | ~$0.02-0.03/kWh |
-| Demand Reduction (DRV) | Avoided distribution investment | $0.00-0.10/kWh |
-| Locational (LSRV) | Avoided transmission/local distribution | $0.00-0.05/kWh |
+| Component              | What It Values                          | Typical Value   |
+| ---------------------- | --------------------------------------- | --------------- |
+| Energy                 | Avoided wholesale energy cost           | ~$0.03-0.08/kWh |
+| Capacity               | Avoided generation capacity             | ~$0.02-0.04/kWh |
+| Environmental (E)      | Social cost of carbon                   | ~$0.02-0.03/kWh |
+| Demand Reduction (DRV) | Avoided distribution investment         | $0.00-0.10/kWh  |
+| Locational (LSRV)      | Avoided transmission/local distribution | $0.00-0.05/kWh  |
 
 ### How VDER Costs Arise
 
@@ -558,15 +566,15 @@ Together, they create a balanced framework where:
 
 ## Summary: The Policy Story Behind Each Rider
 
-| Rider | Era | Policy Driver |
-|-------|-----|---------------|
-| Tax Sur-Credit | 2017+ | Federal tax reform, ongoing property tax changes |
-| DLM Surcharge | 2014+ | REV grid modernization, demand response over generation |
-| CBC | 2017+ | VDER solar reform, ensuring solar pays for grid use |
-| EV Make Ready | 2020+ | Transportation electrification, climate goals |
-| Arrears Management | 2020+ | COVID pandemic response, utility customer protection |
-| GRT | Long-standing | Municipal taxation authority |
-| VDER Cost Recovery | 2017+ | VDER solar reform, compensating distributed generation |
+| Rider              | Era           | Policy Driver                                           |
+| ------------------ | ------------- | ------------------------------------------------------- |
+| Tax Sur-Credit     | 2017+         | Federal tax reform, ongoing property tax changes        |
+| DLM Surcharge      | 2014+         | REV grid modernization, demand response over generation |
+| CBC                | 2017+         | VDER solar reform, ensuring solar pays for grid use     |
+| EV Make Ready      | 2020+         | Transportation electrification, climate goals           |
+| Arrears Management | 2020+         | COVID pandemic response, utility customer protection    |
+| GRT                | Long-standing | Municipal taxation authority                            |
+| VDER Cost Recovery | 2017+         | VDER solar reform, compensating distributed generation  |
 
 ---
 
@@ -575,6 +583,7 @@ Together, they create a balanced framework where:
 Riders have a two-part structure:
 
 **1. Rider Reference (in main tariff)**
+
 ```json
 {
   "tariffRateId": 20389577,
@@ -587,6 +596,7 @@ Riders have a two-part structure:
 ```
 
 **2. Rider Implementation (detailed rate)**
+
 ```json
 {
   "tariffRateId": 20443074,
@@ -611,13 +621,13 @@ When processing the JSON, look for both:
 
 ## Quick Reference: Rider Calculation Methods
 
-| Rider | Charge Type | Basis | Rate Structure |
-|-------|-------------|-------|----------------|
-| Tax Sur-Credit | CONSUMPTION_BASED | Per kWh | Variable (lookup) |
-| DLM Surcharge | CONSUMPTION_BASED | Per kWh | Variable (lookup) |
-| CBC | QUANTITY | Per kW of solar | Fixed ($1.84/kW) |
-| EV Make Ready | CONSUMPTION_BASED | Per kWh | Fixed ($0.0008) |
-| Arrears Management | CONSUMPTION_BASED | Per kWh | Fixed ($0.0012) |
-| GRT Distribution | QUANTITY | % of delivery charges | Fixed by zone |
-| GRT Supply | QUANTITY | % of supply charges | Fixed by zone |
-| VDER Cost Recovery | CONSUMPTION_BASED | Per kWh | Fixed ($0.0011) |
+| Rider              | Charge Type       | Basis                 | Rate Structure    |
+| ------------------ | ----------------- | --------------------- | ----------------- |
+| Tax Sur-Credit     | CONSUMPTION_BASED | Per kWh               | Variable (lookup) |
+| DLM Surcharge      | CONSUMPTION_BASED | Per kWh               | Variable (lookup) |
+| CBC                | QUANTITY          | Per kW of solar       | Fixed ($1.84/kW)  |
+| EV Make Ready      | CONSUMPTION_BASED | Per kWh               | Fixed ($0.0008)   |
+| Arrears Management | CONSUMPTION_BASED | Per kWh               | Fixed ($0.0012)   |
+| GRT Distribution   | QUANTITY          | % of delivery charges | Fixed by zone     |
+| GRT Supply         | QUANTITY          | % of supply charges   | Fixed by zone     |
+| VDER Cost Recovery | CONSUMPTION_BASED | Per kWh               | Fixed ($0.0011)   |

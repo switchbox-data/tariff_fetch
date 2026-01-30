@@ -21,7 +21,9 @@
         "ms-python.python",
         "charliermarsh.ruff",
         "astral-sh.ty",
-        "tekumara.typos-vscode"
+        "tekumara.typos-vscode",
+        "foxundermoon.shell-format",
+        "dprint.dprint"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/workspaces/tariff_fetch/.venv/bin/python",
@@ -38,6 +40,15 @@
             "source.fixAll": "explicit",
             "source.organizeImports": "explicit"
           }
+        },
+        "shellformat.flag": "-i 2",
+        "[shellscript]": {
+          "editor.defaultFormatter": "foxundermoon.shell-format",
+          "editor.formatOnSave": true
+        },
+        "[markdown]": {
+          "editor.defaultFormatter": "dprint.dprint",
+          "editor.formatOnSave": true
         }
       }
     }

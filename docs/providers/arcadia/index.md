@@ -20,14 +20,13 @@ The Signal API uses a custom JSON objects to represent tariffs, with a complex h
 
 ## Key Endpoints
 
-| Endpoint | Purpose |
-|----------|---------|
-| `GET /tariffs` | Search and retrieve tariffs |
-| `GET /tariffs/{tariffId}` | Get a specific tariff with rates |
-| `GET /tariffs/{masterTariffId}/history` | Historical versions |
-| `GET /properties/{key}/lookups` | Variable rate values |
-| `POST /calculate` | Bill calculations |
-
+| Endpoint                                | Purpose                          |
+| --------------------------------------- | -------------------------------- |
+| `GET /tariffs`                          | Search and retrieve tariffs      |
+| `GET /tariffs/{tariffId}`               | Get a specific tariff with rates |
+| `GET /tariffs/{masterTariffId}/history` | Historical versions              |
+| `GET /properties/{key}/lookups`         | Variable rate values             |
+| `POST /calculate`                       | Bill calculations                |
 
 ## Pricing
 

@@ -25,13 +25,13 @@ Every URDB rate has these common metadata fields:
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `label` | Unique identifier for this rate |
-| `utility` | Utility company name |
-| `name` | Rate schedule name |
-| `sector` | Customer class: Residential, Commercial, Industrial, Lighting |
-| `startdate` / `enddate` | Unix timestamps for when the rate is effective |
+| Field                   | Description                                                   |
+| ----------------------- | ------------------------------------------------------------- |
+| `label`                 | Unique identifier for this rate                               |
+| `utility`               | Utility company name                                          |
+| `name`                  | Rate schedule name                                            |
+| `sector`                | Customer class: Residential, Commercial, Industrial, Lighting |
+| `startdate` / `enddate` | Unix timestamps for when the rate is effective                |
 
 Beyond metadata, a rate can include:
 
@@ -42,18 +42,17 @@ Beyond metadata, a rate can include:
 
 We will walk through each in turn, building intuition via examples.
 
-
 ### Rate Tier Properties
 
 This will make more sense when we get to the examples, but throughout this guide, you'll see tier objects inside rate structures. The available properties depend on the structure type:
 
 | Property | `energyratestructure` | `flatdemandstructure` | `demandratestructure` |
-|----------|:---------------------:|:---------------------:|:---------------------:|
-| `rate` | ✓ | ✓ | ✓ |
-| `max` | ✓ | ✓ | ✓ |
-| `unit` | ✓ | — | — |
-| `adj` | ✓ | ✓ | ✓ |
-| `sell` | ✓ | — | ✓ |
+| -------- | :-------------------: | :-------------------: | :-------------------: |
+| `rate`   |           ✓           |           ✓           |           ✓           |
+| `max`    |           ✓           |           ✓           |           ✓           |
+| `unit`   |           ✓           |           —           |           —           |
+| `adj`    |           ✓           |           ✓           |           ✓           |
+| `sell`   |           ✓           |           —           |           ✓           |
 
 - **`rate`** — The rate amount ($/kWh or $/kW)
 - **`max`** — Cumulative upper limit for this tier
@@ -99,12 +98,12 @@ The simplest possible rate—just a monthly customer charge with no usage-based 
 }
 ```
 
-| Field | Description |
-|-------|-------------|
+| Field                   | Description                            |
+| ----------------------- | -------------------------------------- |
 | `fixedchargefirstmeter` | Monthly fixed charge (customer charge) |
-| `fixedchargeunits` | Unit for the fixed charge |
-| `mincharge` | Minimum bill amount (floor) |
-| `minchargeunits` | Unit for minimum charge |
+| `fixedchargeunits`      | Unit for the fixed charge              |
+| `mincharge`             | Minimum bill amount (floor)            |
+| `minchargeunits`        | Unit for minimum charge                |
 
 #### Bill Calculation
 
@@ -289,17 +288,18 @@ This example shows an inclining tiered rate:
 
 Recall that `energyratestructure` is an array of periods, where each period is an array of tiers. We still have just **one period** (index 0), but now it contains **three tiers**:
 
-| Tier | `max` | `rate` | Meaning |
-|------|-------|--------|---------|
-| 0 | 500 | 0.08 | First 500 kWh at $0.08 |
-| 1 | 1000 | 0.12 | Next 500 kWh (501-1000) at $0.12 |
-| 2 | _(none)_ | 0.15 | Everything above 1000 kWh at $0.15 |
+| Tier | `max`    | `rate` | Meaning                            |
+| ---- | -------- | ------ | ---------------------------------- |
+| 0    | 500      | 0.08   | First 500 kWh at $0.08             |
+| 1    | 1000     | 0.12   | Next 500 kWh (501-1000) at $0.12   |
+| 2    | _(none)_ | 0.15   | Everything above 1000 kWh at $0.15 |
 
 The `max` field indicates the **cumulative** upper limit for that tier (see [Rate Tier Properties](#rate-tier-properties)). The final tier has no `max` — it applies to all remaining usage.
 
 #### Bill Calculation
 
 For 800 kWh usage:
+
 ```
 Tier 1: 500 kWh × $0.08 = $40.00
 Tier 2: 300 kWh × $0.12 = $36.00
@@ -384,10 +384,10 @@ This example has two seasons with flat (non-tiered) rates:
 
 Recall that `energyratestructure` is an array of periods, where each period is an array of tiers. We now have **two periods**, each with just **one tier** (no tiering):
 
-| Period | Season | Rate |
-|--------|--------|------|
-| 0 | Winter | $0.08/kWh |
-| 1 | Summer | $0.12/kWh |
+| Period | Season | Rate      |
+| ------ | ------ | --------- |
+| 0      | Winter | $0.08/kWh |
+| 1      | Summer | $0.12/kWh |
 
 **The schedules** now vary by month:
 
@@ -497,10 +497,10 @@ This example has two periods year-round (no seasonal variation, no tiers):
 
 Recall that `energyratestructure` is an array of periods, where each period is an array of tiers. We have **two periods**, each with **one tier**:
 
-| Period | TOU | Rate |
-|--------|-----|------|
-| 0 | Off-Peak | $0.08/kWh |
-| 1 | Peak | $0.20/kWh |
+| Period | TOU      | Rate      |
+| ------ | -------- | --------- |
+| 0      | Off-Peak | $0.08/kWh |
+| 1      | Peak     | $0.20/kWh |
 
 **The schedules** now vary by hour (not month). Every row is identical because there's no seasonal variation:
 
@@ -538,12 +538,12 @@ This final example combines **all three dimensions** we've covered:
 - **Time-of-Use**: Peak vs. Off-Peak (different prices by hour)
 - **Tiers**: First 500 kWh vs. over 500 kWh (different prices by consumption)
 
-| Season | TOU Period | Hours | Tier 1 (≤500) | Tier 2 (>500) |
-|--------|------------|-------|---------------|---------------|
-| Summer | Peak | 2pm-7pm weekdays | $0.25 | $0.35 |
-| Summer | Off-Peak | All other times | $0.10 | $0.15 |
-| Winter | Peak | 6am-9am, 5pm-8pm weekdays | $0.15 | $0.20 |
-| Winter | Off-Peak | All other times | $0.08 | $0.10 |
+| Season | TOU Period | Hours                     | Tier 1 (≤500) | Tier 2 (>500) |
+| ------ | ---------- | ------------------------- | ------------- | ------------- |
+| Summer | Peak       | 2pm-7pm weekdays          | $0.25         | $0.35         |
+| Summer | Off-Peak   | All other times           | $0.10         | $0.15         |
+| Winter | Peak       | 6am-9am, 5pm-8pm weekdays | $0.15         | $0.20         |
+| Winter | Off-Peak   | All other times           | $0.08         | $0.10         |
 
 #### URDB JSON
 
@@ -612,12 +612,12 @@ This final example combines **all three dimensions** we've covered:
 
 This combines everything from the previous examples. Recall that `energyratestructure` is an array of periods, where each period is an array of tiers. We now have **four periods** (2 seasons × 2 TOU periods), each with **two tiers**:
 
-| Period | Season | TOU | Tier 1 (≤500) | Tier 2 (>500) |
-|--------|--------|-----|---------------|---------------|
-| 0 | Winter | Off-Peak | $0.08 | $0.10 |
-| 1 | Winter | Peak | $0.15 | $0.20 |
-| 2 | Summer | Off-Peak | $0.10 | $0.15 |
-| 3 | Summer | Peak | $0.25 | $0.35 |
+| Period | Season | TOU      | Tier 1 (≤500) | Tier 2 (>500) |
+| ------ | ------ | -------- | ------------- | ------------- |
+| 0      | Winter | Off-Peak | $0.08         | $0.10         |
+| 1      | Winter | Peak     | $0.15         | $0.20         |
+| 2      | Summer | Off-Peak | $0.10         | $0.15         |
+| 3      | Summer | Peak     | $0.25         | $0.35         |
 
 **`energyweekdayschedule`** varies by both month AND hour:
 
@@ -668,13 +668,13 @@ Demand charges are based on your **peak power draw** (kW), not total consumption
 
 Demand charges use structures parallel to energy charges:
 
-| Energy Field | Demand Equivalent | Description |
-|--------------|-------------------|-------------|
-| `energyratestructure` | `flatdemandstructure` | Seasonal/monthly demand tiers |
-| `energyratestructure` | `demandratestructure` | TOU demand periods/tiers |
-| `energyweekdayschedule` | `demandweekdayschedule` | Maps hours to TOU demand periods |
-| `energyweekendschedule` | `demandweekendschedule` | Weekend TOU demand schedule |
-| — | `flatdemandmonths` | Maps months to flatdemandstructure periods |
+| Energy Field            | Demand Equivalent       | Description                                |
+| ----------------------- | ----------------------- | ------------------------------------------ |
+| `energyratestructure`   | `flatdemandstructure`   | Seasonal/monthly demand tiers              |
+| `energyratestructure`   | `demandratestructure`   | TOU demand periods/tiers                   |
+| `energyweekdayschedule` | `demandweekdayschedule` | Maps hours to TOU demand periods           |
+| `energyweekendschedule` | `demandweekendschedule` | Weekend TOU demand schedule                |
+| —                       | `flatdemandmonths`      | Maps months to flatdemandstructure periods |
 
 ### Example: Flat Demand Charge
 
@@ -780,10 +780,10 @@ This example shows demand charges that vary by time of day. Peak demand during e
 
 **`demandratestructure`** — TOU demand periods (tiers don't have `unit`—it comes from `demandrateunit`):
 
-| Period | TOU | Rate |
-|--------|-----|------|
-| 0 | Off-Peak | $5.00/kW |
-| 1 | Peak | $15.00/kW |
+| Period | TOU      | Rate      |
+| ------ | -------- | --------- |
+| 0      | Off-Peak | $5.00/kW  |
+| 1      | Peak     | $15.00/kW |
 
 **`demandweekdayschedule`** and **`demandweekendschedule`** — Same 12×24 format as energy schedules. Peak demand is measured during hours 14-18 (2pm-6pm) on weekdays.
 
@@ -821,12 +821,12 @@ The structure mirrors what we saw in the energy charge examples:
 
 Rates can combine all three charge types, and the URDB format supports this naturally—you simply include the relevant fields for each:
 
-| Charge Type | Required Fields |
-|-------------|-----------------|
-| Fixed | `fixedchargefirstmeter`, `fixedchargeunits` |
-| Energy | `energyratestructure`, `energyweekdayschedule`, `energyweekendschedule` |
-| Demand (flat/seasonal) | `flatdemandstructure`, `flatdemandmonths` |
-| Demand (TOU) | `demandratestructure`, `demandweekdayschedule`, `demandweekendschedule` |
+| Charge Type            | Required Fields                                                         |
+| ---------------------- | ----------------------------------------------------------------------- |
+| Fixed                  | `fixedchargefirstmeter`, `fixedchargeunits`                             |
+| Energy                 | `energyratestructure`, `energyweekdayschedule`, `energyweekendschedule` |
+| Demand (flat/seasonal) | `flatdemandstructure`, `flatdemandmonths`                               |
+| Demand (TOU)           | `demandratestructure`, `demandweekdayschedule`, `demandweekendschedule` |
 
 ### Example: Fixed + Energy + Flat Demand
 
@@ -903,12 +903,12 @@ Each charge type uses its own independent set of fields. The bill calculation si
 
 Beyond the core fixed, energy, and demand charges, utility rates often include various adjustments that modify the base charges.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `fueladjustmentsmonthly` | Array of 12 floats | Monthly $/kWh fuel adjustments |
-| `dgrules` | String | Distributed generation compensation policy |
-| `energyattrs` | Array of objects | Additional energy charge metadata |
-| `demandattrs` | Array of objects | Additional demand charge metadata |
+| Field                    | Type               | Description                                |
+| ------------------------ | ------------------ | ------------------------------------------ |
+| `fueladjustmentsmonthly` | Array of 12 floats | Monthly $/kWh fuel adjustments             |
+| `dgrules`                | String             | Distributed generation compensation policy |
+| `energyattrs`            | Array of objects   | Additional energy charge metadata          |
+| `demandattrs`            | Array of objects   | Additional demand charge metadata          |
 
 ### Fuel Adjustments
 
@@ -989,12 +989,12 @@ Total:                               $88.80
 
 For customers with solar panels or other generation, the `dgrules` field specifies how exported energy is compensated.
 
-| `dgrules` Value | Meaning |
-|-----------------|---------|
-| `Net Metering` | Exports offset imports 1:1 at retail rate |
+| `dgrules` Value             | Meaning                                                   |
+| --------------------------- | --------------------------------------------------------- |
+| `Net Metering`              | Exports offset imports 1:1 at retail rate                 |
 | `Net Billing Instantaneous` | Exports credited at sell rate, calculated instantaneously |
-| `Net Billing Hourly` | Exports credited at sell rate, calculated hourly |
-| `Buy All Sell All` | All generation sold to utility, all consumption purchased |
+| `Net Billing Hourly`        | Exports credited at sell rate, calculated hourly          |
+| `Buy All Sell All`          | All generation sold to utility, all consumption purchased |
 
 When using net billing, the `sell` property in [tier objects](#rate-tier-properties) specifies the export rate:
 
@@ -1079,13 +1079,13 @@ These are typically informational—they may represent line items that are alrea
 
 ## Comparison with Arcadia
 
-| Aspect | URDB | Arcadia |
-|--------|------|---------|
-| **Schedule granularity** | 12×24 arrays (month × hour) | Separate season/TOU objects |
-| **Period indexing** | Zero-based integers in schedules | Named periods with date ranges |
-| **Tier structure** | `max` is cumulative | `consumptionUpperLimit` is cumulative |
-| **Variable rates** | Not supported | `variableRateKey` for lookups |
-| **Riders** | Not separated | Explicit `riderId`/`riderTariffId` |
+| Aspect                   | URDB                             | Arcadia                               |
+| ------------------------ | -------------------------------- | ------------------------------------- |
+| **Schedule granularity** | 12×24 arrays (month × hour)      | Separate season/TOU objects           |
+| **Period indexing**      | Zero-based integers in schedules | Named periods with date ranges        |
+| **Tier structure**       | `max` is cumulative              | `consumptionUpperLimit` is cumulative |
+| **Variable rates**       | Not supported                    | `variableRateKey` for lookups         |
+| **Riders**               | Not separated                    | Explicit `riderId`/`riderTariffId`    |
 
 ---
 

@@ -21,17 +21,17 @@ Tariff (header)
 
 ## Key Tariff Fields
 
-| Field | Description |
-|-------|-------------|
-| `tariffId` | Unique ID for *this version* of the tariff |
-| `masterTariffId` | Persistent ID across all revisions of a tariff |
-| `tariffCode` | Utility's shortcode (e.g., "EL1", "E-1") |
-| `tariffName` | Official tariff name |
-| `lseId` | Load Serving Entity (utility) ID |
-| `effectiveDate` | When this version became effective |
-| `priorTariffId` | Previous version's `tariffId` |
-| `customerClass` | Target segment: RESIDENTIAL, COMMERCIAL, INDUSTRIAL, etc. |
-| `customerCount` | Approximate customers on this tariff |
+| Field            | Description                                               |
+| ---------------- | --------------------------------------------------------- |
+| `tariffId`       | Unique ID for _this version_ of the tariff                |
+| `masterTariffId` | Persistent ID across all revisions of a tariff            |
+| `tariffCode`     | Utility's shortcode (e.g., "EL1", "E-1")                  |
+| `tariffName`     | Official tariff name                                      |
+| `lseId`          | Load Serving Entity (utility) ID                          |
+| `effectiveDate`  | When this version became effective                        |
+| `priorTariffId`  | Previous version's `tariffId`                             |
+| `customerClass`  | Target segment: RESIDENTIAL, COMMERCIAL, INDUSTRIAL, etc. |
+| `customerCount`  | Approximate customers on this tariff                      |
 
 ### `tariffId` vs `masterTariffId`
 
@@ -46,13 +46,13 @@ To get historical versions, use the [Tariff History API](https://docs.arcadia.co
 
 These flags tell you what features a tariff has without parsing all the rates:
 
-| Flag | What It Tells You |
-|------|-------------------|
-| `hasTimeOfUseRates` | Rates vary by time of day (peak/off-peak) |
-| `hasTieredRates` | Some rates have consumption-based tiers |
+| Flag                 | What It Tells You                             |
+| -------------------- | --------------------------------------------- |
+| `hasTimeOfUseRates`  | Rates vary by time of day (peak/off-peak)     |
+| `hasTieredRates`     | Some rates have consumption-based tiers       |
 | `hasContractedRates` | Includes supply charges (for bundled service) |
-| `hasNetMetering` | Net metering is available for solar customers |
-| `isActive` | Tariff is currently in effect |
+| `hasNetMetering`     | Net metering is available for solar customers |
+| `isActive`           | Tariff is currently in effect                 |
 
 ---
 
@@ -71,21 +71,21 @@ Before running any calculations, the properties array reveals:
 
 ### Common Property Types
 
-| `propertyTypes` | Meaning |
-|-----------------|---------|
-| `RATE_CRITERIA` | Input that affects which rates apply or how they're calculated |
+| `propertyTypes` | Meaning                                                         |
+| --------------- | --------------------------------------------------------------- |
+| `RATE_CRITERIA` | Input that affects which rates apply or how they're calculated  |
 | `SERVICE_TERMS` | Describes service characteristics (informational, not an input) |
 
 ### Common Properties
 
-| Property | Description | Typical Use |
-|----------|-------------|-------------|
-| `consumption` | Energy usage (kWh) | All consumption-based charges |
-| `demand` | Peak demand (kW) | Demand charges (commercial tariffs) |
-| `territoryId` | Service zone/region | Zone-specific rates |
-| `systemSize` | Solar system capacity (kW) | Solar-related charges (CBC, net metering) |
-| `connectionType` | Single-phase vs. three-phase | Service charges |
-| `chargeClass` | Categories to include | Filtering SUPPLY vs. DISTRIBUTION |
+| Property         | Description                  | Typical Use                               |
+| ---------------- | ---------------------------- | ----------------------------------------- |
+| `consumption`    | Energy usage (kWh)           | All consumption-based charges             |
+| `demand`         | Peak demand (kW)             | Demand charges (commercial tariffs)       |
+| `territoryId`    | Service zone/region          | Zone-specific rates                       |
+| `systemSize`     | Solar system capacity (kW)   | Solar-related charges (CBC, net metering) |
+| `connectionType` | Single-phase vs. three-phase | Service charges                           |
+| `chargeClass`    | Categories to include        | Filtering SUPPLY vs. DISTRIBUTION         |
 
 ### Property Structure
 
@@ -120,26 +120,26 @@ The `rates` array contains the actual charges. Each `TariffRate` object represen
 
 ### Key Rate Fields
 
-| Field | Description |
-|-------|-------------|
-| `rateName` | Human-readable name |
-| `rateGroupName` | Category grouping (e.g., "Delivery Charges") |
-| `chargeType` | How it's calculated: FIXED_PRICE, CONSUMPTION_BASED, QUANTITY, MINIMUM |
-| `chargeClass` | Category: DISTRIBUTION, SUPPLY, TRANSMISSION, TAX |
-| `variableRateKey` | If present, rate value must be looked up via API |
-| `territory` | If present, rate is zone-specific |
-| `season` | If present, rate is seasonal |
-| `rateBands` | Tier structure with actual rate amounts |
+| Field             | Description                                                            |
+| ----------------- | ---------------------------------------------------------------------- |
+| `rateName`        | Human-readable name                                                    |
+| `rateGroupName`   | Category grouping (e.g., "Delivery Charges")                           |
+| `chargeType`      | How it's calculated: FIXED_PRICE, CONSUMPTION_BASED, QUANTITY, MINIMUM |
+| `chargeClass`     | Category: DISTRIBUTION, SUPPLY, TRANSMISSION, TAX                      |
+| `variableRateKey` | If present, rate value must be looked up via API                       |
+| `territory`       | If present, rate is zone-specific                                      |
+| `season`          | If present, rate is seasonal                                           |
+| `rateBands`       | Tier structure with actual rate amounts                                |
 
 ### Charge Types
 
-| `chargeType` | Meaning | Unit |
-|--------------|---------|------|
-| `FIXED_PRICE` | Flat monthly fee | $/month |
-| `CONSUMPTION_BASED` | Per-kWh charge | $/kWh |
-| `QUANTITY` | Based on a property value | Varies ($/kW, %) |
-| `DEMAND` | Based on peak demand | $/kW |
-| `MINIMUM` | Floor on total bill | $/month |
+| `chargeType`        | Meaning                   | Unit             |
+| ------------------- | ------------------------- | ---------------- |
+| `FIXED_PRICE`       | Flat monthly fee          | $/month          |
+| `CONSUMPTION_BASED` | Per-kWh charge            | $/kWh            |
+| `QUANTITY`          | Based on a property value | Varies ($/kW, %) |
+| `DEMAND`            | Based on peak demand      | $/kW             |
+| `MINIMUM`           | Floor on total bill       | $/month          |
 
 ### Variable Rates
 
@@ -156,13 +156,13 @@ Each rate has a `rateBands` array containing one or more `TariffRateBand` object
 
 ### Key Rate Band Fields
 
-| Field | Description |
-|-------|-------------|
-| `rateAmount` | The actual rate value |
-| `rateUnit` | COST_PER_UNIT, PERCENTAGE, etc. |
-| `consumptionUpperLimit` | For tiered rates, the kWh threshold |
-| `rateSequenceNumber` | Order of tiers (1, 2, 3...) |
-| `isCredit` | True if this is a credit (negative charge) |
+| Field                   | Description                                |
+| ----------------------- | ------------------------------------------ |
+| `rateAmount`            | The actual rate value                      |
+| `rateUnit`              | COST_PER_UNIT, PERCENTAGE, etc.            |
+| `consumptionUpperLimit` | For tiered rates, the kWh threshold        |
+| `rateSequenceNumber`    | Order of tiers (1, 2, 3...)                |
+| `isCredit`              | True if this is a credit (negative charge) |
 
 ### Tiered Rate Example
 

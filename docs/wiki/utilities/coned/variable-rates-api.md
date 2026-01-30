@@ -18,9 +18,9 @@ You downloaded a tariff (like ConEd EL1) and see rates with `variableRateKey`:
 
 The `rateAmount: 0.0` is a placeholder. The actual values change over time (monthly, in most cases). To get them, you have two options:
 
-| Approach | How It Works | What You Get |
-|----------|--------------|--------------|
-| **Lookups API** | Extract `variableRateKey` values from tariff → query each one | Raw rate values, exactly what you asked for |
+| Approach          | How It Works                                                       | What You Get                                    |
+| ----------------- | ------------------------------------------------------------------ | ----------------------------------------------- |
+| **Lookups API**   | Extract `variableRateKey` values from tariff → query each one      | Raw rate values, exactly what you asked for     |
 | **Calculate API** | Use tariff metadata to set up a billing scenario → run calculation | All applicable rates resolved for that scenario |
 
 **Key difference**: These approaches don't always give the same results.
@@ -54,11 +54,11 @@ If you:
 
 ### When Results Differ
 
-| Scenario | Lookups API | Calculate API |
-|----------|-------------|---------------|
-| Query all zone-specific MSC rates | Returns H, I, and J values | Returns only the zone you specified |
-| Customer without solar | Returns CBC rate if you query it | Won't include CBC (doesn't apply) |
-| Query a key that doesn't apply | Returns data anyway | Won't appear in results |
+| Scenario                          | Lookups API                      | Calculate API                       |
+| --------------------------------- | -------------------------------- | ----------------------------------- |
+| Query all zone-specific MSC rates | Returns H, I, and J values       | Returns only the zone you specified |
+| Customer without solar            | Returns CBC rate if you query it | Won't include CBC (doesn't apply)   |
+| Query a key that doesn't apply    | Returns data anyway              | Won't appear in results             |
 
 **Bottom line**: Lookups gives you raw data; Calculate gives you scenario-specific data.
 
@@ -95,6 +95,7 @@ print(f"Found {len(variable_keys)} variable rate keys")
 ```
 
 **For ConEd EL1, this returns keys like:**
+
 ```python
 [
     "marketSupplyChargeResidentialZoneH",
@@ -322,12 +323,12 @@ def filter_to_variable_rates(tariff_json, calculate_response):
 
 ### When to Use Each:
 
-| Goal | Use |
-|------|-----|
-| Get all variable rates for a specific customer scenario | Calculate API |
-| Get one rate's full history with forecast/actual breakdown | Lookups API |
-| Discover what variable rates exist without knowing keys | Calculate API |
-| Get raw data regardless of applicability | Lookups API |
+| Goal                                                       | Use           |
+| ---------------------------------------------------------- | ------------- |
+| Get all variable rates for a specific customer scenario    | Calculate API |
+| Get one rate's full history with forecast/actual breakdown | Lookups API   |
+| Discover what variable rates exist without knowing keys    | Calculate API |
+| Get raw data regardless of applicability                   | Lookups API   |
 
 ---
 
@@ -339,11 +340,11 @@ def filter_to_variable_rates(tariff_json, calculate_response):
 
 **Parameters**:
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `propertyKey` | Yes | The `variableRateKey` |
+| Parameter      | Required    | Description                    |
+| -------------- | ----------- | ------------------------------ |
+| `propertyKey`  | Yes         | The `variableRateKey`          |
 | `fromDateTime` | Recommended | Start of date range (ISO 8601) |
-| `toDateTime` | Recommended | End of date range (ISO 8601) |
+| `toDateTime`   | Recommended | End of date range (ISO 8601)   |
 
 **Default date behavior**: Last 72 hours if not specified.
 
@@ -360,14 +361,14 @@ def filter_to_variable_rates(tariff_json, calculate_response):
 
 **Key request fields**:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `masterTariffId` | Yes | From tariff JSON |
-| `fromDateTime` | Yes | Billing period start |
-| `toDateTime` | Yes | Billing period end |
-| `territoryId` | Depends | Required if tariff has multiple territories |
-| `detailLevel` | Yes | Use `CHARGE_TYPE_AND_TOU` or `RATE` |
-| `propertyInputs` | Yes | At minimum, consumption |
+| Field            | Required | Description                                 |
+| ---------------- | -------- | ------------------------------------------- |
+| `masterTariffId` | Yes      | From tariff JSON                            |
+| `fromDateTime`   | Yes      | Billing period start                        |
+| `toDateTime`     | Yes      | Billing period end                          |
+| `territoryId`    | Depends  | Required if tariff has multiple territories |
+| `detailLevel`    | Yes      | Use `CHARGE_TYPE_AND_TOU` or `RATE`         |
+| `propertyInputs` | Yes      | At minimum, consumption                     |
 
 **Response structure**:
 
@@ -479,14 +480,14 @@ for item in calculate_results["2024-01"]['results'][0]['items']:
 
 ## Summary
 
-| Aspect | Lookups API | Calculate API |
-|--------|-------------|---------------|
-| **Input needed** | `variableRateKey` from tariff | `masterTariffId`, `territoryId`, consumption |
-| **Output** | Raw rate values with forecast/actual | Resolved rates for specific scenario |
-| **Calls for 1 year, all rates** | ~16 (one per key) | 12 (one per month) |
-| **Includes non-applicable rates** | Yes (if you query them) | No (filtered by scenario) |
-| **Forecast vs. actual breakdown** | Yes | No |
-| **Discovers rates for you** | No (you must know keys) | Yes (returns all applicable) |
+| Aspect                            | Lookups API                          | Calculate API                                |
+| --------------------------------- | ------------------------------------ | -------------------------------------------- |
+| **Input needed**                  | `variableRateKey` from tariff        | `masterTariffId`, `territoryId`, consumption |
+| **Output**                        | Raw rate values with forecast/actual | Resolved rates for specific scenario         |
+| **Calls for 1 year, all rates**   | ~16 (one per key)                    | 12 (one per month)                           |
+| **Includes non-applicable rates** | Yes (if you query them)              | No (filtered by scenario)                    |
+| **Forecast vs. actual breakdown** | Yes                                  | No                                           |
+| **Discovers rates for you**       | No (you must know keys)              | Yes (returns all applicable)                 |
 
 **Use Lookups when**: You know exactly which rates you want and need raw historical data.
 

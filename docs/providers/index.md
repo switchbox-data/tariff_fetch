@@ -4,11 +4,11 @@
 
 ## Supported Providers
 
-| Provider | Product | Energy Types | Coverage | Data Format |
-|----------|---------|--------------|----------|-------------|
-| [Arcadia](arcadia/index.md) | Signal Tariffs API | Electricity | US utilities, comprehensive | Tariff JSON object |
-| [NREL](nrel/index.md) | Utility Rate Database (URDB) | Electricity | US utilities | URDB JSON format |
-| [Rate Acuity](rateacuity/index.md) | Web Portal | Electricity, Gas | US utilities | CSV exports |
+| Provider                           | Product                      | Energy Types     | Coverage                    | Data Format        |
+| ---------------------------------- | ---------------------------- | ---------------- | --------------------------- | ------------------ |
+| [Arcadia](arcadia/index.md)        | Signal Tariffs API           | Electricity      | US utilities, comprehensive | Tariff JSON object |
+| [NREL](nrel/index.md)              | Utility Rate Database (URDB) | Electricity      | US utilities                | URDB JSON format   |
+| [Rate Acuity](rateacuity/index.md) | Web Portal                   | Electricity, Gas | US utilities                | CSV exports        |
 
 ## Choosing a Provider
 

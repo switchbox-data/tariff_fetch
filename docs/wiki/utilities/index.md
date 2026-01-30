@@ -4,9 +4,9 @@ Guides organized by utility company.
 
 ## Available Utilities
 
-| Utility | LSE ID | Region | Service Type |
-|---------|--------|--------|--------------|
-| [Consolidated Edison (ConEd)](coned/index.md) | 2252 | New York City, Westchester | Electricity |
+| Utility                                       | LSE ID | Region                     | Service Type |
+| --------------------------------------------- | ------ | -------------------------- | ------------ |
+| [Consolidated Edison (ConEd)](coned/index.md) | 2252   | New York City, Westchester | Electricity  |
 
 ## Adding New Utilities
 

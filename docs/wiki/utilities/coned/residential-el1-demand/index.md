@@ -18,25 +18,25 @@ SC4 is ConEd's **demand-based rate** available to any residential customer who w
 
 Demand charges are based on your **peak power usage** (kW), not total energy consumption (kWh):
 
-| Concept | Energy (kWh) | Demand (kW) |
-|---------|--------------|-------------|
+| Concept          | Energy (kWh)                     | Demand (kW)                      |
+| ---------------- | -------------------------------- | -------------------------------- |
 | What it measures | Total electricity used over time | Maximum instantaneous power draw |
-| Analogy | Miles driven | Top speed reached |
-| Billing period | Sum of all usage | Highest 60-minute average |
-| Units | kilowatt-hours | kilowatts |
+| Analogy          | Miles driven                     | Top speed reached                |
+| Billing period   | Sum of all usage                 | Highest 60-minute average        |
+| Units            | kilowatt-hours                   | kilowatts                        |
 
 **Why demand charges exist:** The utility must build infrastructure to handle your peak load. A customer who uses 1,000 kWh spread evenly over a month costs less to serve than one who uses 1,000 kWh in concentrated bursts. Demand charges recover infrastructure costs more fairly.
 
 ### Key Differences from SC1 and SC3
 
-| Aspect | SC1 (Default) | SC3 (Vol. TOU) | SC4 (Demand-Based) |
-|--------|---------------|----------------|-------------------|
-| TOU | No | Yes | Yes |
-| Tiering | Yes | No | Partial (delivery adjustments) |
-| Demand Charges | No | No | **Yes** |
-| Applicability | Everyone | Opt-in | **Opt-in** |
-| Energy Input | `consumption` | `consumption[ON_PEAK/OFF_PEAK]` | `consumption` |
-| Demand Input | N/A | N/A | **`demand[ON_PEAK/OFF_PEAK]`** |
+| Aspect         | SC1 (Default) | SC3 (Vol. TOU)                  | SC4 (Demand-Based)             |
+| -------------- | ------------- | ------------------------------- | ------------------------------ |
+| TOU            | No            | Yes                             | Yes                            |
+| Tiering        | Yes           | No                              | Partial (delivery adjustments) |
+| Demand Charges | No            | No                              | **Yes**                        |
+| Applicability  | Everyone      | Opt-in                          | **Opt-in**                     |
+| Energy Input   | `consumption` | `consumption[ON_PEAK/OFF_PEAK]` | `consumption`                  |
+| Demand Input   | N/A           | N/A                             | **`demand[ON_PEAK/OFF_PEAK]`** |
 
 ### Who This Rate is For
 
@@ -66,14 +66,14 @@ SC4 uses a specific formula for billing demand:
 
 #### Example Calculation
 
-| Day | Max 60-min On-Peak (kW) | Max 60-min Off-Peak (kW) |
-|-----|-------------------------|--------------------------|
-| Day 1 | 4.2 | 2.1 |
-| Day 2 | 3.8 | 1.9 |
-| Day 3 | 5.1 | 2.3 |
-| Day 4 | 4.5 | 2.0 |
-| Day 5 | 3.9 | 2.2 |
-| ... | ... | ... |
+| Day   | Max 60-min On-Peak (kW) | Max 60-min Off-Peak (kW) |
+| ----- | ----------------------- | ------------------------ |
+| Day 1 | 4.2                     | 2.1                      |
+| Day 2 | 3.8                     | 1.9                      |
+| Day 3 | 5.1                     | 2.3                      |
+| Day 4 | 4.5                     | 2.0                      |
+| Day 5 | 3.9                     | 2.2                      |
+| ...   | ...                     | ...                      |
 
 **On-Peak Billing Demand** = Average of 3 highest = (5.1 + 4.5 + 4.2) / 3 = **4.6 kW**
 **Off-Peak Billing Demand** = Average of 3 highest = (2.3 + 2.2 + 2.1) / 3 = **2.2 kW**
@@ -88,11 +88,11 @@ SC4 uses a **different TOU schedule** than SC3. On-peak hours are more limited:
 
 ### Schedule Summary
 
-| Period | Hours | Days |
-|--------|-------|------|
-| **On-Peak** | 12:00 PM – 8:00 PM | Sun – Thu |
-| **Off-Peak** | All other hours | Sun – Thu |
-| **Off-Peak** | All day | **Fri – Sat** |
+| Period       | Hours              | Days          |
+| ------------ | ------------------ | ------------- |
+| **On-Peak**  | 12:00 PM – 8:00 PM | Sun – Thu     |
+| **Off-Peak** | All other hours    | Sun – Thu     |
+| **Off-Peak** | All day            | **Fri – Sat** |
 
 **Key differences from SC3:**
 
@@ -120,21 +120,21 @@ This schedule benefits customers who can shift high-demand activities to:
 
 ### Fixed Charges
 
-| Rate Name | Charge Type | Rate Value | Note |
-|-----------|-------------|------------|------|
-| Customer Charge | FIXED_PRICE | **$29.00/mo** | Higher than SC1/SC3 ($20) |
-| Billing and Payment Processing | FIXED_PRICE | $1.28/mo | Same as other tariffs |
+| Rate Name                      | Charge Type | Rate Value    | Note                      |
+| ------------------------------ | ----------- | ------------- | ------------------------- |
+| Customer Charge                | FIXED_PRICE | **$29.00/mo** | Higher than SC1/SC3 ($20) |
+| Billing and Payment Processing | FIXED_PRICE | $1.28/mo      | Same as other tariffs     |
 
 ### Demand Charges ($/kW)
 
 The core differentiator of SC4. Based on peak power draw, not energy consumption.
 
-| Season | TOU Period | Rate |
-|--------|------------|------|
-| Summer | On-Peak | **$25.36/kW** |
-| Summer | Off-Peak | $7.48/kW |
-| Winter | On-Peak | **$19.50/kW** |
-| Winter | Off-Peak | $7.48/kW |
+| Season | TOU Period | Rate          |
+| ------ | ---------- | ------------- |
+| Summer | On-Peak    | **$25.36/kW** |
+| Summer | Off-Peak   | $7.48/kW      |
+| Winter | On-Peak    | **$19.50/kW** |
+| Winter | Off-Peak   | $7.48/kW      |
 
 **Key observations:**
 
@@ -146,16 +146,16 @@ The core differentiator of SC4. Based on peak power draw, not energy consumption
 
 Same variable-rate adjustments as SC1/SC3, applied to total consumption:
 
-| Rate Name | Charge Type | Zone | Season | Tiered | Rate Value |
-|-----------|-------------|------|--------|--------|------------|
-| Delivery Revenue Surcharge | CONSUMPTION_BASED | All | All | No | *Lookup* |
-| Reconciliation Rate | CONSUMPTION_BASED | All | All | No | *Lookup* |
-| Transition Adjustment | CONSUMPTION_BASED | All | All | No | *Lookup* |
-| Uncollectible Bill Expense | CONSUMPTION_BASED | All | All | No | *Lookup* |
-| Monthly Adjustment Clause | CONSUMPTION_BASED | All | All | No | *Lookup* |
-| Revenue Decoupling Mechanism | CONSUMPTION_BASED | All | All | No | *Lookup* |
-| Clean Energy Standard (Delivery) | CONSUMPTION_BASED | All | All | No | *Lookup* |
-| Temporary Rate Adjustment | CONSUMPTION_BASED | H/I/J | Sum/Win | **Yes** | Credit (varies) |
+| Rate Name                        | Charge Type       | Zone  | Season  | Tiered  | Rate Value      |
+| -------------------------------- | ----------------- | ----- | ------- | ------- | --------------- |
+| Delivery Revenue Surcharge       | CONSUMPTION_BASED | All   | All     | No      | _Lookup_        |
+| Reconciliation Rate              | CONSUMPTION_BASED | All   | All     | No      | _Lookup_        |
+| Transition Adjustment            | CONSUMPTION_BASED | All   | All     | No      | _Lookup_        |
+| Uncollectible Bill Expense       | CONSUMPTION_BASED | All   | All     | No      | _Lookup_        |
+| Monthly Adjustment Clause        | CONSUMPTION_BASED | All   | All     | No      | _Lookup_        |
+| Revenue Decoupling Mechanism     | CONSUMPTION_BASED | All   | All     | No      | _Lookup_        |
+| Clean Energy Standard (Delivery) | CONSUMPTION_BASED | All   | All     | No      | _Lookup_        |
+| Temporary Rate Adjustment        | CONSUMPTION_BASED | H/I/J | Sum/Win | **Yes** | Credit (varies) |
 
 > **📘 Deep Dive**: For a complete explanation of delivery adjustments, see **[Delivery Adjustments Guide](../delivery-adjustments.md)**.
 
@@ -163,13 +163,13 @@ Same variable-rate adjustments as SC1/SC3, applied to total consumption:
 
 Same as SC1/SC3:
 
-| Rate Name | Zone | Rate Value |
-|-----------|------|------------|
-| MSC Rate | H/I/J | *Lookup* |
-| MSC I Adjustment | H/I/J | *Lookup* |
-| MSC II Adjustment | All | *Lookup* |
-| Clean Energy Standard (Supply) | All | *Lookup* |
-| Merchant Function Charge | All | *Lookup* |
+| Rate Name                      | Zone  | Rate Value |
+| ------------------------------ | ----- | ---------- |
+| MSC Rate                       | H/I/J | _Lookup_   |
+| MSC I Adjustment               | H/I/J | _Lookup_   |
+| MSC II Adjustment              | All   | _Lookup_   |
+| Clean Energy Standard (Supply) | All   | _Lookup_   |
+| Merchant Function Charge       | All   | _Lookup_   |
 
 > **📘 Deep Dive**: For a complete explanation of supply charges, see **[Supply Charges Guide](../supply-charges.md)**.
 
@@ -177,16 +177,16 @@ Same as SC1/SC3:
 
 Same riders as SC1/SC3:
 
-| Rider | Charge Type | Rate Value |
-|-------|-------------|------------|
-| Tax Sur-Credit | CONSUMPTION_BASED | *Lookup* |
-| Dynamic Load Management | CONSUMPTION_BASED | *Lookup* |
-| Customer Benefit Contribution | QUANTITY | $1.84/kW |
-| EV Make Ready Surcharge | CONSUMPTION_BASED | $0.0008/kWh |
-| Arrears Management Recovery | CONSUMPTION_BASED | $0.0012/kWh |
-| GRT Distribution | QUANTITY | 3.33–5.51% (by zone) |
-| GRT Supply | QUANTITY | 1.01–3.09% (by zone) |
-| VDER Cost Recovery | CONSUMPTION_BASED | $0.0011/kWh |
+| Rider                         | Charge Type       | Rate Value           |
+| ----------------------------- | ----------------- | -------------------- |
+| Tax Sur-Credit                | CONSUMPTION_BASED | _Lookup_             |
+| Dynamic Load Management       | CONSUMPTION_BASED | _Lookup_             |
+| Customer Benefit Contribution | QUANTITY          | $1.84/kW             |
+| EV Make Ready Surcharge       | CONSUMPTION_BASED | $0.0008/kWh          |
+| Arrears Management Recovery   | CONSUMPTION_BASED | $0.0012/kWh          |
+| GRT Distribution              | QUANTITY          | 3.33–5.51% (by zone) |
+| GRT Supply                    | QUANTITY          | 1.01–3.09% (by zone) |
+| VDER Cost Recovery            | CONSUMPTION_BASED | $0.0011/kWh          |
 
 > **📘 Deep Dive**: For a complete explanation of riders, see **[Riders Guide](../riders.md)**.
 
@@ -234,28 +234,28 @@ Same variable-rate adjustments as SC1/SC3, applied to **total consumption** (not
 
 > **📘 Deep Dive**: For regulatory background and calculation details, see **[Delivery Adjustments Guide](../delivery-adjustments.md)**.
 
-**Monthly Adjustment Clause (MAC)** — *Variable*
+**Monthly Adjustment Clause (MAC)** — _Variable_
 Umbrella adjustment for property taxes, storm costs, pension expenses.
 
-**Revenue Decoupling Mechanism (RDM) Adjustment** — *Variable*
+**Revenue Decoupling Mechanism (RDM) Adjustment** — _Variable_
 True-up for actual vs. expected sales volume.
 
-**Delivery Revenue Surcharge** — *Variable*
+**Delivery Revenue Surcharge** — _Variable_
 Supplemental revenue adjustment.
 
-**Clean Energy Standard Delivery Surcharge** — *Variable*
+**Clean Energy Standard Delivery Surcharge** — _Variable_
 Grid infrastructure costs for clean energy compliance.
 
-**Reconciliation Rate** — *Variable*
+**Reconciliation Rate** — _Variable_
 Legacy deferred costs from 1990s restructuring.
 
-**Transition Adjustment** — *Variable*
+**Transition Adjustment** — _Variable_
 Legacy deregulation costs.
 
-**Uncollectible Bill Expense** — *Variable*
+**Uncollectible Bill Expense** — _Variable_
 Bad debt recovery.
 
-**Temporary Rate Adjustment** — *Credit, varies by zone/season*
+**Temporary Rate Adjustment** — _Credit, varies by zone/season_
 A tiered credit that reduces delivery costs. Zone and season-specific.
 
 ---
@@ -266,26 +266,26 @@ Same as SC1/SC3—charges for the electricity commodity itself. Only apply if us
 
 > **📘 Deep Dive**: For NYISO settlement, load-weighted averaging, and reconciliation details, see **[Supply Charges Guide](../supply-charges.md)**.
 
-**MSC Rate (Market Supply Charge)** — *Variable, by zone*
+**MSC Rate (Market Supply Charge)** — _Variable, by zone_
 Base cost of electricity, forecasted monthly from wholesale prices.
 
-**MSC I Adjustment** — *Variable, by zone*
+**MSC I Adjustment** — _Variable, by zone_
 Reconciles actual energy costs vs. forecast.
 
-**MSC II Adjustment** — *Variable*
+**MSC II Adjustment** — _Variable_
 Reconciles capacity costs and ancillary services.
 
-**Clean Energy Standard Supply Surcharge** — *Variable*
+**Clean Energy Standard Supply Surcharge** — _Variable_
 RECs, ZECs, and other clean energy compliance costs.
 
-**Merchant Function Charge** — *Variable*
+**Merchant Function Charge** — _Variable_
 ConEd's costs to administer supply service.
 
 ---
 
 ### System Benefits Charge
 
-#### System Benefits Charge (SBC) — *Variable*
+#### System Benefits Charge (SBC) — _Variable_
 
 Funds NY's clean energy programs administered by NYSERDA.
 
@@ -293,7 +293,7 @@ Funds NY's clean energy programs administered by NYSERDA.
 
 ### NY State Surcharge
 
-#### New York State Surcharge — *Variable*
+#### New York State Surcharge — _Variable_
 
 Temporary surcharge for policy initiatives or one-time cost recovery.
 
@@ -311,11 +311,11 @@ If your total bill is less than $29, you pay $29 anyway. Higher than SC1/SC3 ($2
 
 Same riders as SC1/SC3. See **[Riders Guide](../riders.md)** for full details.
 
-#### Tax Sur-Credit — *Variable*
+#### Tax Sur-Credit — _Variable_
 
 Tax cost true-ups. Can be positive or negative.
 
-#### Dynamic Load Management (DLM) Surcharge — *Variable*
+#### Dynamic Load Management (DLM) Surcharge — _Variable_
 
 Demand response program costs.
 
@@ -335,11 +335,11 @@ COVID-era arrears recovery.
 
 Municipal taxes on utilities:
 
-| Zone | GRT Distribution | GRT Supply |
-|------|------------------|------------|
-| H (Upper Westchester) | 3.3322% | 1.0101% |
-| I (Lower Westchester) | 5.5127% | 3.0928% |
-| J (NYC) | 4.7940% | 2.4066% |
+| Zone                  | GRT Distribution | GRT Supply |
+| --------------------- | ---------------- | ---------- |
+| H (Upper Westchester) | 3.3322%          | 1.0101%    |
+| I (Lower Westchester) | 5.5127%          | 3.0928%    |
+| J (NYC)               | 4.7940%          | 2.4066%    |
 
 #### VDER Cost Recovery — $0.0011/kWh
 
@@ -357,36 +357,36 @@ A Zone J customer in July (Summer) with:
 
 ### Fixed Charges
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| Customer Charge | $29.00 | $29.00 |
-| Billing & Payment | $1.28 | $1.28 |
-| **Subtotal Fixed** | | **$30.28** |
+| Charge             | Calculation | Amount     |
+| ------------------ | ----------- | ---------- |
+| Customer Charge    | $29.00      | $29.00     |
+| Billing & Payment  | $1.28       | $1.28      |
+| **Subtotal Fixed** |             | **$30.28** |
 
 ### Demand Charges
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| Summer On-Peak Demand | 5 kW × $25.36 | $126.80 |
-| Summer Off-Peak Demand | 3 kW × $7.48 | $22.44 |
-| **Subtotal Demand** | | **$149.24** |
+| Charge                 | Calculation   | Amount      |
+| ---------------------- | ------------- | ----------- |
+| Summer On-Peak Demand  | 5 kW × $25.36 | $126.80     |
+| Summer Off-Peak Demand | 3 kW × $7.48  | $22.44      |
+| **Subtotal Demand**    |               | **$149.24** |
 
 ### Energy Charges (Delivery Adjustments + Supply)
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| Delivery Adjustments | 800 kWh × ~$0.02 (varies) | ~$16.00 |
-| MSC + Adjustments | 800 kWh × ~$0.09 (varies) | ~$72.00 |
-| CES (Delivery + Supply) | 800 kWh × ~$0.006 | ~$4.80 |
-| **Subtotal Energy** | | **~$92.80** |
+| Charge                  | Calculation               | Amount      |
+| ----------------------- | ------------------------- | ----------- |
+| Delivery Adjustments    | 800 kWh × ~$0.02 (varies) | ~$16.00     |
+| MSC + Adjustments       | 800 kWh × ~$0.09 (varies) | ~$72.00     |
+| CES (Delivery + Supply) | 800 kWh × ~$0.006         | ~$4.80      |
+| **Subtotal Energy**     |                           | **~$92.80** |
 
 ### Riders & Taxes
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| Various Riders | 800 kWh × ~$0.004 | ~$3.20 |
-| GRT | ~$273 × ~7% | ~$19.11 |
-| **Subtotal Riders** | | **~$22.31** |
+| Charge              | Calculation       | Amount      |
+| ------------------- | ----------------- | ----------- |
+| Various Riders      | 800 kWh × ~$0.004 | ~$3.20      |
+| GRT                 | ~$273 × ~7%       | ~$19.11     |
+| **Subtotal Riders** |                   | **~$22.31** |
 
 ### Total
 
@@ -554,7 +554,7 @@ The complete tariff JSON response from the Arcadia Signal API is included below 
 }
 ```
 
-*Note: The JSON above is a representative excerpt showing key rate structures. Some rates have been omitted for brevity. The actual tariff contains delivery adjustments, supply charges, and riders.*
+_Note: The JSON above is a representative excerpt showing key rate structures. Some rates have been omitted for brevity. The actual tariff contains delivery adjustments, supply charges, and riders._
 
 </details>
 
@@ -583,11 +583,11 @@ SC4 introduces the `DEMAND_BASED` charge type, distinct from `CONSUMPTION_BASED`
 }
 ```
 
-| Field | Description |
-|-------|-------------|
+| Field                        | Description                                    |
+| ---------------------------- | ---------------------------------------------- |
 | `chargeType: "DEMAND_BASED"` | Charge calculated from peak demand, not energy |
-| `quantityKey` | Specifies which demand calculation to use |
-| `rateAmount` | $/kW (dollars per kilowatt of demand) |
+| `quantityKey`                | Specifies which demand calculation to use      |
+| `rateAmount`                 | $/kW (dollars per kilowatt of demand)          |
 
 ### Multiple TOU Periods
 
@@ -609,15 +609,15 @@ This is how the JSON represents "Friday and Saturday are entirely off-peak."
 
 The `properties` array shows what inputs are needed to calculate bills. SC4 introduces **demand properties** not present in SC1 or SC3.
 
-| Property | Type | Period | Description | Default | Used For |
-|----------|------|--------|-------------|---------|----------|
-| `hasGeothermalHeatPumps` | BOOLEAN | — | Applicability flag | true | Rate eligibility |
-| `consumption` | DECIMAL | — | Total energy usage (kWh) | — | Delivery adjustments |
-| `demand` | DEMAND | ON_PEAK | 60-min billing demand (kW) | — | On-peak demand charge |
-| `demand` | DEMAND | OFF_PEAK | 60-min billing demand (kW) | — | Off-peak demand charge |
-| `systemSize` | DECIMAL | — | Solar system capacity (kW) | 0 | CBC rider |
-| `territoryId` | CHOICE | — | Service zone (H, I, or J) | — | Zone-specific rates |
-| `chargeClass` | CHOICE | — | Charge categories | DISTRIBUTION,SUPPLY,CONTRACTED | Filtering |
+| Property                 | Type    | Period   | Description                | Default                        | Used For               |
+| ------------------------ | ------- | -------- | -------------------------- | ------------------------------ | ---------------------- |
+| `hasGeothermalHeatPumps` | BOOLEAN | —        | Applicability flag         | true                           | Rate eligibility       |
+| `consumption`            | DECIMAL | —        | Total energy usage (kWh)   | —                              | Delivery adjustments   |
+| `demand`                 | DEMAND  | ON_PEAK  | 60-min billing demand (kW) | —                              | On-peak demand charge  |
+| `demand`                 | DEMAND  | OFF_PEAK | 60-min billing demand (kW) | —                              | Off-peak demand charge |
+| `systemSize`             | DECIMAL | —        | Solar system capacity (kW) | 0                              | CBC rider              |
+| `territoryId`            | CHOICE  | —        | Service zone (H, I, or J)  | —                              | Zone-specific rates    |
+| `chargeClass`            | CHOICE  | —        | Charge categories          | DISTRIBUTION,SUPPLY,CONTRACTED | Filtering              |
 
 Below we walk through the properties specific to SC4. For standard properties like `territoryId` and `systemSize`, see the [SC1 documentation](../residential-el1/index.md#tariff-properties).
 
@@ -654,14 +654,14 @@ An **applicability flag** indicating whether the customer has geothermal heat pu
 
 The demand properties have additional fields that define how billing demand is calculated:
 
-| Field | Description |
-|-------|-------------|
-| `quantityKey` | `billingDemand60min2252` — ConEd-specific calculation method |
-| `dataType` | `DEMAND` — distinct from `DECIMAL` (energy) |
-| `quantityUnit` | `kW` (kilowatts, not kilowatt-hours) |
-| `lookbackQuantity` | 1 — look back 1 billing period |
-| `lookbackPeriod` | `BILLING_PERIOD` — within the current billing cycle |
-| `lookbackIntervalQuantity` | 60 — 60-minute integration interval |
+| Field                      | Description                                                  |
+| -------------------------- | ------------------------------------------------------------ |
+| `quantityKey`              | `billingDemand60min2252` — ConEd-specific calculation method |
+| `dataType`                 | `DEMAND` — distinct from `DECIMAL` (energy)                  |
+| `quantityUnit`             | `kW` (kilowatts, not kilowatt-hours)                         |
+| `lookbackQuantity`         | 1 — look back 1 billing period                               |
+| `lookbackPeriod`           | `BILLING_PERIOD` — within the current billing cycle          |
+| `lookbackIntervalQuantity` | 60 — 60-minute integration interval                          |
 
 These properties require **interval meter data** to calculate billing demand. Standard monthly meters don't capture this information.
 

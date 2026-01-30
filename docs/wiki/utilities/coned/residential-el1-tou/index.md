@@ -12,7 +12,7 @@
 
 ## Overview
 
-SC3 is ConEd's **voluntary time-of-use (TOU) rate** for residential customers. Unlike the default SC1 tariff, SC3 charges different rates depending on *when* you use electricity:
+SC3 is ConEd's **voluntary time-of-use (TOU) rate** for residential customers. Unlike the default SC1 tariff, SC3 charges different rates depending on _when_ you use electricity:
 
 - **On-Peak (8am–midnight)**: Higher rates
 - **Off-Peak (midnight–8am)**: Significantly lower rates
@@ -21,12 +21,12 @@ This structure rewards customers who can shift consumption to overnight hours—
 
 ### Key Differences from SC1 (Default Rate)
 
-| Aspect | SC1 (Default) | SC3 (Voluntary TOU) |
-|--------|---------------|---------------------|
-| TOU | No | Yes (On-Peak/Off-Peak) |
-| Tiering | Yes (≤250 kWh / >250 kWh) | No |
-| Tariff Type | DEFAULT | ALTERNATIVE |
-| Best for | Average usage patterns | Flexible schedules, EV owners, night owls |
+| Aspect      | SC1 (Default)             | SC3 (Voluntary TOU)                       |
+| ----------- | ------------------------- | ----------------------------------------- |
+| TOU         | No                        | Yes (On-Peak/Off-Peak)                    |
+| Tiering     | Yes (≤250 kWh / >250 kWh) | No                                        |
+| Tariff Type | DEFAULT                   | ALTERNATIVE                               |
+| Best for    | Average usage patterns    | Flexible schedules, EV owners, night owls |
 
 ### Who This Rate Is For
 
@@ -51,10 +51,10 @@ Hour:     0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
           midnight          8am    8am                                     midnight
 ```
 
-| Period | Hours | Days | Description |
-|--------|-------|------|-------------|
+| Period       | Hours              | Days     | Description    |
+| ------------ | ------------------ | -------- | -------------- |
 | **Off-Peak** | 12:00 AM – 8:00 AM | All days | Cheapest rates |
-| **On-Peak** | 8:00 AM – 12:00 AM | All days | Higher rates |
+| **On-Peak**  | 8:00 AM – 12:00 AM | All days | Higher rates   |
 
 **Key details:**
 
@@ -68,29 +68,29 @@ Hour:     0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 
 ### Fixed Charges
 
-| Rate Name | Charge Type | Rate Value |
-|-----------|-------------|------------|
-| Customer Charge | FIXED_PRICE | $20.00/mo |
-| Billing and Payment Processing | FIXED_PRICE | $1.28/mo |
+| Rate Name                      | Charge Type | Rate Value |
+| ------------------------------ | ----------- | ---------- |
+| Customer Charge                | FIXED_PRICE | $20.00/mo  |
+| Billing and Payment Processing | FIXED_PRICE | $1.28/mo   |
 
 ### Delivery Energy Charges (TOU)
 
 Delivery rates vary by **zone**, **season**, and **TOU period**. No tiering.
 
-| Zone | Season | TOU Period | Rate |
-|------|--------|------------|------|
-| H | Summer | On-Peak | $0.3523/kWh |
-| H | Summer | Off-Peak | $0.0249/kWh |
-| H | Winter | On-Peak | $0.1305/kWh |
-| H | Winter | Off-Peak | $0.0249/kWh |
-| I | Summer | On-Peak | $0.3523/kWh |
-| I | Summer | Off-Peak | $0.0249/kWh |
-| I | Winter | On-Peak | $0.1305/kWh |
-| I | Winter | Off-Peak | $0.0249/kWh |
-| J | Summer | On-Peak | $0.3523/kWh |
-| J | Summer | Off-Peak | $0.0249/kWh |
-| J | Winter | On-Peak | $0.1305/kWh |
-| J | Winter | Off-Peak | $0.0249/kWh |
+| Zone | Season | TOU Period | Rate        |
+| ---- | ------ | ---------- | ----------- |
+| H    | Summer | On-Peak    | $0.3523/kWh |
+| H    | Summer | Off-Peak   | $0.0249/kWh |
+| H    | Winter | On-Peak    | $0.1305/kWh |
+| H    | Winter | Off-Peak   | $0.0249/kWh |
+| I    | Summer | On-Peak    | $0.3523/kWh |
+| I    | Summer | Off-Peak   | $0.0249/kWh |
+| I    | Winter | On-Peak    | $0.1305/kWh |
+| I    | Winter | Off-Peak   | $0.0249/kWh |
+| J    | Summer | On-Peak    | $0.3523/kWh |
+| J    | Summer | Off-Peak   | $0.0249/kWh |
+| J    | Winter | On-Peak    | $0.1305/kWh |
+| J    | Winter | Off-Peak   | $0.0249/kWh |
 
 **Key observations:**
 
@@ -103,15 +103,15 @@ Delivery rates vary by **zone**, **season**, and **TOU period**. No tiering.
 
 Same variable-rate adjustments as SC1. These apply to all kWh regardless of TOU period.
 
-| Rate Name | Charge Type | Rate Value |
-|-----------|-------------|------------|
-| Delivery Revenue Surcharge | CONSUMPTION_BASED | *Lookup* |
-| Reconciliation Rate | CONSUMPTION_BASED | *Lookup* |
-| Transition Adjustment | CONSUMPTION_BASED | *Lookup* |
-| Uncollectible Bill Expense | CONSUMPTION_BASED | *Lookup* |
-| Monthly Adjustment Clause | CONSUMPTION_BASED | *Lookup* |
-| Revenue Decoupling Mechanism | CONSUMPTION_BASED | *Lookup* |
-| Clean Energy Standard (Delivery) | CONSUMPTION_BASED | *Lookup* |
+| Rate Name                        | Charge Type       | Rate Value |
+| -------------------------------- | ----------------- | ---------- |
+| Delivery Revenue Surcharge       | CONSUMPTION_BASED | _Lookup_   |
+| Reconciliation Rate              | CONSUMPTION_BASED | _Lookup_   |
+| Transition Adjustment            | CONSUMPTION_BASED | _Lookup_   |
+| Uncollectible Bill Expense       | CONSUMPTION_BASED | _Lookup_   |
+| Monthly Adjustment Clause        | CONSUMPTION_BASED | _Lookup_   |
+| Revenue Decoupling Mechanism     | CONSUMPTION_BASED | _Lookup_   |
+| Clean Energy Standard (Delivery) | CONSUMPTION_BASED | _Lookup_   |
 
 > **📘 Deep Dive**: For a complete explanation of delivery adjustments, see **[Delivery Adjustments Guide](../delivery-adjustments.md)**.
 
@@ -119,13 +119,13 @@ Same variable-rate adjustments as SC1. These apply to all kWh regardless of TOU 
 
 Same as SC1—zone-specific MSC rates, adjustments, and CES supply surcharge.
 
-| Rate Name | Zone | Rate Value |
-|-----------|------|------------|
-| MSC Rate | H/I/J | *Lookup* |
-| MSC I Adjustment | H/I/J | *Lookup* |
-| MSC II Adjustment | All | *Lookup* |
-| Clean Energy Standard (Supply) | All | *Lookup* |
-| Merchant Function Charge | All | *Lookup* |
+| Rate Name                      | Zone  | Rate Value |
+| ------------------------------ | ----- | ---------- |
+| MSC Rate                       | H/I/J | _Lookup_   |
+| MSC I Adjustment               | H/I/J | _Lookup_   |
+| MSC II Adjustment              | All   | _Lookup_   |
+| Clean Energy Standard (Supply) | All   | _Lookup_   |
+| Merchant Function Charge       | All   | _Lookup_   |
 
 > **📘 Deep Dive**: For a complete explanation of supply charges, see **[Supply Charges Guide](../supply-charges.md)**.
 
@@ -133,16 +133,16 @@ Same as SC1—zone-specific MSC rates, adjustments, and CES supply surcharge.
 
 Same riders as SC1:
 
-| Rider | Charge Type | Rate Value |
-|-------|-------------|------------|
-| Tax Sur-Credit | CONSUMPTION_BASED | *Lookup* |
-| Dynamic Load Management | CONSUMPTION_BASED | *Lookup* |
-| Customer Benefit Contribution | QUANTITY | $1.84/kW |
-| EV Make Ready Surcharge | CONSUMPTION_BASED | $0.0008/kWh |
-| Arrears Management Recovery | CONSUMPTION_BASED | $0.0012/kWh |
-| GRT Distribution | QUANTITY | 3.33–5.51% (by zone) |
-| GRT Supply | QUANTITY | 1.01–3.09% (by zone) |
-| VDER Cost Recovery | CONSUMPTION_BASED | $0.0011/kWh |
+| Rider                         | Charge Type       | Rate Value           |
+| ----------------------------- | ----------------- | -------------------- |
+| Tax Sur-Credit                | CONSUMPTION_BASED | _Lookup_             |
+| Dynamic Load Management       | CONSUMPTION_BASED | _Lookup_             |
+| Customer Benefit Contribution | QUANTITY          | $1.84/kW             |
+| EV Make Ready Surcharge       | CONSUMPTION_BASED | $0.0008/kWh          |
+| Arrears Management Recovery   | CONSUMPTION_BASED | $0.0012/kWh          |
+| GRT Distribution              | QUANTITY          | 3.33–5.51% (by zone) |
+| GRT Supply                    | QUANTITY          | 1.01–3.09% (by zone) |
+| VDER Cost Recovery            | CONSUMPTION_BASED | $0.0011/kWh          |
 
 > **📘 Deep Dive**: For a complete explanation of riders, see **[Riders Guide](../riders.md)**.
 
@@ -164,7 +164,7 @@ Covers the cost of generating and mailing bills, processing payments. Same as SC
 
 ### Delivery Energy Charges (TOU)
 
-These are the core delivery charges for using ConEd's distribution network. Unlike SC1's tiered rates, SC3 uses **time-of-use rates**—the price per kWh depends on *when* you consume, not *how much* you consume.
+These are the core delivery charges for using ConEd's distribution network. Unlike SC1's tiered rates, SC3 uses **time-of-use rates**—the price per kWh depends on _when_ you consume, not _how much_ you consume.
 
 #### On-Peak Rate — $0.3523/kWh (Summer) / $0.1305/kWh (Winter)
 
@@ -188,25 +188,25 @@ Same variable-rate adjustments as SC1, applied to **total consumption** (not spl
 
 > **📘 Deep Dive**: For regulatory background and calculation details, see **[Delivery Adjustments Guide](../delivery-adjustments.md)**.
 
-**Monthly Adjustment Clause (MAC)** — *Variable*
+**Monthly Adjustment Clause (MAC)** — _Variable_
 Umbrella adjustment for property taxes, storm costs, pension expenses.
 
-**Revenue Decoupling Mechanism (RDM) Adjustment** — *Variable*
+**Revenue Decoupling Mechanism (RDM) Adjustment** — _Variable_
 True-up for actual vs. expected sales volume.
 
-**Delivery Revenue Surcharge** — *Variable*
+**Delivery Revenue Surcharge** — _Variable_
 Supplemental revenue adjustment.
 
-**Clean Energy Standard Delivery Surcharge** — *Variable*
+**Clean Energy Standard Delivery Surcharge** — _Variable_
 Grid infrastructure costs for clean energy compliance.
 
-**Reconciliation Rate** — *Variable*
+**Reconciliation Rate** — _Variable_
 Legacy deferred costs from 1990s restructuring.
 
-**Transition Adjustment** — *Variable*
+**Transition Adjustment** — _Variable_
 Legacy deregulation costs.
 
-**Uncollectible Bill Expense** — *Variable*
+**Uncollectible Bill Expense** — _Variable_
 Bad debt recovery.
 
 ---
@@ -217,26 +217,26 @@ Same as SC1—charges for the electricity commodity itself. Only apply if using 
 
 > **📘 Deep Dive**: For NYISO settlement, load-weighted averaging, and reconciliation details, see **[Supply Charges Guide](../supply-charges.md)**.
 
-**MSC Rate (Market Supply Charge)** — *Variable, by zone*
+**MSC Rate (Market Supply Charge)** — _Variable, by zone_
 Base cost of electricity, forecasted monthly from wholesale prices.
 
-**MSC I Adjustment** — *Variable, by zone*
+**MSC I Adjustment** — _Variable, by zone_
 Reconciles actual energy costs vs. forecast.
 
-**MSC II Adjustment** — *Variable*
+**MSC II Adjustment** — _Variable_
 Reconciles capacity costs and ancillary services.
 
-**Clean Energy Standard Supply Surcharge** — *Variable*
+**Clean Energy Standard Supply Surcharge** — _Variable_
 RECs, ZECs, and other clean energy compliance costs.
 
-**Merchant Function Charge** — *Variable*
+**Merchant Function Charge** — _Variable_
 ConEd's costs to administer supply service.
 
 ---
 
 ### System Benefits Charge
 
-#### System Benefits Charge (SBC) — *Variable*
+#### System Benefits Charge (SBC) — _Variable_
 
 Funds NY's clean energy programs administered by NYSERDA.
 
@@ -244,7 +244,7 @@ Funds NY's clean energy programs administered by NYSERDA.
 
 ### NY State Surcharge
 
-#### New York State Surcharge — *Variable*
+#### New York State Surcharge — _Variable_
 
 Temporary surcharge for policy initiatives or one-time cost recovery.
 
@@ -262,11 +262,11 @@ If your total bill is less than $20, you pay $20 anyway. Same as SC1.
 
 Same riders as SC1. See **[Riders Guide](../riders.md)** for full details.
 
-#### Tax Sur-Credit — *Variable*
+#### Tax Sur-Credit — _Variable_
 
 Tax cost true-ups. Can be positive or negative.
 
-#### Dynamic Load Management (DLM) Surcharge — *Variable*
+#### Dynamic Load Management (DLM) Surcharge — _Variable_
 
 Demand response program costs.
 
@@ -286,11 +286,11 @@ COVID-era arrears recovery.
 
 Municipal taxes on utilities:
 
-| Zone | GRT Distribution | GRT Supply |
-|------|------------------|------------|
-| H (Upper Westchester) | 3.3322% | 1.0101% |
-| I (Lower Westchester) | 5.5127% | 3.0928% |
-| J (NYC) | 4.7940% | 2.4066% |
+| Zone                  | GRT Distribution | GRT Supply |
+| --------------------- | ---------------- | ---------- |
+| H (Upper Westchester) | 3.3322%          | 1.0101%    |
+| I (Lower Westchester) | 5.5127%          | 3.0928%    |
+| J (NYC)               | 4.7940%          | 2.4066%    |
 
 #### VDER Cost Recovery — $0.0011/kWh
 
@@ -307,31 +307,31 @@ A Zone J customer in July (Summer) using:
 
 ### Delivery Charges
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| Customer Charge | $20.00 | $20.00 |
-| Billing & Payment | $1.28 | $1.28 |
-| Summer On-Peak | 200 kWh × $0.3523 | $70.46 |
-| Summer Off-Peak | 100 kWh × $0.0249 | $2.49 |
-| Delivery Adjustments | 300 kWh × ~$0.02 (varies) | ~$6.00 |
-| **Subtotal Delivery** | | **~$100.23** |
+| Charge                | Calculation               | Amount       |
+| --------------------- | ------------------------- | ------------ |
+| Customer Charge       | $20.00                    | $20.00       |
+| Billing & Payment     | $1.28                     | $1.28        |
+| Summer On-Peak        | 200 kWh × $0.3523         | $70.46       |
+| Summer Off-Peak       | 100 kWh × $0.0249         | $2.49        |
+| Delivery Adjustments  | 300 kWh × ~$0.02 (varies) | ~$6.00       |
+| **Subtotal Delivery** |                           | **~$100.23** |
 
 ### Supply Charges
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| MSC Rate (Zone J) | 300 kWh × ~$0.08 (varies) | ~$24.00 |
-| MSC I/II Adjustments | 300 kWh × ~$0.005 | ~$1.50 |
-| CES Supply | 300 kWh × ~$0.003 | ~$0.90 |
-| **Subtotal Supply** | | **~$26.40** |
+| Charge               | Calculation               | Amount      |
+| -------------------- | ------------------------- | ----------- |
+| MSC Rate (Zone J)    | 300 kWh × ~$0.08 (varies) | ~$24.00     |
+| MSC I/II Adjustments | 300 kWh × ~$0.005         | ~$1.50      |
+| CES Supply           | 300 kWh × ~$0.003         | ~$0.90      |
+| **Subtotal Supply**  |                           | **~$26.40** |
 
 ### Riders & Taxes
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| Various Riders | 300 kWh × ~$0.004 | ~$1.20 |
-| GRT | ~$127 × ~7% | ~$8.89 |
-| **Subtotal Riders** | | **~$10.09** |
+| Charge              | Calculation       | Amount      |
+| ------------------- | ----------------- | ----------- |
+| Various Riders      | 300 kWh × ~$0.004 | ~$1.20      |
+| GRT                 | ~$127 × ~7%       | ~$8.89      |
+| **Subtotal Riders** |                   | **~$10.09** |
 
 ### Total
 
@@ -490,7 +490,7 @@ The complete tariff JSON response from the Arcadia Signal API is included below 
 }
 ```
 
-*Note: The JSON above is a representative excerpt showing key rate structures. Some rates have been omitted for brevity. The actual tariff contains entries for all zones (H, I, J), delivery adjustments, supply charges, and riders.*
+_Note: The JSON above is a representative excerpt showing key rate structures. Some rates have been omitted for brevity. The actual tariff contains entries for all zones (H, I, J), delivery adjustments, supply charges, and riders._
 
 </details>
 
@@ -530,13 +530,13 @@ SC3 rates include a `timeOfUse` object that defines when the rate applies:
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `touType` | `ON_PEAK` or `OFF_PEAK` |
-| `season` | When this TOU period applies (month range) |
-| `touPeriods` | Hour/day ranges for this period |
-| `fromDayOfWeek` / `toDayOfWeek` | 0 = Sunday, 6 = Saturday |
-| `fromHour` / `toHour` | 24-hour format (8 = 8am, 0 = midnight) |
+| Field                           | Description                                |
+| ------------------------------- | ------------------------------------------ |
+| `touType`                       | `ON_PEAK` or `OFF_PEAK`                    |
+| `season`                        | When this TOU period applies (month range) |
+| `touPeriods`                    | Hour/day ranges for this period            |
+| `fromDayOfWeek` / `toDayOfWeek` | 0 = Sunday, 6 = Saturday                   |
+| `fromHour` / `toHour`           | 24-hour format (8 = 8am, 0 = midnight)     |
 
 ### Applicability Keys
 
@@ -559,15 +559,15 @@ The rate that applies depends on whether `electricVehiclePresent` matches the `a
 
 The `properties` array tells you what inputs are needed to calculate bills. SC3 has more properties than SC1 due to TOU metering and applicability rules.
 
-| Property | Type | Period | Description | Default | Used For |
-|----------|------|--------|-------------|---------|----------|
-| `isTODCustomerBeforeMarch12014` | BOOLEAN | — | Grandfathering flag | false | Applicability |
-| `consumption` | DECIMAL | ON_PEAK | Energy usage during on-peak hours | — | TOU delivery charges |
-| `consumption` | DECIMAL | OFF_PEAK | Energy usage during off-peak hours | — | TOU delivery charges |
-| `electricVehiclePresent` | BOOLEAN | — | Has electric vehicle | false | Customer charge applicability |
-| `systemSize` | DECIMAL | — | Solar system capacity in kW | 0 | CBC rider |
-| `territoryId` | CHOICE | — | Service zone (H, I, or J) | — | Zone-specific rates |
-| `chargeClass` | CHOICE | — | Charge categories | DISTRIBUTION,SUPPLY,CONTRACTED | Filtering |
+| Property                        | Type    | Period   | Description                        | Default                        | Used For                      |
+| ------------------------------- | ------- | -------- | ---------------------------------- | ------------------------------ | ----------------------------- |
+| `isTODCustomerBeforeMarch12014` | BOOLEAN | —        | Grandfathering flag                | false                          | Applicability                 |
+| `consumption`                   | DECIMAL | ON_PEAK  | Energy usage during on-peak hours  | —                              | TOU delivery charges          |
+| `consumption`                   | DECIMAL | OFF_PEAK | Energy usage during off-peak hours | —                              | TOU delivery charges          |
+| `electricVehiclePresent`        | BOOLEAN | —        | Has electric vehicle               | false                          | Customer charge applicability |
+| `systemSize`                    | DECIMAL | —        | Solar system capacity in kW        | 0                              | CBC rider                     |
+| `territoryId`                   | CHOICE  | —        | Service zone (H, I, or J)          | —                              | Zone-specific rates           |
+| `chargeClass`                   | CHOICE  | —        | Charge categories                  | DISTRIBUTION,SUPPLY,CONTRACTED | Filtering                     |
 
 Below we walk through the properties specific to SC3. For standard properties like `territoryId` and `systemSize`, see the [SC1 documentation](../residential-el1/index.md#tariff-properties).
 
@@ -583,7 +583,7 @@ Below we walk through the properties specific to SC3. For standard properties li
 }
 ```
 
-A **grandfathering flag** for customers who enrolled in TOU rates before March 1, 2014. These customers may have different terms or rate structures. The `APPLICABILITY` property type means this affects *whether* certain rates apply, not the rate values themselves.
+A **grandfathering flag** for customers who enrolled in TOU rates before March 1, 2014. These customers may have different terms or rate structures. The `APPLICABILITY` property type means this affects _whether_ certain rates apply, not the rate values themselves.
 
 #### `consumption[ON_PEAK]` and `consumption[OFF_PEAK]`
 

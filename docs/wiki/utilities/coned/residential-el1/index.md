@@ -22,35 +22,35 @@ The "Religious" in the tariff name refers to houses of worship, which are eligib
 
 ## Quick Reference: All Charges
 
-| Rate Group | Rate Name | Charge Type | Charge Class | Zone | Season | Tiered | Rate Value |
-|------------|-----------|-------------|--------------|:----:|:------:|:------:|------------|
-| Basic Service Charge | Customer Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $20.00/mo |
-| Basic Service Charge | Billing and Payment Processing | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $1.28/mo |
-| Delivery Charges | Delivery Revenue Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| Delivery Charges | Reconciliation Rate | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| Delivery Charges | Transition Adjustment | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| Delivery Charges | Uncollectible Bill Expense | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| Delivery Charges | Monthly Adjustment Clause | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| Delivery Charges | Revenue Decoupling Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| Delivery Charges | Clean Energy Standard (Delivery) | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| Delivery Charges | Summer Rate | CONSUMPTION_BASED | DISTRIBUTION | ✅ | ✅ | ✅ | ≤250: $0.16107, >250: $0.18518 |
-| Delivery Charges | Winter Rate | CONSUMPTION_BASED | DISTRIBUTION | ✅ | ✅ | ✅ | ≤250: $0.16107, >250: $0.16107 |
-| Merchant Function | Merchant Function Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | *Lookup* |
-| Supply Charges | MSC Rate | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | *Lookup* |
-| Supply Charges | MSC I Adjustment | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | *Lookup* |
-| Supply Charges | MSC II Adjustment | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | *Lookup* |
-| Supply Charges | Clean Energy Standard (Supply) | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | *Lookup* |
-| SBC Charges | System Benefits Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| NY State Surcharge | New York State Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | *Lookup* |
-| Minimum Charge | Minimum Charge | MINIMUM | — | ❌ | ❌ | ❌ | $20.00/mo |
-| Rider: Tax Sur-Credit | Tax Sur-Credit | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | *Lookup* |
-| Rider: DLM | Dynamic Load Management | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | *Lookup* |
-| Rider: CBC | Customer Benefit Contribution | QUANTITY | — | ❌ | ❌ | ❌ | $1.84/kW |
-| Rider: EV Make Ready | EV Make Ready Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.0008/kWh |
-| Rider: Arrears Mgmt | Arrears Management Recovery | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.0012/kWh |
-| Rider: GRT | GRT Distribution | QUANTITY | TRANS,DISTRIBUTION | ✅ | ❌ | ❌ | H: 3.33%, I: 5.51%, J: 4.79% |
-| Rider: GRT | GRT Supply | QUANTITY | SUPPLY | ✅ | ❌ | ❌ | H: 1.01%, I: 3.09%, J: 2.41% |
-| Rider: VDER | VDER Cost Recovery | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | $0.0011/kWh |
+| Rate Group            | Rate Name                        | Charge Type       | Charge Class       | Zone | Season | Tiered | Rate Value                     |
+| --------------------- | -------------------------------- | ----------------- | ------------------ | :--: | :----: | :----: | ------------------------------ |
+| Basic Service Charge  | Customer Charge                  | FIXED_PRICE       | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | $20.00/mo                      |
+| Basic Service Charge  | Billing and Payment Processing   | FIXED_PRICE       | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | $1.28/mo                       |
+| Delivery Charges      | Delivery Revenue Surcharge       | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Delivery Charges      | Reconciliation Rate              | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Delivery Charges      | Transition Adjustment            | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Delivery Charges      | Uncollectible Bill Expense       | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Delivery Charges      | Monthly Adjustment Clause        | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Delivery Charges      | Revenue Decoupling Mechanism     | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Delivery Charges      | Clean Energy Standard (Delivery) | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Delivery Charges      | Summer Rate                      | CONSUMPTION_BASED | DISTRIBUTION       |  ✅  |   ✅   |   ✅   | ≤250: $0.16107, >250: $0.18518 |
+| Delivery Charges      | Winter Rate                      | CONSUMPTION_BASED | DISTRIBUTION       |  ✅  |   ✅   |   ✅   | ≤250: $0.16107, >250: $0.16107 |
+| Merchant Function     | Merchant Function Charge         | CONSUMPTION_BASED | SUPPLY,CONTRACTED  |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Supply Charges        | MSC Rate                         | CONSUMPTION_BASED | SUPPLY,CONTRACTED  |  ✅  |   ❌   |   ❌   | _Lookup_                       |
+| Supply Charges        | MSC I Adjustment                 | CONSUMPTION_BASED | SUPPLY,CONTRACTED  |  ✅  |   ❌   |   ❌   | _Lookup_                       |
+| Supply Charges        | MSC II Adjustment                | CONSUMPTION_BASED | SUPPLY,CONTRACTED  |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Supply Charges        | Clean Energy Standard (Supply)   | CONSUMPTION_BASED | SUPPLY,CONTRACTED  |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| SBC Charges           | System Benefits Charge           | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| NY State Surcharge    | New York State Surcharge         | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Minimum Charge        | Minimum Charge                   | MINIMUM           | —                  |  ❌  |   ❌   |   ❌   | $20.00/mo                      |
+| Rider: Tax Sur-Credit | Tax Sur-Credit                   | CONSUMPTION_BASED | —                  |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Rider: DLM            | Dynamic Load Management          | CONSUMPTION_BASED | —                  |  ❌  |   ❌   |   ❌   | _Lookup_                       |
+| Rider: CBC            | Customer Benefit Contribution    | QUANTITY          | —                  |  ❌  |   ❌   |   ❌   | $1.84/kW                       |
+| Rider: EV Make Ready  | EV Make Ready Surcharge          | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | $0.0008/kWh                    |
+| Rider: Arrears Mgmt   | Arrears Management Recovery      | CONSUMPTION_BASED | DISTRIBUTION       |  ❌  |   ❌   |   ❌   | $0.0012/kWh                    |
+| Rider: GRT            | GRT Distribution                 | QUANTITY          | TRANS,DISTRIBUTION |  ✅  |   ❌   |   ❌   | H: 3.33%, I: 5.51%, J: 4.79%   |
+| Rider: GRT            | GRT Supply                       | QUANTITY          | SUPPLY             |  ✅  |   ❌   |   ❌   | H: 1.01%, I: 3.09%, J: 2.41%   |
+| Rider: VDER           | VDER Cost Recovery               | CONSUMPTION_BASED | —                  |  ❌  |   ❌   |   ❌   | $0.0011/kWh                    |
 
 ---
 
@@ -87,25 +87,25 @@ The tier structure incentivizes conservation. Summer Tier 2 is higher because pe
 
 > **📘 Deep Dive**: These adjustments involve regulatory mechanisms, time lags, and reconciliation math. For a complete explanation with step-by-step examples, see **[Delivery Adjustments Guide](../delivery-adjustments.md)**.
 
-**Monthly Adjustment Clause (MAC)** — *Variable*
+**Monthly Adjustment Clause (MAC)** — _Variable_
 Umbrella adjustment that captures various delivery cost true-ups: property taxes, storm costs, pension expenses. Changes monthly based on actual vs. forecasted costs.
 
-**Revenue Decoupling Mechanism (RDM) Adjustment** — *Variable*
+**Revenue Decoupling Mechanism (RDM) Adjustment** — _Variable_
 Part of NY's decoupling policy: ConEd's revenue is "decoupled" from sales volume. If customers use less than expected, this adjusts upward (and vice versa). Removes utility incentive to discourage conservation. Typically reconciled annually.
 
-**Delivery Revenue Surcharge** — *Variable*
+**Delivery Revenue Surcharge** — _Variable_
 A supplemental revenue adjustment for specific shortfalls or PSC-ordered changes outside the normal MAC/RDM mechanisms.
 
-**Clean Energy Standard Delivery Surcharge** — *Variable*
+**Clean Energy Standard Delivery Surcharge** — _Variable_
 Recovers ConEd's costs for grid infrastructure needed to comply with NY's Clean Energy Standard (distribution upgrades, DER integration).
 
-**Reconciliation Rate** — *Variable*
+**Reconciliation Rate** — _Variable_
 True-ups for deferred costs from NY's 1990s electricity restructuring. Legacy item, typically small.
 
-**Transition Adjustment** — *Variable*
+**Transition Adjustment** — _Variable_
 More legacy costs from deregulation-era restructuring. Typically minimal now.
 
-**Uncollectible Bill Expense** — *Variable*
+**Uncollectible Bill Expense** — _Variable_
 Recovers costs from customers who don't pay their bills. Spiked during COVID; now returning to normal levels.
 
 ---
@@ -116,31 +116,31 @@ These are charges for the electricity commodity itself. Only apply if you use Co
 
 #### Core Supply Rate
 
-**MSC Rate (Market Supply Charge)** — *Variable, by zone*
+**MSC Rate (Market Supply Charge)** — _Variable, by zone_
 
 The base cost of electricity. ConEd forecasts this monthly based on expected wholesale prices from NYISO. Zone-specific because NYISO prices differ by location (H, I, J).
 
-**Merchant Function Charge** — *Variable*
+**Merchant Function Charge** — _Variable_
 Covers ConEd's costs to administer supply service: procurement staff, risk management, billing systems. Only applies to default service customers (not ESCO customers).
 
 #### Supply Adjustments
 
 > **📘 Deep Dive**: Supply adjustments involve NYISO settlement, load-weighted averaging, and 2-3 month reconciliation lags. For a complete explanation with step-by-step examples, see **[Supply Charges Guide](../supply-charges.md)**.
 
-**MSC I Adjustment** — *Variable, by zone*
+**MSC I Adjustment** — _Variable, by zone_
 Reconciles actual **energy costs** vs. what was billed via the forecasted MSC. Applied with a 2-3 month lag after NYISO settlement finalizes. Zone-specific because wholesale energy prices differ by location.
 
-**MSC II Adjustment** — *Variable*
+**MSC II Adjustment** — _Variable_
 Reconciles **capacity costs, ancillary services, and working capital**. Not zone-specific—averaged across ConEd's territory.
 
-**Clean Energy Standard Supply Surcharge** — *Variable*
+**Clean Energy Standard Supply Surcharge** — _Variable_
 Recovers the cost of Renewable Energy Credits (RECs), Zero Emission Credits (ZECs), and other clean energy compliance costs on the supply side.
 
 ---
 
 ### System Benefits Charge
 
-#### System Benefits Charge (SBC) — *Variable*
+#### System Benefits Charge (SBC) — _Variable_
 
 Funds NY's clean energy programs administered by NYSERDA: energy efficiency rebates, low-income assistance, renewable energy research. Set by the PSC; all customers pay.
 
@@ -148,7 +148,7 @@ Funds NY's clean energy programs administered by NYSERDA: energy efficiency reba
 
 ### NY State Surcharge
 
-#### New York State Surcharge — *Variable*
+#### New York State Surcharge — _Variable_
 
 A temporary surcharge authorized by the NY PSC. Often used for policy initiatives or one-time cost recovery.
 
@@ -168,11 +168,11 @@ Riders are add-on tariff components that apply to multiple base tariffs. They're
 
 > **📘 Deep Dive**: Each rider has its own origin story, policy rationale, and calculation method. For detailed explanations including how VDER and CBC work together for solar, why all customers pay for EV infrastructure, and the COVID arrears recovery program, see **[Riders Guide](../riders.md)**.
 
-#### Tax Sur-Credit — *Variable*
+#### Tax Sur-Credit — _Variable_
 
 Adjusts for differences between tax costs embedded in rates vs. actual taxes paid. Can be positive (surcharge) or negative (credit). Related to federal tax reform and property tax changes.
 
-#### Dynamic Load Management (DLM) Surcharge — *Variable*
+#### Dynamic Load Management (DLM) Surcharge — _Variable_
 
 Recovers costs for ConEd's demand response programs: paying customers and batteries to reduce load during peak periods. Part of NY's grid modernization efforts.
 
@@ -192,11 +192,11 @@ Recovers costs from ConEd's COVID-era arrears forgiveness program. During the pa
 
 New York municipalities levy a Gross Receipts Tax on utilities. Applied as a percentage of your charges, split into Distribution and Supply components:
 
-| Zone | GRT Distribution | GRT Supply |
-|------|------------------|------------|
-| H (Upper Westchester) | 3.3322% | 1.0101% |
-| I (Lower Westchester) | 5.5127% | 3.0928% |
-| J (NYC) | 4.7940% | 2.4066% |
+| Zone                  | GRT Distribution | GRT Supply |
+| --------------------- | ---------------- | ---------- |
+| H (Upper Westchester) | 3.3322%          | 1.0101%    |
+| I (Lower Westchester) | 5.5127%          | 3.0928%    |
+| J (NYC)               | 4.7940%          | 2.4066%    |
 
 Different municipalities have different tax rates, so this varies by zone.
 
@@ -212,38 +212,38 @@ A Zone J customer in July (Summer) using 500 kWh:
 
 ### Delivery Charges
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| Customer Charge | $20.00 | $20.00 |
-| Billing & Payment | $1.28 | $1.28 |
-| Summer Rate Tier 1 | 250 kWh × $0.16107 | $40.27 |
-| Summer Rate Tier 2 | 250 kWh × $0.18518 | $46.30 |
-| Delivery Adjustments | 500 kWh × ~$0.02 (varies) | ~$10.00 |
-| **Subtotal Delivery** | | **~$117.85** |
+| Charge                | Calculation               | Amount       |
+| --------------------- | ------------------------- | ------------ |
+| Customer Charge       | $20.00                    | $20.00       |
+| Billing & Payment     | $1.28                     | $1.28        |
+| Summer Rate Tier 1    | 250 kWh × $0.16107        | $40.27       |
+| Summer Rate Tier 2    | 250 kWh × $0.18518        | $46.30       |
+| Delivery Adjustments  | 500 kWh × ~$0.02 (varies) | ~$10.00      |
+| **Subtotal Delivery** |                           | **~$117.85** |
 
 ### Supply Charges
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| MSC Rate (Zone J) | 500 kWh × ~$0.08 (varies) | ~$40.00 |
-| MSC I/II Adjustments | 500 kWh × ~$0.005 | ~$2.50 |
-| CES Supply | 500 kWh × ~$0.003 | ~$1.50 |
-| Merchant Function | 500 kWh × ~$0.001 | ~$0.50 |
-| **Subtotal Supply** | | **~$44.50** |
+| Charge               | Calculation               | Amount      |
+| -------------------- | ------------------------- | ----------- |
+| MSC Rate (Zone J)    | 500 kWh × ~$0.08 (varies) | ~$40.00     |
+| MSC I/II Adjustments | 500 kWh × ~$0.005         | ~$2.50      |
+| CES Supply           | 500 kWh × ~$0.003         | ~$1.50      |
+| Merchant Function    | 500 kWh × ~$0.001         | ~$0.50      |
+| **Subtotal Supply**  |                           | **~$44.50** |
 
 ### Riders & Taxes
 
-| Charge | Calculation | Amount |
-|--------|-------------|--------|
-| Tax Sur-Credit | 500 kWh × ~$0.001 | ~$0.50 |
-| DLM Surcharge | 500 kWh × ~$0.001 | ~$0.50 |
-| EV Make Ready | 500 kWh × $0.0008 | $0.40 |
-| Arrears Management | 500 kWh × $0.0012 | $0.60 |
-| VDER Cost Recovery | 500 kWh × $0.0011 | $0.55 |
-| SBC + NY Surcharge | 500 kWh × ~$0.005 | ~$2.50 |
-| GRT Distribution | ~$118 × 4.794% | ~$5.66 |
-| GRT Supply | ~$45 × 2.4066% | ~$1.08 |
-| **Subtotal Riders** | | **~$11.79** |
+| Charge              | Calculation       | Amount      |
+| ------------------- | ----------------- | ----------- |
+| Tax Sur-Credit      | 500 kWh × ~$0.001 | ~$0.50      |
+| DLM Surcharge       | 500 kWh × ~$0.001 | ~$0.50      |
+| EV Make Ready       | 500 kWh × $0.0008 | $0.40       |
+| Arrears Management  | 500 kWh × $0.0012 | $0.60       |
+| VDER Cost Recovery  | 500 kWh × $0.0011 | $0.55       |
+| SBC + NY Surcharge  | 500 kWh × ~$0.005 | ~$2.50      |
+| GRT Distribution    | ~$118 × 4.794%    | ~$5.66      |
+| GRT Supply          | ~$45 × 2.4066%    | ~$1.08      |
+| **Subtotal Riders** |                   | **~$11.79** |
 
 ### Total
 
@@ -251,12 +251,12 @@ A Zone J customer in July (Summer) using 500 kWh:
 
 ### Breakdown by Category
 
-| Category | Amount | % of Bill |
-|----------|--------|-----------|
-| Fixed Charges | $21.28 | 12% |
-| Delivery (Volumetric) | ~$96.57 | 55% |
-| Supply | ~$44.50 | 26% |
-| Riders & Taxes | ~$11.79 | 7% |
+| Category              | Amount  | % of Bill |
+| --------------------- | ------- | --------- |
+| Fixed Charges         | $21.28  | 12%       |
+| Delivery (Volumetric) | ~$96.57 | 55%       |
+| Supply                | ~$44.50 | 26%       |
+| Riders & Taxes        | ~$11.79 | 7%        |
 
 **Key insight**: Delivery charges make up the majority of the bill. The tiered structure means the second 250 kWh costs more than the first—incentivizing conservation.
 
@@ -694,7 +694,7 @@ The complete tariff JSON response from the Arcadia Signal API is included below 
 ]
 ```
 
-*Note: The JSON above is a representative excerpt showing key rate structures. Some rates have been omitted for brevity. The actual tariff contains ~50 rate entries including all zone/season variations.*
+_Note: The JSON above is a representative excerpt showing key rate structures. Some rates have been omitted for brevity. The actual tariff contains ~50 rate entries including all zone/season variations._
 
 </details>
 
@@ -704,24 +704,24 @@ The complete tariff JSON response from the Arcadia Signal API is included below 
 
 ### Key Fields
 
-| Field | What It Means |
-|-------|---------------|
-| `chargeType` | How the charge is calculated (see below) |
-| `chargeClass` | Category: DISTRIBUTION, SUPPLY, TRANSMISSION, TAX |
-| `rateAmount` | The rate value (may be 0.0 if variable) |
-| `variableRateKey` | If present, use Lookups API to get actual value |
-| `territory` | If present, rate varies by zone (H, I, or J) |
-| `season` | If present, rate varies by season (Summer/Winter) |
-| `rateBands` | Array of tiers (if multiple, rate is tiered) |
+| Field             | What It Means                                     |
+| ----------------- | ------------------------------------------------- |
+| `chargeType`      | How the charge is calculated (see below)          |
+| `chargeClass`     | Category: DISTRIBUTION, SUPPLY, TRANSMISSION, TAX |
+| `rateAmount`      | The rate value (may be 0.0 if variable)           |
+| `variableRateKey` | If present, use Lookups API to get actual value   |
+| `territory`       | If present, rate varies by zone (H, I, or J)      |
+| `season`          | If present, rate varies by season (Summer/Winter) |
+| `rateBands`       | Array of tiers (if multiple, rate is tiered)      |
 
 ### Charge Types
 
-| chargeType | Meaning | Unit |
-|------------|---------|------|
-| `FIXED_PRICE` | Flat monthly fee | $/month |
-| `CONSUMPTION_BASED` | Per-kWh charge | $/kWh |
-| `QUANTITY` | Based on a property value | Varies ($/kW, %) |
-| `MINIMUM` | Floor on total bill | $/month |
+| chargeType          | Meaning                   | Unit             |
+| ------------------- | ------------------------- | ---------------- |
+| `FIXED_PRICE`       | Flat monthly fee          | $/month          |
+| `CONSUMPTION_BASED` | Per-kWh charge            | $/kWh            |
+| `QUANTITY`          | Based on a property value | Varies ($/kW, %) |
+| `MINIMUM`           | Floor on total bill       | $/month          |
 
 ### Fixed vs. Variable Rates
 
@@ -774,11 +774,11 @@ Rates that vary by zone have a `territory` object:
 
 The three zones:
 
-| territoryId | Zone | Area |
-|-------------|------|------|
-| 3632 | H | Upper Westchester |
-| 3633 | I | Lower Westchester |
-| 3634 | J | New York City |
+| territoryId | Zone | Area              |
+| ----------- | ---- | ----------------- |
+| 3632        | H    | Upper Westchester |
+| 3633        | I    | Lower Westchester |
+| 3634        | J    | New York City     |
 
 ### Seasonal Rates
 
@@ -795,21 +795,21 @@ Rates that vary by season have a `season` object:
 }
 ```
 
-| Season | Months |
-|--------|--------|
+| Season | Months                |
+| ------ | --------------------- |
 | Summer | June 1 – September 30 |
-| Winter | October 1 – May 31 |
+| Winter | October 1 – May 31    |
 
 ### Tariff Properties
 
 The `properties` array tells you what inputs are needed to calculate bills for this tariff. SC1 is relatively simple—it only requires four properties.
 
-| Property | Type | Description | Default | Used For |
-|----------|------|-------------|---------|----------|
-| `consumption` | DECIMAL | Energy usage in kWh | — | All consumption-based charges |
-| `systemSize` | DECIMAL | Solar system capacity in kW | 0 | CBC rider (solar customers only) |
-| `territoryId` | CHOICE | Service zone (H, I, or J) | — | Zone-specific rates (MSC, GRT, delivery) |
-| `chargeClass` | CHOICE | Charge categories to include | DISTRIBUTION,SUPPLY,CONTRACTED | Filtering rates by category |
+| Property      | Type    | Description                  | Default                        | Used For                                 |
+| ------------- | ------- | ---------------------------- | ------------------------------ | ---------------------------------------- |
+| `consumption` | DECIMAL | Energy usage in kWh          | —                              | All consumption-based charges            |
+| `systemSize`  | DECIMAL | Solar system capacity in kW  | 0                              | CBC rider (solar customers only)         |
+| `territoryId` | CHOICE  | Service zone (H, I, or J)    | —                              | Zone-specific rates (MSC, GRT, delivery) |
+| `chargeClass` | CHOICE  | Charge categories to include | DISTRIBUTION,SUPPLY,CONTRACTED | Filtering rates by category              |
 
 #### `consumption`
 
@@ -866,11 +866,11 @@ The nameplate capacity of a customer's solar PV system. **Defaults to 0** (no so
 
 Selects which NYISO load zone the customer is in. Required for the Calculate API because several rates vary by zone:
 
-| Zone | `territoryId` | Area | Notes |
-|------|---------------|------|-------|
-| H | 3632 | Upper Westchester | Lower wholesale prices, lower GRT |
-| I | 3633 | Lower Westchester | Moderate prices |
-| J | 3634 | New York City | Higher prices (transmission-constrained), higher GRT |
+| Zone | `territoryId` | Area              | Notes                                                |
+| ---- | ------------- | ----------------- | ---------------------------------------------------- |
+| H    | 3632          | Upper Westchester | Lower wholesale prices, lower GRT                    |
+| I    | 3633          | Lower Westchester | Moderate prices                                      |
+| J    | 3634          | New York City     | Higher prices (transmission-constrained), higher GRT |
 
 #### `chargeClass`
 
@@ -904,10 +904,10 @@ Use this to understand what categories of charges exist. If a customer uses an E
 
 Rates with `variableRateKey` show `rateAmount: 0.0` in the JSON. To get actual values, use Arcadia's APIs:
 
-| API | What It Returns | When to Use |
-|-----|-----------------|-------------|
-| **[Lookups API](https://docs.arcadia.com/v2022-12-21-Signal/reference/lookups)** | Raw rate values for one `variableRateKey` | Historical analysis of specific rates |
-| **Calculate API** | All resolved rates + computed bill line items | Getting all rates at once |
+| API                                                                              | What It Returns                               | When to Use                           |
+| -------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------- |
+| **[Lookups API](https://docs.arcadia.com/v2022-12-21-Signal/reference/lookups)** | Raw rate values for one `variableRateKey`     | Historical analysis of specific rates |
+| **Calculate API**                                                                | All resolved rates + computed bill line items | Getting all rates at once             |
 
 **Key differences**:
 

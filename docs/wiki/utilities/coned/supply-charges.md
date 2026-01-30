@@ -19,12 +19,12 @@ This explainer focuses on **supply charges** and explains:
 
 ## The Players
 
-| Entity | Role |
-|--------|------|
-| **NYISO** | Runs the wholesale electricity market for New York State |
-| **ConEd** | Buys electricity from NYISO on behalf of customers who haven't chosen an ESCO |
-| **NY PSC** | Regulates ConEd; must approve rate changes |
-| **You** | Residential customer paying for electricity |
+| Entity     | Role                                                                          |
+| ---------- | ----------------------------------------------------------------------------- |
+| **NYISO**  | Runs the wholesale electricity market for New York State                      |
+| **ConEd**  | Buys electricity from NYISO on behalf of customers who haven't chosen an ESCO |
+| **NY PSC** | Regulates ConEd; must approve rate changes                                    |
+| **You**    | Residential customer paying for electricity                                   |
 
 ---
 
@@ -48,11 +48,11 @@ These prices vary by location (node) and time. A hot summer afternoon in NYC mig
 
 For retail purposes, NYISO aggregates nodal prices into **zone-level prices**:
 
-| Zone | Area | Typical Price Characteristics |
-|------|------|------------------------------|
-| H | Upper Westchester | Lower, less congested |
-| I | Lower Westchester/Yonkers | Moderate |
-| J | New York City | Higher, transmission-constrained |
+| Zone | Area                      | Typical Price Characteristics    |
+| ---- | ------------------------- | -------------------------------- |
+| H    | Upper Westchester         | Lower, less congested            |
+| I    | Lower Westchester/Yonkers | Moderate                         |
+| J    | New York City             | Higher, transmission-constrained |
 
 ConEd serves all three zones, so they track prices for each separately.
 
@@ -73,13 +73,13 @@ ConEd must set a **single $/kWh rate** for the upcoming month before knowing:
 
 ConEd builds their MSC forecast using:
 
-| Input | How It's Used |
-|-------|---------------|
-| **Historical LMPs** | Same month in prior years as baseline |
-| **Forward market prices** | NYISO forward curves for upcoming period |
-| **Weather forecast** | Expected heating/cooling demand |
-| **Load forecast** | Predicted hourly consumption pattern |
-| **Fuel prices** | Natural gas forwards (drives generation costs) |
+| Input                     | How It's Used                                  |
+| ------------------------- | ---------------------------------------------- |
+| **Historical LMPs**       | Same month in prior years as baseline          |
+| **Forward market prices** | NYISO forward curves for upcoming period       |
+| **Weather forecast**      | Expected heating/cooling demand                |
+| **Load forecast**         | Predicted hourly consumption pattern           |
+| **Fuel prices**           | Natural gas forwards (drives generation costs) |
 
 ### Load-Weighted Averaging (Critical Concept)
 
@@ -93,11 +93,11 @@ Forecasted MSC = Σ (Expected_LMP_hour × Expected_Load_hour) / Σ Expected_Load
 
 Consider a simplified example:
 
-| Hour | Expected LMP | Expected Load | LMP × Load |
-|------|--------------|---------------|------------|
-| 2 AM (off-peak) | $0.03/kWh | 1,000 MWh | $30,000 |
-| 2 PM (peak) | $0.15/kWh | 3,000 MWh | $450,000 |
-| **Total** | | **4,000 MWh** | **$480,000** |
+| Hour            | Expected LMP | Expected Load | LMP × Load   |
+| --------------- | ------------ | ------------- | ------------ |
+| 2 AM (off-peak) | $0.03/kWh    | 1,000 MWh     | $30,000      |
+| 2 PM (peak)     | $0.15/kWh    | 3,000 MWh     | $450,000     |
+| **Total**       |              | **4,000 MWh** | **$480,000** |
 
 ```
 Simple average: ($0.03 + $0.15) / 2 = $0.09/kWh  ← WRONG
@@ -111,11 +111,11 @@ The load-weighted average reflects that **more electricity is consumed during ex
 
 ConEd creates separate forecasts for each zone:
 
-| Rate | Zone | Reflects |
-|------|------|----------|
-| `marketSupplyChargeResidentialZoneH` | H | Forecasted load-weighted LMP for Zone H |
-| `marketSupplyChargeResidentialZoneI` | I | Forecasted load-weighted LMP for Zone I |
-| `marketSupplyChargeResidentialZoneJ` | J | Forecasted load-weighted LMP for Zone J |
+| Rate                                 | Zone | Reflects                                |
+| ------------------------------------ | ---- | --------------------------------------- |
+| `marketSupplyChargeResidentialZoneH` | H    | Forecasted load-weighted LMP for Zone H |
+| `marketSupplyChargeResidentialZoneI` | I    | Forecasted load-weighted LMP for Zone I |
+| `marketSupplyChargeResidentialZoneJ` | J    | Forecasted load-weighted LMP for Zone J |
 
 ---
 
@@ -135,12 +135,12 @@ January MSC Rate (Zone J): $0.0823/kWh  ← Forecast made in late December
 
 Throughout January, ConEd buys power at actual NYISO prices:
 
-| Day | Hour | Actual LMP (Zone J) | Actual Load | Cost |
-|-----|------|---------------------|-------------|------|
-| Jan 1 | 00:00 | $0.042 | 4,200 MW | $176,400 |
-| Jan 1 | 01:00 | $0.038 | 3,900 MW | $148,200 |
-| ... | ... | ... | ... | ... |
-| Jan 31 | 23:00 | $0.067 | 4,800 MW | $321,600 |
+| Day    | Hour  | Actual LMP (Zone J) | Actual Load | Cost     |
+| ------ | ----- | ------------------- | ----------- | -------- |
+| Jan 1  | 00:00 | $0.042              | 4,200 MW    | $176,400 |
+| Jan 1  | 01:00 | $0.038              | 3,900 MW    | $148,200 |
+| ...    | ...   | ...                 | ...         | ...      |
+| Jan 31 | 23:00 | $0.067              | 4,800 MW    | $321,600 |
 
 ConEd tracks every 5-minute interval across the entire month.
 
@@ -150,13 +150,14 @@ ConEd tracks every 5-minute interval across the entire month.
 
 Your January bill uses:
 
-| Line Item | Value | Based On |
-|-----------|-------|----------|
-| MSC Rate | $0.0823/kWh | Forecast (from Step 1) |
-| MSC I Adjustment | $0.0012/kWh | True-up from October |
-| MSC II Adjustment | -$0.0008/kWh | True-up from October |
+| Line Item         | Value        | Based On               |
+| ----------------- | ------------ | ---------------------- |
+| MSC Rate          | $0.0823/kWh  | Forecast (from Step 1) |
+| MSC I Adjustment  | $0.0012/kWh  | True-up from October   |
+| MSC II Adjustment | -$0.0008/kWh | True-up from October   |
 
 **You're paying:**
+
 - January supply at a **forecast**
 - October supply **corrections**
 
@@ -166,11 +167,11 @@ Your January bill uses:
 
 NYISO doesn't finalize costs immediately:
 
-| Settlement Stage | Timing | What Happens |
-|------------------|--------|--------------|
-| Initial | T+5 days | Preliminary pricing posted |
-| First true-up | T+30 days | Corrections for meter data |
-| Final | T+60 days | All adjustments finalized |
+| Settlement Stage | Timing    | What Happens               |
+| ---------------- | --------- | -------------------------- |
+| Initial          | T+5 days  | Preliminary pricing posted |
+| First true-up    | T+30 days | Corrections for meter data |
+| Final            | T+60 days | All adjustments finalized  |
 
 Only after final settlement does ConEd know the **true cost** for January.
 
@@ -190,14 +191,14 @@ Variance = Actual Cost - Billed Amount
 
 **Example:**
 
-| Metric | Value |
-|--------|-------|
-| Total January Load (Zone J residential) | 2,500,000 MWh |
-| Forecasted MSC | $0.0823/kWh |
-| Billed to customers | $205,750,000 |
-| Actual load-weighted LMP | $0.0847/kWh |
-| Actual procurement cost | $211,750,000 |
-| **Variance (under-collection)** | **$6,000,000** |
+| Metric                                  | Value          |
+| --------------------------------------- | -------------- |
+| Total January Load (Zone J residential) | 2,500,000 MWh  |
+| Forecasted MSC                          | $0.0823/kWh    |
+| Billed to customers                     | $205,750,000   |
+| Actual load-weighted LMP                | $0.0847/kWh    |
+| Actual procurement cost                 | $211,750,000   |
+| **Variance (under-collection)**         | **$6,000,000** |
 
 ConEd under-collected by $6 million. This needs to be recovered.
 
@@ -258,22 +259,22 @@ MSC I Variance = Σ (Actual_Energy_LMP × Load) - (Forecasted_MSC × Load)
 - **Zone-specific**: Because NYISO energy prices differ by zone
 - **Driven by**: Weather, demand spikes, generation outages, fuel prices
 
-| Zone | Key | Why Different |
-|------|-----|---------------|
-| H | `mscIResidentialWestchester2252` | Less congestion, different load shape |
-| I | `mscIResidentialWestchester2252` | Similar to Zone H |
-| J | `mscIResidentialNewYork2252` | NYC transmission constraints = higher prices |
+| Zone | Key                              | Why Different                                |
+| ---- | -------------------------------- | -------------------------------------------- |
+| H    | `mscIResidentialWestchester2252` | Less congestion, different load shape        |
+| I    | `mscIResidentialWestchester2252` | Similar to Zone H                            |
+| J    | `mscIResidentialNewYork2252`     | NYC transmission constraints = higher prices |
 
 ### MSC II Adjustment (Capacity & Ancillaries)
 
 Reconciles **non-energy costs**:
 
-| Cost Type | What It Is |
-|-----------|------------|
-| **Capacity** | Payments to generators to be available (even if not running) |
-| **Ancillary services** | Frequency regulation, spinning reserves, voltage support |
-| **Working capital** | Carrying costs for the lag between payment and collection |
-| **NYISO fees** | Administrative charges from the grid operator |
+| Cost Type              | What It Is                                                   |
+| ---------------------- | ------------------------------------------------------------ |
+| **Capacity**           | Payments to generators to be available (even if not running) |
+| **Ancillary services** | Frequency regulation, spinning reserves, voltage support     |
+| **Working capital**    | Carrying costs for the lag between payment and collection    |
+| **NYISO fees**         | Administrative charges from the grid operator                |
 
 ```
 MSC II Variance = Actual_Capacity_Costs - Forecasted_Capacity_Costs
@@ -314,11 +315,13 @@ Gap created ──────────────────────�
 ### January Billing Period (Zone J Residential)
 
 **Forecasting (December):**
+
 ```
 Expected January load shape × Forward LMP curve = $0.0823/kWh forecasted MSC
 ```
 
 **Reality (January):**
+
 ```
 Actual hourly data:
 - Total load: 2,500,000 MWh
@@ -327,21 +330,25 @@ Actual hourly data:
 ```
 
 **What customers paid:**
+
 ```
 2,500,000 MWh × $0.0823/kWh = $205,750,000
 ```
 
 **Variance:**
+
 ```
 $211,750,000 - $205,750,000 = $6,000,000 under-collection
 ```
 
 **MSC I Adjustment (applied in April/May):**
+
 ```
 $6,000,000 / 2,400,000 MWh (expected recovery period load) = $0.0025/kWh
 ```
 
 **Your April bill includes:**
+
 ```
 Energy for April:        500 kWh × $0.0756 = $37.80  (April forecast)
 MSC I Adjustment:        500 kWh × $0.0025 = $1.25   (January true-up)
@@ -356,12 +363,12 @@ Total Supply Charges:                        $39.20
 
 ### Why This Structure Exists
 
-| Reason | Explanation |
-|--------|-------------|
-| **Timing mismatch** | Bills must go out before costs are known |
-| **Settlement lag** | NYISO takes ~60 days to finalize |
-| **Regulatory requirement** | Rate changes need PSC approval |
-| **Revenue neutrality** | ConEd can't profit on supply; must true-up |
+| Reason                     | Explanation                                |
+| -------------------------- | ------------------------------------------ |
+| **Timing mismatch**        | Bills must go out before costs are known   |
+| **Settlement lag**         | NYISO takes ~60 days to finalize           |
+| **Regulatory requirement** | Rate changes need PSC approval             |
+| **Revenue neutrality**     | ConEd can't profit on supply; must true-up |
 
 ### The Math in One Equation
 
@@ -396,12 +403,12 @@ The `chargeClass: "SUPPLY,CONTRACTED"` rates in the tariff only apply to custome
 
 ## Glossary
 
-| Term | Definition |
-|------|------------|
-| **LMP** | Locational Marginal Price — wholesale electricity price at a specific location and time |
-| **MSC** | Market Supply Charge — ConEd's retail supply rate for default service customers |
-| **NYISO** | New York Independent System Operator — runs the wholesale electricity market |
-| **PSC** | Public Service Commission — NY's utility regulator |
-| **ESCO** | Energy Service Company — competitive retail electricity supplier |
-| **Load-weighted average** | Average where each price is weighted by the consumption during that period |
-| **Settlement** | NYISO's process of finalizing actual costs after the operating period |
+| Term                      | Definition                                                                              |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| **LMP**                   | Locational Marginal Price — wholesale electricity price at a specific location and time |
+| **MSC**                   | Market Supply Charge — ConEd's retail supply rate for default service customers         |
+| **NYISO**                 | New York Independent System Operator — runs the wholesale electricity market            |
+| **PSC**                   | Public Service Commission — NY's utility regulator                                      |
+| **ESCO**                  | Energy Service Company — competitive retail electricity supplier                        |
+| **Load-weighted average** | Average where each price is weighted by the consumption during that period              |
+| **Settlement**            | NYISO's process of finalizing actual costs after the operating period                   |

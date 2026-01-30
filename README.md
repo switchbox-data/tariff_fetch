@@ -12,6 +12,7 @@ A CLI tool, and python library, to simplify downloading electric and gas utility
 - **PyPI page**: <https://pypi.org/project/tariff_fetch/>
 
 ## Requirements
+
 - Python 3.11+
 - Credentials for the providers you intend to call:
 
@@ -26,7 +27,6 @@ A CLI tool, and python library, to simplify downloading electric and gas utility
   - **RateAcuity Web Portal**: `RATEACUITY_USERNAME`, `RATEACUITY_PASSWORD`
 
     There is no self-serve signup. [Contact RateAcuity](https://rateacuity.com/contact-us/) to request Web Portal access. No API key is required for `tariff_fetch`.
-
 
 - Google Chrome or Chromium installed locally (for RateAcuity)
 
@@ -93,6 +93,7 @@ just cligas
 ```
 
 Options:
+
 - `--state` / `-s`: two-letter state abbreviation (default: prompt)
 - `--providers` / `-p`: (only for electricity benchmarks) repeat per provider (`genability`, `openei`, `rateacuity`)
 - `--output-folder` / `-o`: directory for exports (default: `./outputs`)

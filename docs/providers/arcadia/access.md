@@ -21,4 +21,4 @@ ARCADIA_APP_KEY=<your app key goes here>
 ```
 
 !!! warning "Important"
-    Make sure to add `.env` to your `.gitignore` file to avoid accidentally committing your credentials to version control.
+Make sure to add `.env` to your `.gitignore` file to avoid accidentally committing your credentials to version control.

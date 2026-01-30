@@ -20,12 +20,12 @@ URDB outputs data in the an open data standard called URDB JSON. Many NREL tools
 
 ## Key Endpoints
 
-| Endpoint | Purpose |
-|----------|---------|
-| `GET /utility_rates` | Search and retrieve rates |
-| `GET /utility_rates?getpage={label}` | Get a specific rate by ID |
+| Endpoint                                    | Purpose                     |
+| ------------------------------------------- | --------------------------- |
+| `GET /utility_rates`                        | Search and retrieve rates   |
+| `GET /utility_rates?getpage={label}`        | Get a specific rate by ID   |
 | `GET /utility_rates?ratesforutility={name}` | Get all rates for a utility |
-| `GET /utility_rates?lat={lat}&lon={lon}` | Find rates by location |
+| `GET /utility_rates?lat={lat}&lon={lon}`    | Find rates by location      |
 
 ## Resources
 
@@ -34,9 +34,9 @@ URDB outputs data in the an open data standard called URDB JSON. Many NREL tools
 
 ## Comparison with Arcadia
 
-| Aspect | URDB | Arcadia |
-|--------|------|---------|
-| Cost | Free | Paid |
-| Coverage | OK, community-maintained | Comprehensive, professionally maintained |
-| Update frequency | Annual | Regular updates |
-| Variable rates | Not supported | Lookups API |
+| Aspect           | URDB                     | Arcadia                                  |
+| ---------------- | ------------------------ | ---------------------------------------- |
+| Cost             | Free                     | Paid                                     |
+| Coverage         | OK, community-maintained | Comprehensive, professionally maintained |
+| Update frequency | Annual                   | Regular updates                          |
+| Variable rates   | Not supported            | Lookups API                              |

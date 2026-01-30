@@ -39,9 +39,11 @@ Rather than constantly filing new rate cases (expensive, slow), regulators allow
 ### 1. Monthly Adjustment Clause (MAC)
 
 #### What Problem It Solves
+
 The MAC is an **umbrella mechanism** that captures cost changes the PSC has pre-approved for pass-through. It's the "catch-all" for costs that vary but shouldn't require a rate case to update.
 
 #### What's Included
+
 The MAC typically includes:
 
 - Property tax changes
@@ -53,6 +55,7 @@ The MAC typically includes:
 #### How It Works
 
 **Step 1: Rate Case Establishes Baseline**
+
 ```
 During rate case, PSC sets base delivery rates assuming:
 - Property taxes: $X million/year
@@ -61,6 +64,7 @@ During rate case, PSC sets base delivery rates assuming:
 ```
 
 **Step 2: Actual Costs Differ**
+
 ```
 Year 1 Reality:
 - Property taxes: $X + $5 million (taxes went up)
@@ -69,6 +73,7 @@ Year 1 Reality:
 ```
 
 **Step 3: MAC Adjustment Calculated**
+
 ```
 Net variance = +$5M + $20M - $2M = +$23 million under-recovery
 
@@ -81,11 +86,13 @@ MAC Rate = $23 million / Expected annual kWh sales
 The MAC rate is updated (typically monthly or quarterly) and applied to all kWh consumed.
 
 #### Time Lag
+
 - **Lag**: 1-3 months
 - **Why**: ConEd needs to compile actual costs, file with PSC, get approval
 - **Pattern**: You're paying for cost variances from ~2-3 months ago
 
 #### Variable Rate Key
+
 ```json
 "variableRateKey": "monthlyAdjustmentClauseResidential"
 ```
@@ -95,6 +102,7 @@ The MAC rate is updated (typically monthly or quarterly) and applied to all kWh 
 ### 2. Revenue Decoupling Mechanism (RDM) Adjustment
 
 #### What Problem It Solves
+
 Traditional utility regulation created a perverse incentive: utilities made more money when customers used more electricity. This discouraged utilities from promoting energy efficiency.
 
 **Revenue decoupling** breaks this link by guaranteeing the utility a fixed revenue amount regardless of sales volume.
@@ -117,6 +125,7 @@ Decoupled Model:
 #### How It Works
 
 **Step 1: Rate Case Sets Target Revenue**
+
 ```
 PSC authorizes ConEd to collect $2.5 billion/year in delivery revenue
 Based on expected sales of 40 billion kWh
@@ -124,6 +133,7 @@ Implied rate: $0.0625/kWh
 ```
 
 **Step 2: Actual Sales Differ**
+
 ```
 Year 1: Mild summer → customers use only 38 billion kWh
 At $0.0625/kWh, ConEd collects only $2.375 billion
@@ -131,6 +141,7 @@ Shortfall: $125 million
 ```
 
 **Step 3: RDM Adjustment Calculated**
+
 ```
 RDM Adjustment = Shortfall / Expected Future Sales
                = $125 million / 40 billion kWh
@@ -141,6 +152,7 @@ RDM Adjustment = Shortfall / Expected Future Sales
 Next year's bills include the RDM surcharge to make ConEd whole.
 
 #### The Flip Side
+
 ```
 Year 2: Hot summer → customers use 43 billion kWh
 At $0.0625/kWh, ConEd collects $2.6875 billion
@@ -153,11 +165,13 @@ RDM Adjustment = -$187.5 million / 40 billion kWh
 Customers get money back when they use more than expected!
 
 #### Time Lag
+
 - **Lag**: 12-18 months typically
 - **Why**: RDM is usually reconciled annually after a full year of data
 - **Pattern**: This year's RDM reflects last year's over/under-collection
 
 #### Why This Matters for Clean Energy
+
 Revenue decoupling is foundational to NY's climate policy. Without it:
 
 - ConEd would fight rooftop solar (reduces sales)
@@ -167,6 +181,7 @@ Revenue decoupling is foundational to NY's climate policy. Without it:
 With decoupling, ConEd's revenue is protected regardless of sales trends.
 
 #### Variable Rate Key
+
 ```json
 "variableRateKey": "revenueDecouplingMechanismAdjustmentSc1"
 ```
@@ -176,17 +191,21 @@ With decoupling, ConEd's revenue is protected regardless of sales trends.
 ### 3. Delivery Revenue Surcharge
 
 #### What Problem It Solves
+
 This is a **supplemental revenue adjustment** that handles specific revenue shortfalls or policy-driven rate changes outside the normal MAC and RDM mechanisms.
 
 #### Common Uses
+
 - Implementing PSC-ordered rate changes mid-period
 - Recovering costs from specific events (major storms, infrastructure failures)
 - Adjusting for regulatory lag when costs change faster than rate cases
 
 #### How It Works
+
 Similar to MAC, but used for more specific, identifiable cost categories that the PSC wants tracked separately.
 
 #### Variable Rate Key
+
 ```json
 "variableRateKey": "DeliveryRevenueSurchargeSc1"
 ```
@@ -196,9 +215,11 @@ Similar to MAC, but used for more specific, identifiable cost categories that th
 ### 4. Reconciliation Rate
 
 #### What Problem It Solves
+
 The Reconciliation Rate handles **true-ups for deferred costs** from NY's electricity restructuring in the late 1990s.
 
 #### Historical Context
+
 When NY deregulated electricity in 1996-2000:
 
 - Utilities sold off power plants
@@ -207,6 +228,7 @@ When NY deregulated electricity in 1996-2000:
 - The Reconciliation Rate adjusts for actual vs. expected recovery
 
 #### Why It Still Exists
+
 Even decades later, there are ongoing reconciliations for:
 
 - Legacy power purchase contracts
@@ -214,10 +236,12 @@ Even decades later, there are ongoing reconciliations for:
 - Long-term debt from restructuring
 
 #### Time Lag
+
 - **Lag**: Annual
 - **Pattern**: Reconciles prior year's deferred cost recovery
 
 #### Variable Rate Key
+
 ```json
 "variableRateKey": "macAdjustmentReconciliation2252"
 ```
@@ -227,17 +251,21 @@ Even decades later, there are ongoing reconciliations for:
 ### 5. Transition Adjustment
 
 #### What Problem It Solves
+
 Another legacy of deregulation. The Transition Adjustment handles costs related to the **transition** from regulated monopoly to competitive markets.
 
 #### What It Covers
+
 - Costs of separating generation from distribution
 - Stranded cost recovery adjustments
 - Contract buyouts from the restructuring era
 
 #### Why It's (Usually) Small Now
+
 Most transition costs have been recovered, so this adjustment is typically minimal. It persists for final true-ups and any remaining legacy obligations.
 
 #### Variable Rate Key
+
 ```json
 "variableRateKey": "macAdjustmentTransitionAdjustment2252"
 ```
@@ -247,29 +275,34 @@ Most transition costs have been recovered, so this adjustment is typically minim
 ### 6. Uncollectible Bill Expense
 
 #### What Problem It Solves
+
 Some customers don't pay their bills. ConEd can't collect from them, but still incurred costs to serve them. This adjustment recovers those costs from paying customers.
 
 #### How It Works
 
 **Step 1: Rate Case Estimates Bad Debt**
+
 ```
 PSC assumes 1.5% of billed revenue will be uncollectible
 Base rates include recovery for this expected level
 ```
 
 **Step 2: Actual Bad Debt Differs**
+
 ```
 Year 1: Economic downturn → 2.3% of bills unpaid
 Excess bad debt: 0.8% × $2.5 billion = $20 million
 ```
 
 **Step 3: Adjustment Calculated**
+
 ```
 Uncollectible Expense Adjustment = $20 million / 40 billion kWh
                                  = $0.0005/kWh
 ```
 
 #### COVID-19 Impact
+
 This adjustment spiked during COVID when:
 
 - Moratoriums prevented disconnections
@@ -279,10 +312,12 @@ This adjustment spiked during COVID when:
 The separate "Arrears Management Program Recovery Surcharge" (a rider) handles some of this, but the Uncollectible Bill Expense adjustment captures ongoing bad debt variances.
 
 #### Time Lag
+
 - **Lag**: 6-12 months
 - **Why**: ConEd needs time to determine which bills are truly uncollectible (not just late)
 
 #### Variable Rate Key
+
 ```json
 "variableRateKey": "macAdjustmentUncollectibeBillExpense2252"
 ```
@@ -292,15 +327,18 @@ The separate "Arrears Management Program Recovery Surcharge" (a rider) handles s
 ### 7. Clean Energy Standard Delivery Surcharge
 
 #### What Problem It Solves
+
 NY's Clean Energy Standard (CES) mandates that utilities procure increasing amounts of renewable energy. This surcharge recovers the **delivery-side costs** of that mandate.
 
 #### What It Covers (Delivery Side)
+
 - Grid upgrades needed to integrate renewables
 - Interconnection study costs
 - Distribution system modifications for DERs (Distributed Energy Resources)
 - Administrative costs for clean energy programs
 
 #### The Supply Side Counterpart
+
 There's also a "Clean Energy Standard Supply Surcharge" that covers:
 
 - Renewable Energy Credit (REC) purchases
@@ -312,12 +350,14 @@ The delivery surcharge is separate because these are **infrastructure costs**, n
 #### How It Works
 
 **Step 1: PSC Sets CES Targets**
+
 ```
 2025: 70% renewable electricity
 2030: 100% carbon-free electricity
 ```
 
 **Step 2: ConEd Incurs Costs**
+
 ```
 Year 1 CES delivery costs:
 - Distribution upgrades: $50 million
@@ -327,16 +367,19 @@ Total: $90 million
 ```
 
 **Step 3: Surcharge Calculated**
+
 ```
 CES Delivery Surcharge = $90 million / 40 billion kWh
                        = $0.00225/kWh
 ```
 
 #### Time Lag
+
 - **Lag**: Varies (quarterly to annual updates)
 - **Why**: Depends on when costs are incurred and PSC reporting requirements
 
 #### Variable Rate Key
+
 ```json
 "variableRateKey": "cleanEnergyStandardDelivery2252"
 ```
@@ -394,15 +437,15 @@ YEAR 3: NEXT RATE CASE (OR CONTINUED ADJUSTMENTS)
 
 These aren't completely independent—they're designed to work together:
 
-| Adjustment | What It Catches | Frequency | Typical Lag |
-|------------|-----------------|-----------|-------------|
-| MAC | Cost changes (taxes, storms, etc.) | Monthly | 1-3 months |
-| RDM | Sales volume variance | Annual | 12-18 months |
-| Delivery Revenue Surcharge | Specific revenue shortfalls | As needed | Varies |
-| Reconciliation Rate | Deferred cost recovery | Annual | 12+ months |
-| Transition Adjustment | Legacy restructuring costs | Annual | 12+ months |
-| Uncollectible Bill Expense | Bad debt variance | Quarterly | 6-12 months |
-| CES Delivery Surcharge | Clean energy infrastructure | Quarterly | 3-6 months |
+| Adjustment                 | What It Catches                    | Frequency | Typical Lag  |
+| -------------------------- | ---------------------------------- | --------- | ------------ |
+| MAC                        | Cost changes (taxes, storms, etc.) | Monthly   | 1-3 months   |
+| RDM                        | Sales volume variance              | Annual    | 12-18 months |
+| Delivery Revenue Surcharge | Specific revenue shortfalls        | As needed | Varies       |
+| Reconciliation Rate        | Deferred cost recovery             | Annual    | 12+ months   |
+| Transition Adjustment      | Legacy restructuring costs         | Annual    | 12+ months   |
+| Uncollectible Bill Expense | Bad debt variance                  | Quarterly | 6-12 months  |
+| CES Delivery Surcharge     | Clean energy infrastructure        | Quarterly | 3-6 months   |
 
 ---
 
@@ -410,11 +453,11 @@ These aren't completely independent—they're designed to work together:
 
 You might wonder: why not just set these adjustments at fixed levels?
 
-| Approach | Problem |
-|----------|---------|
-| Fixed adjustments | Would be wrong as soon as actual costs differ from forecast |
-| Frequent rate cases | Expensive ($millions), slow (12-18 months), adversarial |
-| Variable adjustments | Allow continuous true-up within PSC-approved framework |
+| Approach             | Problem                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| Fixed adjustments    | Would be wrong as soon as actual costs differ from forecast |
+| Frequent rate cases  | Expensive ($millions), slow (12-18 months), adversarial     |
+| Variable adjustments | Allow continuous true-up within PSC-approved framework      |
 
 The variable adjustment mechanism is a regulatory compromise:
 
@@ -429,14 +472,14 @@ The variable adjustment mechanism is a regulatory compromise:
 
 For a typical ConEd residential customer using 500 kWh/month:
 
-| Component | Typical Range | Monthly Impact |
-|-----------|---------------|----------------|
-| Base Delivery Rate | $0.161/kWh | $80.50 |
-| MAC | ±$0.001-0.005/kWh | ±$0.50-2.50 |
-| RDM | ±$0.002-0.008/kWh | ±$1.00-4.00 |
-| Uncollectible | $0.0003-0.001/kWh | $0.15-0.50 |
-| CES Delivery | $0.001-0.003/kWh | $0.50-1.50 |
-| Others | ±$0.001/kWh | ±$0.50 |
+| Component          | Typical Range     | Monthly Impact |
+| ------------------ | ----------------- | -------------- |
+| Base Delivery Rate | $0.161/kWh        | $80.50         |
+| MAC                | ±$0.001-0.005/kWh | ±$0.50-2.50    |
+| RDM                | ±$0.002-0.008/kWh | ±$1.00-4.00    |
+| Uncollectible      | $0.0003-0.001/kWh | $0.15-0.50     |
+| CES Delivery       | $0.001-0.003/kWh  | $0.50-1.50     |
+| Others             | ±$0.001/kWh       | ±$0.50         |
 
 The adjustments typically add/subtract **$2-8/month** from your base delivery charges, or about **3-10%** of the delivery portion of your bill.
 

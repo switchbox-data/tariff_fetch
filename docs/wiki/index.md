@@ -25,9 +25,9 @@ This wiki explains what all of that means so you can actually use the data.
 
 ## Utilities Covered
 
-| Utility | Region | Guides Available |
-|---------|--------|------------------|
-| [Consolidated Edison (ConEd)](utilities/coned/index.md) | New York | EL1 Residential |
+| Utility                                                 | Region   | Guides Available |
+| ------------------------------------------------------- | -------- | ---------------- |
+| [Consolidated Edison (ConEd)](utilities/coned/index.md) | New York | EL1 Residential  |
 
 ## Structure
 
