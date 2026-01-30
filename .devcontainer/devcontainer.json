@@ -10,7 +10,7 @@
       "theme": "bira"
     }
   },
-  "postCreateCommand": "bash -c '.devcontainer/install-python-deps.sh && .devcontainer/install-prek.sh && .devcontainer/install-ohmyzsh-plugins.sh && .devcontainer/install-prek-deps.sh'",
+  "postCreateCommand": "bash -c '.devcontainer/install-ohmyzsh-plugins.sh && .devcontainer/install-python-deps.sh && .devcontainer/install-prek.sh && .devcontainer/install-prek-deps.sh'",
   "customizations": {
     "vscode": {
       "extensions": [
