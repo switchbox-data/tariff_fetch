@@ -18,6 +18,9 @@ check:
     uv lock --locked
     echo "🚀 Linting, formatting, and type checking code"
     prek run -a
+
+# Check for obsolete dependencies
+check-deps:
     echo "🚀 Checking for obsolete dependencies: Running deptry"
     uv run deptry .
 
