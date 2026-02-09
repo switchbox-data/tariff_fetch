@@ -1,0 +1,2088 @@
+[
+  {
+    "is_active": true,
+    "tariff_id": 3538383,
+    "master_tariff_id": 809,
+    "tariff_code": "EL1",
+    "tariff_name": "Residential and Religious",
+    "lse_id": 2252,
+    "lse_name": "Consolidated Edison Co-NY Inc",
+    "service_type": "ELECTRICITY",
+    "prior_tariff_id": 3491277,
+    "tariff_type": "DEFAULT",
+    "customer_class": "RESIDENTIAL",
+    "customer_count": 3024550,
+    "customer_likelihood": 100.0,
+    "territory_id": 2533,
+    "effective_date": "2026-02-01",
+    "end_date": null,
+    "time_zone": "US/Eastern",
+    "effective_on_rule": "TARIFF_EFFECTIVE_DATE",
+    "billing_period": "MONTHLY",
+    "currency": "USD",
+    "charge_types": [
+      "FIXED_PRICE",
+      "CONSUMPTION_BASED",
+      "QUANTITY",
+      "MINIMUM"
+    ],
+    "charge_period": "MONTHLY",
+    "has_time_of_use_rates": false,
+    "has_tiered_rates": true,
+    "has_contracted_rates": true,
+    "has_rate_applicability": false,
+    "tariff_book_name": "Residential and Religious",
+    "lse_code": "ConEd",
+    "customer_count_source": "FERC Form 1",
+    "closed_date": null,
+    "min_monthly_consumption": null,
+    "max_monthly_consumption": null,
+    "min_monthly_demand": null,
+    "max_monthly_demand": null,
+    "has_tariff_applicability": false,
+    "has_net_metering": true,
+    "privacy": "PUBLIC",
+    "properties": [
+      {
+        "quantity_key": null,
+        "key_name": "consumption",
+        "display_name": "Consumption (kWh)",
+        "keyspace": "electricity",
+        "family": "load",
+        "description": "Quantity in kWh of load that is used for a period of time",
+        "data_type": "DECIMAL",
+        "property_types": "RATE_CRITERIA",
+        "operator": null,
+        "is_default": false
+      },
+      {
+        "quantity_key": null,
+        "quantity_unit": "kW",
+        "key_name": "systemSize",
+        "display_name": "System Size",
+        "keyspace": "solarPV",
+        "family": "system",
+        "description": "Nameplate capacity (kW).",
+        "data_type": "DECIMAL",
+        "property_types": "RATE_CRITERIA",
+        "operator": "=",
+        "propertyValue": "0",
+        "is_default": true
+      },
+      {
+        "quantity_key": null,
+        "quantity_unit": "",
+        "key_name": "territoryId",
+        "display_name": "Territory",
+        "keyspace": "electricity",
+        "family": "billing",
+        "description": "Rate Baseline Region",
+        "data_type": "CHOICE",
+        "property_types": "RATE_CRITERIA",
+        "operator": null,
+        "choices": [
+          {
+            "value": "3632",
+            "displayValue": "Zone H",
+            "dataValue": "3632",
+            "likelihood": null
+          },
+          {
+            "value": "3633",
+            "displayValue": "Zone I",
+            "dataValue": "3633",
+            "likelihood": null
+          },
+          {
+            "value": "3634",
+            "displayValue": "Zone J",
+            "dataValue": "3634",
+            "likelihood": null
+          }
+        ],
+        "is_default": true
+      },
+      {
+        "quantity_key": null,
+        "key_name": "chargeClass",
+        "display_name": "Charge Class Type",
+        "keyspace": "electricity",
+        "family": "service",
+        "description": "The tariff has rates with the following charge class.",
+        "data_type": "CHOICE",
+        "property_types": "SERVICE_TERMS",
+        "operator": "=",
+        "propertyValue": "DISTRIBUTION,SUPPLY,CONTRACTED",
+        "choices": [
+          {
+            "value": "1",
+            "displayValue": "Transmission",
+            "dataValue": "1",
+            "likelihood": null
+          },
+          {
+            "value": "2",
+            "displayValue": "Distribution",
+            "dataValue": "2",
+            "likelihood": null
+          },
+          {
+            "value": "4",
+            "displayValue": "Supply",
+            "dataValue": "4",
+            "likelihood": null
+          },
+          {
+            "value": "8",
+            "displayValue": "Tax",
+            "dataValue": "8",
+            "likelihood": null
+          },
+          {
+            "value": "16",
+            "displayValue": "Other",
+            "dataValue": "16",
+            "likelihood": null
+          },
+          {
+            "value": "32",
+            "displayValue": "Contracted",
+            "dataValue": "32",
+            "likelihood": null
+          }
+        ],
+        "is_default": false
+      }
+    ],
+    "rates": [
+      {
+        "master_tariff_rate_id": 18246979,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918155,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 2,
+        "rate_group_name": "Basic Service Charge",
+        "rate_name": "Customer Charge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "FIXED_PRICE",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_factor_key": "billingPeriodProrationFactor",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934102,
+            "tariff_rate_id": 20918155,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 21.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Basic Service Charge",
+        "tariff_book_rate_name": "Customer Charge",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 17033348,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918156,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 2,
+        "rate_group_name": "Basic Service Charge",
+        "rate_name": "Billing and Payment Processing Charge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "FIXED_PRICE",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934103,
+            "tariff_rate_id": 20918156,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 1.8,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 3,
+        "tariff_book_rate_group_name": "Basic Service Charge",
+        "tariff_book_rate_name": "Billing and Payment Processing Charge",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 17275990,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918157,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Delivery Revenue Surcharge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "DeliveryRevenueSurchargeSc1",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934104,
+            "tariff_rate_id": 20918157,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Delivery Revenue Surcharge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17033333,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918158,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Reconciliation Rate",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "macAdjustmentReconciliation2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934105,
+            "tariff_rate_id": 20918158,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Reconciliation Rate",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17033335,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918159,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Transition Adjustment",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "macAdjustmentTransitionAdjustment2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934106,
+            "tariff_rate_id": 20918159,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 3,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Transition Adjustment",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17033334,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918160,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Uncollectible Bill Expense",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "macAdjustmentUncollectibeBillExpense2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934107,
+            "tariff_rate_id": 20918160,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 4,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Uncollectible Bill Expense-Rate",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17033347,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918161,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Monthly Adjustment Clause",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "monthlyAdjustmentClauseResidential",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934108,
+            "tariff_rate_id": 20918161,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 5,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Monthly Adjustment Clause",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17033342,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918162,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Revenue Decoupling Mechanism Adjustment  ",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "revenueDecouplingMechanismAdjustmentSc1",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934109,
+            "tariff_rate_id": 20918162,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 6,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Revenue Decoupling Mechanism Adjustment  ",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17827177,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918163,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Clean Energy Standard Delivery Surcharge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "cleanEnergyStandardDelivery2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934110,
+            "tariff_rate_id": 20918163,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 7,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Clean Energy Standard Delivery Surcharge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 16981863,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918164,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Summer Rate",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934111,
+            "tariff_rate_id": 20918164,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": true,
+            "consumption_upper_limit": 250.0,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          },
+          {
+            "tariff_rate_band_id": 15934112,
+            "tariff_rate_id": 20918164,
+            "rate_sequence_number": 2,
+            "has_consumption_limit": true,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.18858,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 8,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Energy Rate - Summer - Territory H",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3632,
+          "territory_name": "Zone H",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 41.24471966666667,
+            "longitude": -73.81995450000002
+          }
+        },
+        "season": {
+          "season_id": 213,
+          "lse_id": 2252,
+          "season_group_id": 1,
+          "season_name": "Summer",
+          "season_from_month": 6,
+          "season_from_day": 1,
+          "season_to_month": 9,
+          "season_to_day": 30,
+          "from_edge_predominance": "PREDOMINANT",
+          "to_edge_predominance": "SUBSERVIENT"
+        }
+      },
+      {
+        "master_tariff_rate_id": 17327636,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918165,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Summer Rate",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934113,
+            "tariff_rate_id": 20918165,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": true,
+            "consumption_upper_limit": 250.0,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          },
+          {
+            "tariff_rate_band_id": 15934114,
+            "tariff_rate_id": 20918165,
+            "rate_sequence_number": 2,
+            "has_consumption_limit": true,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.18858,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 9,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Summer Rate - Territory I",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3633,
+          "territory_name": "Zone I",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.99908249152543,
+            "longitude": -73.81227445762711
+          }
+        },
+        "season": {
+          "season_id": 213,
+          "lse_id": 2252,
+          "season_group_id": 1,
+          "season_name": "Summer",
+          "season_from_month": 6,
+          "season_from_day": 1,
+          "season_to_month": 9,
+          "season_to_day": 30,
+          "from_edge_predominance": "PREDOMINANT",
+          "to_edge_predominance": "SUBSERVIENT"
+        }
+      },
+      {
+        "master_tariff_rate_id": 17327637,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918166,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Summer Rate",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934115,
+            "tariff_rate_id": 20918166,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": true,
+            "consumption_upper_limit": 250.0,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          },
+          {
+            "tariff_rate_band_id": 15934116,
+            "tariff_rate_id": 20918166,
+            "rate_sequence_number": 2,
+            "has_consumption_limit": true,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.18858,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 10,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Summer Rate - Territory J",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3634,
+          "territory_name": "Zone J",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.72388634472048,
+            "longitude": -73.93697824534158
+          }
+        },
+        "season": {
+          "season_id": 213,
+          "lse_id": 2252,
+          "season_group_id": 1,
+          "season_name": "Summer",
+          "season_from_month": 6,
+          "season_from_day": 1,
+          "season_to_month": 9,
+          "season_to_day": 30,
+          "from_edge_predominance": "PREDOMINANT",
+          "to_edge_predominance": "SUBSERVIENT"
+        }
+      },
+      {
+        "master_tariff_rate_id": 16981864,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918167,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Winter Rate",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934117,
+            "tariff_rate_id": 20918167,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": true,
+            "consumption_upper_limit": 250.0,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          },
+          {
+            "tariff_rate_band_id": 15934118,
+            "tariff_rate_id": 20918167,
+            "rate_sequence_number": 2,
+            "has_consumption_limit": true,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 11,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Energy Rate - Winter - Territory H",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3632,
+          "territory_name": "Zone H",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 41.24471966666667,
+            "longitude": -73.81995450000002
+          }
+        },
+        "season": {
+          "season_id": 214,
+          "lse_id": 2252,
+          "season_group_id": 1,
+          "season_name": "Winter",
+          "season_from_month": 10,
+          "season_from_day": 1,
+          "season_to_month": 5,
+          "season_to_day": 31,
+          "from_edge_predominance": "PREDOMINANT",
+          "to_edge_predominance": "SUBSERVIENT"
+        }
+      },
+      {
+        "master_tariff_rate_id": 17327638,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918168,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Winter Rate",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934119,
+            "tariff_rate_id": 20918168,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": true,
+            "consumption_upper_limit": 250.0,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          },
+          {
+            "tariff_rate_band_id": 15934120,
+            "tariff_rate_id": 20918168,
+            "rate_sequence_number": 2,
+            "has_consumption_limit": true,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 12,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Winter Rate - Territory I",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3633,
+          "territory_name": "Zone I",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.99908249152543,
+            "longitude": -73.81227445762711
+          }
+        },
+        "season": {
+          "season_id": 214,
+          "lse_id": 2252,
+          "season_group_id": 1,
+          "season_name": "Winter",
+          "season_from_month": 10,
+          "season_from_day": 1,
+          "season_to_month": 5,
+          "season_to_day": 31,
+          "from_edge_predominance": "PREDOMINANT",
+          "to_edge_predominance": "SUBSERVIENT"
+        }
+      },
+      {
+        "master_tariff_rate_id": 17327639,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918169,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 3,
+        "rate_group_name": "Delivery Charges",
+        "rate_name": "Winter Rate",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934121,
+            "tariff_rate_id": 20918169,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": true,
+            "consumption_upper_limit": 250.0,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          },
+          {
+            "tariff_rate_band_id": 15934122,
+            "tariff_rate_id": 20918169,
+            "rate_sequence_number": 2,
+            "has_consumption_limit": true,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.16402,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 13,
+        "tariff_book_rate_group_name": "Delivery Charges",
+        "tariff_book_rate_name": "Winter Rate - Territory J",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3634,
+          "territory_name": "Zone J",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.72388634472048,
+            "longitude": -73.93697824534158
+          }
+        },
+        "season": {
+          "season_id": 214,
+          "lse_id": 2252,
+          "season_group_id": 1,
+          "season_name": "Winter",
+          "season_from_month": 10,
+          "season_from_day": 1,
+          "season_to_month": 5,
+          "season_to_day": 31,
+          "from_edge_predominance": "PREDOMINANT",
+          "to_edge_predominance": "SUBSERVIENT"
+        }
+      },
+      {
+        "master_tariff_rate_id": 17033345,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918170,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 4,
+        "rate_group_name": "Merchant Function Charge",
+        "rate_name": "Merchant Function Charge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "2252MerchantFunctionChargeSC1SC7",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934123,
+            "tariff_rate_id": 20918170,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Merchant Function Charge",
+        "tariff_book_rate_name": "Merchant Function Charge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17033330,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918171,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 5,
+        "rate_group_name": "Supply Charges",
+        "rate_name": "MSC Rate - Zone H",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "marketSupplyChargeResidentialZoneH",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934124,
+            "tariff_rate_id": 20918171,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Supply Charges",
+        "tariff_book_rate_name": "MSC Rate - Zone H",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3632,
+          "territory_name": "Zone H",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 41.24471966666667,
+            "longitude": -73.81995450000002
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 17033331,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918172,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 5,
+        "rate_group_name": "Supply Charges",
+        "rate_name": "MSC Rate - Zone I",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "marketSupplyChargeResidentialZoneI",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934125,
+            "tariff_rate_id": 20918172,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Supply Charges",
+        "tariff_book_rate_name": "MSC Rate - Zone I",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3633,
+          "territory_name": "Zone I",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.99908249152543,
+            "longitude": -73.81227445762711
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 17033332,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918173,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 5,
+        "rate_group_name": "Supply Charges",
+        "rate_name": "MSC Rate - Zone J",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "marketSupplyChargeResidentialZoneJ",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934126,
+            "tariff_rate_id": 20918173,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 3,
+        "tariff_book_rate_group_name": "Supply Charges",
+        "tariff_book_rate_name": "MSC Rate - Zone J",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3634,
+          "territory_name": "Zone J",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.72388634472048,
+            "longitude": -73.93697824534158
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 17033337,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918174,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 5,
+        "rate_group_name": "Supply Charges",
+        "rate_name": "MSC I Adjustment Zone H",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "mscIResidentialWestchester2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934127,
+            "tariff_rate_id": 20918174,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 4,
+        "tariff_book_rate_group_name": "Supply Charges",
+        "tariff_book_rate_name": "MSC I Adjustment Zone H",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3632,
+          "territory_name": "Zone H",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 41.24471966666667,
+            "longitude": -73.81995450000002
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 17033338,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918175,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 5,
+        "rate_group_name": "Supply Charges",
+        "rate_name": "MSC I Adjustment Zone I",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "mscIResidentialWestchester2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934128,
+            "tariff_rate_id": 20918175,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 5,
+        "tariff_book_rate_group_name": "Supply Charges",
+        "tariff_book_rate_name": "MSC I Adjustment Zone I",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3633,
+          "territory_name": "Zone I",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.99908249152543,
+            "longitude": -73.81227445762711
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 17033336,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918176,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 5,
+        "rate_group_name": "Supply Charges",
+        "rate_name": "MSC I Adjustment Zone J",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "mscIResidentialNewYork2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934129,
+            "tariff_rate_id": 20918176,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 6,
+        "tariff_book_rate_group_name": "Supply Charges",
+        "tariff_book_rate_name": "MSC I Adjustment Zone J",
+        "transaction_type": "NET",
+        "territory": {
+          "territory_id": 3634,
+          "territory_name": "Zone J",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.72388634472048,
+            "longitude": -73.93697824534158
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 17033339,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918177,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 5,
+        "rate_group_name": "Supply Charges",
+        "rate_name": "MSC II Adjustment",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "mscIIAdjustmentFactor",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934130,
+            "tariff_rate_id": 20918177,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 7,
+        "tariff_book_rate_group_name": "Supply Charges",
+        "tariff_book_rate_name": "MSC II Adjustment",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17827186,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918178,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 5,
+        "rate_group_name": "Supply Charges",
+        "rate_name": "Clean Energy Standard Supply Surcharge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "SUPPLY",
+          "CONTRACTED"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "cleanEnergyStandardSupply2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934131,
+            "tariff_rate_id": 20918178,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 8,
+        "tariff_book_rate_group_name": "Supply Charges",
+        "tariff_book_rate_name": "Clean Energy Standard Supply Surcharge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17033340,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918179,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 6,
+        "rate_group_name": "SBC Charges",
+        "rate_name": "System Benefits Charge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "systemsBenefitsCharge2252",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934132,
+            "tariff_rate_id": 20918179,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "SBC Charges",
+        "tariff_book_rate_name": "Systems Benefit Charge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 17033346,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918180,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 7,
+        "rate_group_name": "Temporary NY  State Surcharge",
+        "rate_name": "New York State Surcharge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "newYorkStateSurchargeSC1",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934133,
+            "tariff_rate_id": 20918180,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Temporary NY  State Surcharge",
+        "tariff_book_rate_name": "New York State Surcharge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 18247006,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918181,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 8,
+        "rate_group_name": "Minimum Charge",
+        "rate_name": "Minimum Charge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "MINIMUM",
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15934134,
+            "tariff_rate_id": 20918181,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 21.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Minimum Charge",
+        "tariff_book_rate_name": "Minimum Charge",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 18302593,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918182,
+        "tariff_id": 3538383,
+        "rider_id": 3323858,
+        "tariff_sequence_number": 9,
+        "rate_group_name": "Tax Surcharge Credit",
+        "rate_name": "Tax Surcharge Credit",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": null,
+        "charge_period": "MONTHLY",
+        "rate_bands": [],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Tax Surcharge Credit",
+        "tariff_book_rate_name": "Tax Surcharge Credit",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 18337978,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918183,
+        "tariff_id": 3538383,
+        "rider_id": 3329281,
+        "tariff_sequence_number": 10,
+        "rate_group_name": "DLM Surcharge",
+        "rate_name": "DLM Surcharge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": null,
+        "charge_period": "MONTHLY",
+        "rate_bands": [],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "DLM Surcharge",
+        "tariff_book_rate_name": "DLM Surcharge",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 19244387,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918184,
+        "tariff_id": 3538383,
+        "rider_id": 3399165,
+        "tariff_sequence_number": 11,
+        "rate_group_name": "CBC Rider",
+        "rate_name": "CBC Rider",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": null,
+        "charge_period": "MONTHLY",
+        "rate_bands": [],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "CBC Rider",
+        "tariff_book_rate_name": "CBC Rider",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 19273406,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918185,
+        "tariff_id": 3538383,
+        "rider_id": 3401705,
+        "tariff_sequence_number": 12,
+        "rate_group_name": "Electric Vehicle Make Ready Surcharge - SC1",
+        "rate_name": "Electric Vehicle Make Ready Surcharge - SC1",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": null,
+        "charge_period": "MONTHLY",
+        "rate_bands": [],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Electric Vehicle Make Ready Surcharge - SC1",
+        "tariff_book_rate_name": "Electric Vehicle Make Ready Surcharge - SC1",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 20659499,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918186,
+        "tariff_id": 3538383,
+        "rider_id": 3476420,
+        "tariff_sequence_number": 13,
+        "rate_group_name": "Arrears Management Program Recovery Surcharge - SC1",
+        "rate_name": "Arrears Management Program Recovery Surcharge - SC1",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": null,
+        "charge_period": "MONTHLY",
+        "rate_bands": [],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Arrears Management Program Recovery Surcharge - SC1",
+        "tariff_book_rate_name": "Arrears Management Program Recovery Surcharge - SC1",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 20670186,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918187,
+        "tariff_id": 3538383,
+        "rider_id": 3516476,
+        "tariff_sequence_number": 14,
+        "rate_group_name": "GRT - Residential",
+        "rate_name": "GRT - Residential",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": null,
+        "charge_period": "MONTHLY",
+        "rate_bands": [],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "GRT - Residential",
+        "tariff_book_rate_name": "GRT - Residential",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 20719532,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20918188,
+        "tariff_id": 3538383,
+        "rider_id": 3521053,
+        "tariff_sequence_number": 15,
+        "rate_group_name": "Value of Distribution Energy Resources (VDER) Cost Recovery",
+        "rate_name": "Value of Distribution Energy Resources (VDER) Cost Recovery",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": null,
+        "charge_period": "MONTHLY",
+        "rate_bands": [],
+        "tariff_book_sequence_number": 1,
+        "tariff_book_rate_group_name": "Value of Distribution Energy Resources (VDER) Cost Recovery",
+        "tariff_book_rate_name": "Value of Distribution Energy Resources (VDER) Cost Recovery",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": null,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 18273430,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 9,
+        "rate_group_name": "Tax Sur-Credit",
+        "rate_name": "Tax Sur-Credit",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "taxSurCreditSC1",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 12196264,
+            "tariff_rate_id": 18273430,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3323858,
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Tax Sur-Credit",
+        "tariff_book_rate_name": "Tax Sur-Credit",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": null,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 18336601,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 10,
+        "rate_group_name": "Dynamic Load Management Surcharge",
+        "rate_name": "Dynamic Load Management Surcharge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_period": "MONTHLY",
+        "variable_rate_key": "dynamicLoadManagementSurcharge2252SC1",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 12289098,
+            "tariff_rate_id": 18336601,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3329281,
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Dynamic Load Management Surcharge",
+        "tariff_book_rate_name": "Dynamic Load Management Surcharge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 19242493,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20812620,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 11,
+        "rate_group_name": "Customer Benefit Contribution",
+        "rate_name": "Customer Benefit Contribution",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "QUANTITY",
+        "charge_period": "MONTHLY",
+        "quantity_key": "systemSize",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15785422,
+            "tariff_rate_id": 20812620,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 1.29,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3529470,
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Customer Benefit Contribution",
+        "tariff_book_rate_name": "Customer Benefit Contribution",
+        "transaction_type": "BUY"
+      },
+      {
+        "master_tariff_rate_id": 19273337,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20903427,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 12,
+        "rate_group_name": "Electric Vehicle Make Ready Surcharge",
+        "rate_name": "Electric Vehicle Make Ready Surcharge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15917456,
+            "tariff_rate_id": 20903427,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.002,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3536446,
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Electric Vehicle Make Ready Surcharge",
+        "tariff_book_rate_name": "Electric Vehicle Make Ready Surcharge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 19273337,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20206987,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 13,
+        "rate_group_name": "Arrears Management Program Recovery Surcharge",
+        "rate_name": "Arrears Management Program Recovery Surcharge",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_class": [
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 14963480,
+            "tariff_rate_id": 20206987,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0012,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3476420,
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Electric Vehicle Make Ready Surcharge",
+        "tariff_book_rate_name": "Electric Vehicle Make Ready Surcharge",
+        "transaction_type": "NET"
+      },
+      {
+        "master_tariff_rate_id": 20669924,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20669930,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 14,
+        "rate_group_name": "GRT Charges",
+        "rate_name": "GRT Distribution - Zone J",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "QUANTITY",
+        "charge_class": [
+          "TRANSMISSION",
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15595394,
+            "tariff_rate_id": 20669930,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 4.794,
+            "rate_unit": "PERCENTAGE",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3516477,
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "GRT Charges",
+        "tariff_book_rate_name": "GRT Distribution - Zone J",
+        "transaction_type": "BUY",
+        "territory": {
+          "territory_id": 3634,
+          "territory_name": "Zone J",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.72388634472048,
+            "longitude": -73.93697824534158
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 20669925,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20669931,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 14,
+        "rate_group_name": "GRT Charges",
+        "rate_name": "GRT Supply - Zone J",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "QUANTITY",
+        "charge_class": [
+          "SUPPLY"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15595395,
+            "tariff_rate_id": 20669931,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 2.4066,
+            "rate_unit": "PERCENTAGE",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3516477,
+        "tariff_book_sequence_number": 3,
+        "tariff_book_rate_group_name": "GRT Charges",
+        "tariff_book_rate_name": "GRT Supply - Zone J",
+        "transaction_type": "BUY",
+        "territory": {
+          "territory_id": 3634,
+          "territory_name": "Zone J",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.72388634472048,
+            "longitude": -73.93697824534158
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 20669926,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20669932,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 14,
+        "rate_group_name": "GRT Charges",
+        "rate_name": "GRT Distribution - Zone I",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "QUANTITY",
+        "charge_class": [
+          "TRANSMISSION",
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15595396,
+            "tariff_rate_id": 20669932,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 5.5127,
+            "rate_unit": "PERCENTAGE",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3516477,
+        "tariff_book_sequence_number": 4,
+        "tariff_book_rate_group_name": "GRT Charges",
+        "tariff_book_rate_name": "GRT Distribution - Zone I",
+        "transaction_type": "BUY",
+        "territory": {
+          "territory_id": 3633,
+          "territory_name": "Zone I",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.99908249152543,
+            "longitude": -73.81227445762711
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 20669927,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20669933,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 14,
+        "rate_group_name": "GRT Charges",
+        "rate_name": "GRT Supply - Zone I",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "QUANTITY",
+        "charge_class": [
+          "SUPPLY"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15595397,
+            "tariff_rate_id": 20669933,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 3.0928,
+            "rate_unit": "PERCENTAGE",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3516477,
+        "tariff_book_sequence_number": 5,
+        "tariff_book_rate_group_name": "GRT Charges",
+        "tariff_book_rate_name": "GRT Supply - Zone I",
+        "transaction_type": "BUY",
+        "territory": {
+          "territory_id": 3633,
+          "territory_name": "Zone I",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 40.99908249152543,
+            "longitude": -73.81227445762711
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 20669928,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20669934,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 14,
+        "rate_group_name": "GRT Charges",
+        "rate_name": "GRT Distribution - Zone H",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "QUANTITY",
+        "charge_class": [
+          "TRANSMISSION",
+          "DISTRIBUTION"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15595398,
+            "tariff_rate_id": 20669934,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 3.3322,
+            "rate_unit": "PERCENTAGE",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3516477,
+        "tariff_book_sequence_number": 6,
+        "tariff_book_rate_group_name": "GRT Charges",
+        "tariff_book_rate_name": "GRT Distribution - Zone H",
+        "transaction_type": "BUY",
+        "territory": {
+          "territory_id": 3632,
+          "territory_name": "Zone H",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 41.24471966666667,
+            "longitude": -73.81995450000002
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 20669929,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20669935,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 14,
+        "rate_group_name": "GRT Charges",
+        "rate_name": "GRT Supply - Zone H",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "QUANTITY",
+        "charge_class": [
+          "SUPPLY"
+        ],
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15595399,
+            "tariff_rate_id": 20669935,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 1.0101,
+            "rate_unit": "PERCENTAGE",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3516477,
+        "tariff_book_sequence_number": 7,
+        "tariff_book_rate_group_name": "GRT Charges",
+        "tariff_book_rate_name": "GRT Supply - Zone H",
+        "transaction_type": "BUY",
+        "territory": {
+          "territory_id": 3632,
+          "territory_name": "Zone H",
+          "lse_id": 2252,
+          "lse_name": "Consolidated Edison Co-NY Inc",
+          "country_code": "US",
+          "parent_territory_id": 2533,
+          "usage_type": "TARIFF",
+          "item_types": "ZIPCODE",
+          "dereg_res": false,
+          "dereg_candi": false,
+          "center_point": {
+            "latitude": 41.24471966666667,
+            "longitude": -73.81995450000002
+          }
+        }
+      },
+      {
+        "master_tariff_rate_id": 20719531,
+        "has_applicability_formula": false,
+        "tariff_rate_id": 20721406,
+        "tariff_id": 3538383,
+        "tariff_sequence_number": 15,
+        "rate_group_name": "Value of Distribution Energy Resources (VDER) Cost Recovery",
+        "rate_name": "Value of Distribution Energy Resources (VDER) Cost Recovery",
+        "from_date_time": "2026-02-01T00:00:00-05:00",
+        "to_date_time": null,
+        "charge_type": "CONSUMPTION_BASED",
+        "charge_period": "MONTHLY",
+        "rate_bands": [
+          {
+            "tariff_rate_band_id": 15663985,
+            "tariff_rate_id": 20721406,
+            "rate_sequence_number": 1,
+            "has_consumption_limit": false,
+            "has_demand_limit": false,
+            "has_property_limit": false,
+            "prev_upper_limit": null,
+            "rate_amount": 0.0011,
+            "rate_unit": "COST_PER_UNIT",
+            "is_credit": false
+          }
+        ],
+        "rider_tariff_id": 3521406,
+        "tariff_book_sequence_number": 2,
+        "tariff_book_rate_group_name": "Value of Distribution Energy Resources (VDER) Cost Recovery",
+        "tariff_book_rate_name": "Value of Distribution Energy Resources (VDER) Cost Recovery",
+        "transaction_type": "NET"
+      }
+    ]
+  }
+]
