@@ -30,11 +30,13 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import re
 from abc import ABC
 from collections.abc import Sequence
+from datetime import date, datetime
 from pathlib import Path
 from time import sleep
-from typing import Any, TypeVar, cast
+from typing import Any, Self, TypeVar, cast
 
 import polars as pl
 from selenium.common.exceptions import TimeoutException
@@ -124,6 +126,10 @@ class GasState(SelectReportState):
         self._select_report("benchall")
         return GasBenchmarkAllStateDropDown(self._context)
 
+    def history(self) -> GasHistoryStateDropDown:
+        self._select_report("history")
+        return GasHistoryStateDropDown(self._context)
+
 
 class DropdownState(State, ABC):
     """Shared behavior for dropdown-driven selections on the benchmark workflow."""
@@ -160,6 +166,16 @@ class DropdownState(State, ABC):
         return next_state
 
 
+class GasHistoryStateDropDown(DropdownState):
+    element_id: str = "StateSelect"
+
+    def get_states(self) -> list[str]:
+        return self._visible_options()
+
+    def select_state(self, state: str) -> GasHistoryUtilityDropdown:
+        return self._select(state, category="State", next_state=GasHistoryUtilityDropdown(self._context))
+
+
 class GasBenchmarkAllStateDropDown(DropdownState):
     element_id: str = "StateSelect"
 
@@ -180,6 +196,16 @@ class GasBenchmarkAllUtiltyDropdown(GasBenchmarkAllStateDropDown):
         return self._select(utility, category="Utility", next_state=GasBenchmarkAllScheduleDropdown(self._context))
 
 
+class GasHistoryUtilityDropdown(GasHistoryStateDropDown):
+    element_id: str = "UtilitySelect"
+
+    def get_utilities(self) -> list[str]:
+        return self._visible_options()
+
+    def select_utility(self, utility: str) -> GasHistoryScheduleDropdown:
+        return self._select(utility, category="Utility", next_state=GasHistoryScheduleDropdown(self._context))
+
+
 class GasBenchmarkAllScheduleDropdown(GasBenchmarkAllUtiltyDropdown):
     element_id: str = "ScheduleSelect"
 
@@ -189,6 +215,17 @@ class GasBenchmarkAllScheduleDropdown(GasBenchmarkAllUtiltyDropdown):
     def select_schedule(self, schedule: str) -> GasBenchmarkAllReport:
         """Select a schedule and produce a report interface that can fetch data."""
         return self._select(schedule, category="Schedule", next_state=GasBenchmarkAllReport(self._context))
+
+
+class GasHistoryScheduleDropdown(GasBenchmarkAllUtiltyDropdown):
+    element_id: str = "ScheduleSelect"
+
+    def get_schedules(self) -> list[str]:
+        return self._visible_options()
+
+    def select_schedule(self, schedule: str):
+        """Select a schedule and produce a report interface that can fetch data."""
+        return self._select(schedule, category="Schedule", next_state=GasHistoryReport(self._context))
 
 
 class ElectricBenchmarkAllStateDropdown(DropdownState):
@@ -314,6 +351,95 @@ class GasBenchmarkAllReport(ReportState):
     def back_to_selections(self) -> GasBenchmarkAllScheduleDropdown:
         """Return to the selections page so additional schedules can be fetched."""
         return self._back_to_selections(GasBenchmarkAllScheduleDropdown(self._context))
+
+
+class GasHistoryReport(State):
+    def set_enddate(self, value: date) -> Self:
+        input_box = self._wait().until(EC.presence_of_element_located((By.ID, "EDate")))
+        date_str = value.strftime("%m-%d-%Y")
+        input_box.clear()
+        input_box.send_keys(date_str)
+        return self
+
+    def set_number_of_comparisons(self, value: int) -> Self:
+        input_box = self._wait().until(EC.presence_of_element_located((By.ID, "NComp")))
+        input_box.clear()
+        input_box.send_keys(str(value))
+        return self
+
+    def set_frequency(self, value: int) -> Self:
+        input_box = self._wait().until(EC.presence_of_element_located((By.ID, "NFreq")))
+        input_box.clear()
+        input_box.send_keys(str(value))
+        return self
+
+    def download_excel(self, timeout: int = 20) -> Path:
+        btn = self._wait().until(EC.presence_of_element_located((By.XPATH, '//input[@value="Search"]')))
+        btn.click()
+        download_path = self._context.download_path
+        initial_state = _get_xlsx(download_path)
+
+        n = timeout
+        while _get_xlsx(download_path) == initial_state and n:
+            sleep(1)
+            n -= 1
+
+        filename = next(iter(_get_xlsx(download_path) ^ initial_state))
+        return Path(download_path, filename)
+
+    def as_dataframe(self, timeout: int = 20) -> pl.DataFrame:
+        filepath = self.download_excel(timeout)
+        logger.info(f"Reading excel file {filepath}")
+
+        header_df = pl.read_excel(
+            filepath,
+            engine="calamine",
+            has_header=True,
+        )
+
+        overrides = {
+            "Min Therms": pl.Float64,
+            "Max Therms": pl.Float64,
+            "Effective Date": pl.String,
+            "Season": pl.String,
+            "Start": pl.Float64,
+            "End": pl.Float64,
+            "Determinant": pl.String,
+            "Rate Determinant": pl.String,
+        }
+
+        filtered_overrides = {k: v for k, v in overrides.items() if k in header_df.columns}
+
+        df = pl.read_excel(
+            filepath,
+            engine="calamine",
+            has_header=True,
+            schema_overrides=filtered_overrides,
+        )
+        df = df.with_columns(pl.col(pl.Utf8).str.to_lowercase())  # pyright: ignore[reportUnknownMemberType]
+
+        df = df.rename({df.columns[0]: "rate"})
+        df = df.rename({c: _to_snake(c) for c in df.columns if not _is_date_column(c)})
+        filepath.unlink()
+        return df
+
+    def back_to_selections(self) -> GasState:
+        self._wait().until(EC.presence_of_element_located((By.LINK_TEXT, "Back to Schedule Selection"))).click()
+        return GasState(self._context)
+
+
+def _is_date_column(name: str) -> bool:
+    try:
+        _ = datetime.strptime(name, "%m/%d/%Y")
+        return True
+    except ValueError:
+        return False
+
+
+def _to_snake(name: str) -> str:
+    name = re.sub(r"[^\w]+", "_", name)
+    name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
+    return name.lower().strip("_")
 
 
 def _get_xlsx(folder: str) -> set[str]:

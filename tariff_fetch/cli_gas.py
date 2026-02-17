@@ -6,6 +6,7 @@ import typer
 from rich.prompt import Prompt
 
 from tariff_fetch._cli.rateacuity import process_rateacuity_gas
+from tariff_fetch._cli.rateacuity_gas_urdb import process_rateacuity_gas_urdb
 from tariff_fetch.rateacuity.base import AuthorizationError
 
 from ._cli.types import StateCode
@@ -28,13 +29,17 @@ def main(
     output_folder: Annotated[
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
+    urdb: bool = False,
 ):
     # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
     if (state_ := (state or prompt_state()).value) is None:
         return
     output_folder_ = Path(output_folder)
     try:
-        process_rateacuity_gas(output_folder_, state_)
+        if urdb:
+            process_rateacuity_gas_urdb(output_folder_, state_, 2025)
+        else:
+            process_rateacuity_gas(output_folder_, state_)
     except AuthorizationError:
         rich.print("Authorization failed")
         rich.print(

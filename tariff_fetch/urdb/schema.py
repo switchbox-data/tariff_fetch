@@ -101,20 +101,20 @@ Attrs = list[dict[str, Any]]  # docs say “attribute/value pairs” :contentRef
 
 
 class URDBRate(TypedDict, total=False):
-    label: Required[str]
-    utility: Required[str]
-    name: Required[str]
-    uri: Required[str]
+    label: str
+    utility: str
+    name: str
+    uri: str
     type: URDBItemType
 
     approved: bool
     is_default: bool
 
-    startdate: Required[int]
+    startdate: int
     enddate: int
     supercedes: str
 
-    sector: Required[RateSector]
+    sector: RateSector
     servicetype: ServiceType
 
     description: str
