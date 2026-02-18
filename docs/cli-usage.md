@@ -39,7 +39,10 @@ Run `uv run tariff-fetch-gas` (or `python -m tariff_fetch.cli_gas` / `just cliga
 
 - `--state` / `-s`: gas benchmark state (prompts if omitted).
 - `--output-folder` / `-o`: output directory (defaults to `./outputs`).
+- `--urdb`: use this flag to convert to URDB format
 
 ### Workflow Overview
 
 This command only targets RateAcuity’s gas workflow. After you confirm the state, the CLI launches the Selenium flow via `process_rateacuity_gas`, exporting the selected schedules. Failures typically mean the `RATEACUITY_USERNAME`/`RATEACUITY_PASSWORD` credentials or local Chrome/Chromium installation need attention.
+
+You may be presented with additional questions when converting to URDB format.
