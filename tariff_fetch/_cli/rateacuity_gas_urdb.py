@@ -1,7 +1,9 @@
 import json
 import os
+from collections.abc import Collection
 from datetime import date
 from pathlib import Path
+from statistics import mean
 from typing import cast
 
 import questionary
@@ -11,10 +13,15 @@ from rich.prompt import Confirm
 from selenium.common.exceptions import WebDriverException
 
 from tariff_fetch.rateacuity import LoginState, create_context
-from tariff_fetch.urdb.rateacuity_history_gas import build_urdb, validate_dataframe
+from tariff_fetch.urdb.rateacuity_history_gas import (
+    build_urdb,
+)
+from tariff_fetch.urdb.rateacuity_history_gas.history_data import HistoryData, PercentageRow, Row
 from tariff_fetch.urdb.schema import URDBRate
 
 from . import console, prompt_filename
+
+# TODO: This is ungodly ugly but it works
 
 
 def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
@@ -83,15 +90,29 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                     .set_frequency(1)
                 )
                 df = scraping_state.as_dataframe()
-                validation_issues = validate_dataframe(df)
+                hd = HistoryData(df)
+                validation_errors = hd.validate_rows()
                 proceed = True
-                if validation_issues:
-                    console.print("Following issues found in the table:")
-                    for issue in validation_issues:
-                        console.print(f" - {issue}")
+                if validation_errors:
+                    console.print("Following rows cannot be processed and will be ignored:")
+                    for error in validation_errors:
+                        console.print(f" - {error.row}")
                     proceed = Confirm.ask("Proceed?", console=console)
+
                 if proceed:
-                    urdb = build_urdb(df)
+                    apply_percentages = False
+                    rows = list(hd.rows())
+                    if percentage_columns := _get_percentage_columns(rows):
+                        percentage_columns_strings = [
+                            f"- {c[0]} ({c[1]}): {c[2]}" if c[1] else f"- {c[0]}: {c[2]}" for c in percentage_columns
+                        ]
+                        console.print("Found following percentage columns (values are averages over 12 months):")
+                        console.print("\n".join(percentage_columns_strings))
+                        console.print("It is impossible to tell which percentages apply to which specific rates.")
+                        console.print("Percentages will be applied to the final result as is")
+                        apply_percentages = Confirm.ask("Apply percentages? (otherwise percentages will be ignored)")
+
+                    urdb = build_urdb(rows, apply_percentages)
                     urdb["utility"] = selected_utility
                     urdb["name"] = tariff
                     result.append(urdb)
@@ -102,8 +123,16 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                     .select_state(state.upper())
                     .select_utility(selected_utility)
                 )
-    suggested_filename = f"rateacuity_{selected_utility}"
+    suggested_filename = f"rateacuity_{selected_utility}.urdb"
     if not (filename := prompt_filename(output_folder, suggested_filename, "json")):
         return
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_text(json.dumps(result, indent=2))
+
+
+def _get_percentage_columns(rows: Collection[Row]) -> list[tuple[str, str | None, float]]:
+    return [
+        (row.rate, row.location, mean(row.month_value_float(month) for month in range(0, 12)))
+        for row in rows
+        if isinstance(row, PercentageRow)
+    ]
