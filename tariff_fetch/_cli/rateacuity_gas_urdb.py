@@ -123,7 +123,7 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                     .select_state(state.upper())
                     .select_utility(selected_utility)
                 )
-    suggested_filename = f"rateacuity_{selected_utility}.urdb"
+    suggested_filename = f"rateacuity_{selected_utility}.urdb.{year}."
     if not (filename := prompt_filename(output_folder, suggested_filename, "json")):
         return
     filename.parent.mkdir(exist_ok=True)
