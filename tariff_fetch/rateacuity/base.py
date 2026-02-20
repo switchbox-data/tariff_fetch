@@ -28,11 +28,11 @@ class ScrapingContext(NamedTuple):
 def create_context() -> Generator[ScrapingContext]:
     with TemporaryDirectory() as temp_dir:
         driver = create_driver_(temp_dir)
-        driver.set_window_size(1920, 1080)
+        driver.set_window_size(1920, 1080)  # pyright: ignore[reportUnknownMemberType]
         try:
             yield ScrapingContext(driver, temp_dir)
         except Exception as e:
-            driver.save_screenshot("selenium_error.png")
+            _ = driver.save_screenshot("selenium_error.png")  # pyright: ignore[reportUnknownMemberType]
             raise e from None
 
 
@@ -44,7 +44,7 @@ def create_driver_(download_path: str) -> webdriver.Chrome:
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
     )
-    options.add_experimental_option(
+    options.add_experimental_option(  # pyright: ignore[reportUnknownMemberType]
         "prefs",
         {
             "download.default_directory": download_path,
@@ -64,4 +64,4 @@ def login(driver: webdriver.Chrome, email_address: str, password: str):
     WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.XPATH, "//input[@type='submit' and @value='Log in']"))
     ).click()
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")  # pyright: ignore[reportUnknownMemberType]

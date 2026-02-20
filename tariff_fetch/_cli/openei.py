@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 import questionary
 from dotenv import load_dotenv
@@ -14,22 +14,28 @@ from .types import Utility
 
 
 def _prompt_sector() -> UtilityRateSector:
-    return questionary.select(
-        message="Select sector",
-        choices=[
-            "Residential",
-            "Commercial",
-            "Industrial",
-            "Lighting",
-        ],
-    ).ask()
+    return cast(
+        UtilityRateSector,
+        questionary.select(
+            message="Select sector",
+            choices=[
+                "Residential",
+                "Commercial",
+                "Industrial",
+                "Lighting",
+            ],
+        ).ask(),
+    )
 
 
 def _prompt_detail_level() -> Literal["full", "minimal"]:
-    return questionary.select(
-        message="Select level of detail",
-        choices=["full", "minimal"],
-    ).ask()
+    return cast(
+        Literal["full", "minimal"],
+        questionary.select(
+            message="Select level of detail",
+            choices=["full", "minimal"],
+        ).ask(),
+    )
 
 
 def _get_tariffs(
@@ -50,18 +56,21 @@ def _get_tariffs(
 
 
 def _prompt_tariffs(tariffs: list[UtilityRatesResponseItem]) -> list[UtilityRatesResponseItem]:
-    return questionary.checkbox(
-        message="Select tariffs to include",
-        choices=[questionary.Choice(title=_["name"], value=_, checked=True) for _ in tariffs],
-    ).ask()
+    return cast(
+        list[UtilityRatesResponseItem],
+        questionary.checkbox(
+            message="Select tariffs to include",
+            choices=[questionary.Choice(title=_["name"], value=_, checked=True) for _ in tariffs],
+        ).ask(),
+    )
 
 
 def process_openei(utility: Utility, output_folder: Path):
-    load_dotenv()
+    _ = load_dotenv()
     if not os.getenv("OPENEI_API_KEY"):
         console.print("[b]OPENEI_API_KEY[/] environment variable is not set")
         console.print("Cannot use OpenEI API due to missing credentials")
-        console.input("Press enter to proceed...")
+        _ = console.input("Press enter to proceed...")
         return
 
     if not (sector := _prompt_sector()):
@@ -71,12 +80,12 @@ def process_openei(utility: Utility, output_folder: Path):
     tariffs = _get_tariffs(utility.eia_id, sector, detail_level)
     if not tariffs:
         console.print("[red]No tariffs found[/]")
-        console.input("Press enter to proceed...")
+        _ = console.input("Press enter to proceed...")
         return
     tariffs = _prompt_tariffs(tariffs)
     if not tariffs:
         console.print("[red]No tariffs selected[/]")
-        console.input("Press enter to proceed...")
+        _ = console.input("Press enter to proceed...")
         return
 
     suggested_filename = f"openei_{utility.name}_{sector}_{detail_level}"
@@ -85,5 +94,5 @@ def process_openei(utility: Utility, output_folder: Path):
 
     filepath.parent.mkdir(exist_ok=True)
     print(filepath)
-    filepath.write_text(json.dumps(tariffs, indent=2))
+    _ = filepath.write_text(json.dumps(tariffs, indent=2))
     console.print(f"Wrote [blue]{len(tariffs)}[/] items to {filepath}")

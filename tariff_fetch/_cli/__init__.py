@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from pathlib import Path
+from typing import cast
 
 import questionary
 from pathvalidate import sanitize_filename
@@ -24,10 +25,13 @@ def prompt_filename(output_folder: Path, suggested_filename: str, extension: str
         filepath = output_folder.joinpath(f"{suggested_filename}-0{os.extsep}{extension}")
 
     return Path(
-        questionary.path(
-            message="Path to save the results",
-            default=filepath.as_posix(),
-            file_filter=lambda _: Path(_).suffix == extension,
-            validate=lambda _: (not os.path.exists(_)) or "A file with that name already exists",
-        ).ask()
+        cast(
+            str,
+            questionary.path(
+                message="Path to save the results",
+                default=filepath.as_posix(),
+                file_filter=lambda _: Path(_).suffix == extension,
+                validate=lambda _: (not os.path.exists(_)) or "A file with that name already exists",  # pyright: ignore[reportUnknownLambdaType, reportUnknownArgumentType]
+            ).ask(),
+        )
     )
