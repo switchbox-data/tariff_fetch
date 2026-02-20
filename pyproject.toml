@@ -76,7 +76,4 @@ ignore = ["E501"]
 "tests/*" = ["S101"]
 
 [tool.basedpyright]
-executionEnvironments = [
-    { root = "tariff_fetch" },
-]
-
+executionEnvironments = [{ root = "." }]
