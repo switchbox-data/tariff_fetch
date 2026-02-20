@@ -30,10 +30,13 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import re
+from abc import ABC
 from collections.abc import Sequence
+from datetime import date, datetime
 from pathlib import Path
 from time import sleep
-from typing import TypeVar
+from typing import Any, Self, TypeVar, cast
 
 import polars as pl
 from selenium.common.exceptions import TimeoutException
@@ -54,7 +57,7 @@ class State:
 
     def __init__(self, context: ScrapingContext):
         """Store the scraping context that contains the shared webdriver."""
-        self._context = context
+        self._context: ScrapingContext = context
 
     @property
     def driver(self) -> Chrome:
@@ -65,7 +68,7 @@ class State:
         """Return True if the login link is absent, indicating an authenticated session."""
         return not self.driver.find_elements(By.ID, "loginLink")
 
-    def _wait(self) -> WebDriverWait:
+    def _wait(self) -> WebDriverWait[Any]:  # pyright: ignore[reportExplicitAny]
         """Create a wait helper bound to the current driver instance."""
         return WebDriverWait(self.driver, 10)
 
@@ -78,7 +81,7 @@ class LoginState(State):
         """Authenticate with RateAcuity and transition into the portal state."""
         login(self._context.driver, username, password)
         try:
-            self._wait().until(EC.presence_of_element_located((By.XPATH, '//a[@class="username"]')))
+            _ = self._wait().until(EC.presence_of_element_located((By.XPATH, '//a[@class="username"]')))
         except TimeoutException:
             raise AuthorizationError() from None
         return PortalState(self._context)
@@ -123,8 +126,12 @@ class GasState(SelectReportState):
         self._select_report("benchall")
         return GasBenchmarkAllStateDropDown(self._context)
 
+    def history(self) -> GasHistoryStateDropDown:
+        self._select_report("history")
+        return GasHistoryStateDropDown(self._context)
 
-class DropdownState(State):
+
+class DropdownState(State, ABC):
     """Shared behavior for dropdown-driven selections on the benchmark workflow."""
 
     element_id: str
@@ -134,7 +141,7 @@ class DropdownState(State):
 
     def _visible_options(self) -> list[str]:
         dropdown = self._dropdown()
-        return [option.text for option in dropdown.find_elements(By.TAG_NAME, "option")]
+        return [option.text for option in dropdown.find_elements(By.TAG_NAME, "option")]  # pyright: ignore[reportUnknownMemberType]
 
     def _select(self, choice: str, *, category: str, next_state: S) -> S:
         raw_options = self._visible_options()
@@ -159,8 +166,18 @@ class DropdownState(State):
         return next_state
 
 
+class GasHistoryStateDropDown(DropdownState):
+    element_id: str = "StateSelect"
+
+    def get_states(self) -> list[str]:
+        return self._visible_options()
+
+    def select_state(self, state: str) -> GasHistoryUtilityDropdown:
+        return self._select(state, category="State", next_state=GasHistoryUtilityDropdown(self._context))
+
+
 class GasBenchmarkAllStateDropDown(DropdownState):
-    element_id = "StateSelect"
+    element_id: str = "StateSelect"
 
     def get_states(self) -> list[str]:
         return self._visible_options()
@@ -170,7 +187,7 @@ class GasBenchmarkAllStateDropDown(DropdownState):
 
 
 class GasBenchmarkAllUtiltyDropdown(GasBenchmarkAllStateDropDown):
-    element_id = "UtilitySelect"
+    element_id: str = "UtilitySelect"
 
     def get_utilities(self) -> list[str]:
         return self._visible_options()
@@ -179,8 +196,18 @@ class GasBenchmarkAllUtiltyDropdown(GasBenchmarkAllStateDropDown):
         return self._select(utility, category="Utility", next_state=GasBenchmarkAllScheduleDropdown(self._context))
 
 
+class GasHistoryUtilityDropdown(GasHistoryStateDropDown):
+    element_id: str = "UtilitySelect"
+
+    def get_utilities(self) -> list[str]:
+        return self._visible_options()
+
+    def select_utility(self, utility: str) -> GasHistoryScheduleDropdown:
+        return self._select(utility, category="Utility", next_state=GasHistoryScheduleDropdown(self._context))
+
+
 class GasBenchmarkAllScheduleDropdown(GasBenchmarkAllUtiltyDropdown):
-    element_id = "ScheduleSelect"
+    element_id: str = "ScheduleSelect"
 
     def get_schedules(self) -> list[str]:
         return self._visible_options()
@@ -190,8 +217,19 @@ class GasBenchmarkAllScheduleDropdown(GasBenchmarkAllUtiltyDropdown):
         return self._select(schedule, category="Schedule", next_state=GasBenchmarkAllReport(self._context))
 
 
+class GasHistoryScheduleDropdown(GasBenchmarkAllUtiltyDropdown):
+    element_id: str = "ScheduleSelect"
+
+    def get_schedules(self) -> list[str]:
+        return self._visible_options()
+
+    def select_schedule(self, schedule: str):
+        """Select a schedule and produce a report interface that can fetch data."""
+        return self._select(schedule, category="Schedule", next_state=GasHistoryReport(self._context))
+
+
 class ElectricBenchmarkAllStateDropdown(DropdownState):
-    element_id = "StateSelect"
+    element_id: str = "StateSelect"
 
     def get_states(self) -> list[str]:
         return self._visible_options()
@@ -201,7 +239,7 @@ class ElectricBenchmarkAllStateDropdown(DropdownState):
 
 
 class ElectricBenchmarkAllUtilityDropdown(ElectricBenchmarkAllStateDropdown):
-    element_id = "UtilitySelect"
+    element_id: str = "UtilitySelect"
 
     def get_utilities(self) -> list[str]:
         return self._visible_options()
@@ -211,7 +249,7 @@ class ElectricBenchmarkAllUtilityDropdown(ElectricBenchmarkAllStateDropdown):
 
 
 class ElectricBenchmarkAllScheduleDropdown(ElectricBenchmarkAllUtilityDropdown):
-    element_id = "ScheduleSelect"
+    element_id: str = "ScheduleSelect"
 
     def get_schedules(self) -> list[str]:
         return self._visible_options()
@@ -222,7 +260,7 @@ class ElectricBenchmarkAllScheduleDropdown(ElectricBenchmarkAllUtilityDropdown):
 
 
 class ElectricBenchmarkStateDropdown(DropdownState):
-    element_id = "StateSelect"
+    element_id: str = "StateSelect"
 
     def get_states(self) -> list[str]:
         """Return all available states visible in the State dropdown."""
@@ -234,7 +272,7 @@ class ElectricBenchmarkStateDropdown(DropdownState):
 
 
 class ElectricBenchmarkUtilityDropdown(ElectricBenchmarkStateDropdown):
-    element_id = "UtilitySelect"
+    element_id: str = "UtilitySelect"
 
     def get_utilities(self) -> list[str]:
         """Return all available utilities for the previously chosen state."""
@@ -246,7 +284,7 @@ class ElectricBenchmarkUtilityDropdown(ElectricBenchmarkStateDropdown):
 
 
 class ElectricBenchmarkScheduleDropdown(ElectricBenchmarkUtilityDropdown):
-    element_id = "ScheduleSelect"
+    element_id: str = "ScheduleSelect"
 
     def get_schedules(self) -> list[str]:
         """Return all schedules associated with the selected utility."""
@@ -286,13 +324,13 @@ class ReportState(State):
         raw_data = pl.read_excel(filepath, engine="calamine", has_header=False)
         header_row_index = next(i for i, row in enumerate(raw_data.iter_rows()) if "Component Description" in row[0])
         df = pl.read_excel(filepath, engine="calamine", read_options={"header_row": header_row_index})
-        df = df.with_columns(
+        df = df.with_columns(  # pyright: ignore[reportUnknownMemberType]
             [
-                pl.when(pl.col(c).cast(pl.Utf8).str.strip_chars() == "").then(None).otherwise(pl.col(c)).alias(c)
+                pl.when(pl.col(c).cast(pl.Utf8).str.strip_chars() == "").then(None).otherwise(pl.col(c)).alias(c)  # pyright: ignore[reportUnknownMemberType]
                 for c in df.columns
             ]
         )
-        df = df.filter(pl.col(df.columns[0]).is_not_null() & pl.col(df.columns[1]).is_not_null())
+        df = df.filter(pl.col(df.columns[0]).is_not_null() & pl.col(df.columns[1]).is_not_null())  # pyright: ignore[reportUnknownMemberType]
         filepath.unlink()
         return df
 
@@ -315,7 +353,96 @@ class GasBenchmarkAllReport(ReportState):
         return self._back_to_selections(GasBenchmarkAllScheduleDropdown(self._context))
 
 
-def _get_xlsx(folder) -> set[str]:
+class GasHistoryReport(State):
+    def set_enddate(self, value: date) -> Self:
+        input_box = self._wait().until(EC.presence_of_element_located((By.ID, "EDate")))
+        date_str = value.strftime("%m-%d-%Y")
+        input_box.clear()
+        input_box.send_keys(date_str)
+        return self
+
+    def set_number_of_comparisons(self, value: int) -> Self:
+        input_box = self._wait().until(EC.presence_of_element_located((By.ID, "NComp")))
+        input_box.clear()
+        input_box.send_keys(str(value))
+        return self
+
+    def set_frequency(self, value: int) -> Self:
+        input_box = self._wait().until(EC.presence_of_element_located((By.ID, "NFreq")))
+        input_box.clear()
+        input_box.send_keys(str(value))
+        return self
+
+    def download_excel(self, timeout: int = 20) -> Path:
+        btn = self._wait().until(EC.presence_of_element_located((By.XPATH, '//input[@value="Search"]')))
+        btn.click()
+        download_path = self._context.download_path
+        initial_state = _get_xlsx(download_path)
+
+        n = timeout
+        while _get_xlsx(download_path) == initial_state and n:
+            sleep(1)
+            n -= 1
+
+        filename = next(iter(_get_xlsx(download_path) ^ initial_state))
+        return Path(download_path, filename)
+
+    def as_dataframe(self, timeout: int = 20) -> pl.DataFrame:
+        filepath = self.download_excel(timeout)
+        logger.info(f"Reading excel file {filepath}")
+
+        header_df = pl.read_excel(
+            filepath,
+            engine="calamine",
+            has_header=True,
+        )
+
+        overrides = {
+            "Min Therms": pl.Float64,
+            "Max Therms": pl.Float64,
+            "Effective Date": pl.String,
+            "Season": pl.String,
+            "Start": pl.Float64,
+            "End": pl.Float64,
+            "Determinant": pl.String,
+            "Rate Determinant": pl.String,
+        }
+
+        filtered_overrides = {k: v for k, v in overrides.items() if k in header_df.columns}
+
+        df = pl.read_excel(
+            filepath,
+            engine="calamine",
+            has_header=True,
+            schema_overrides=filtered_overrides,
+        )
+        df = df.with_columns(pl.col(pl.Utf8).str.to_lowercase())  # pyright: ignore[reportUnknownMemberType]
+
+        df = df.rename({df.columns[0]: "rate"})
+        df = df.rename({c: _to_snake(c) for c in df.columns if not _is_date_column(c)})
+        filepath.unlink()
+        return df
+
+    def back_to_selections(self) -> GasState:
+        self._wait().until(EC.presence_of_element_located((By.LINK_TEXT, "Back to Schedule Selection"))).click()
+        return GasState(self._context)
+
+
+def _is_date_column(name: str) -> bool:
+    try:
+        _ = datetime.strptime(name, "%m/%d/%Y")
+        return True
+    except ValueError:
+        return False
+
+
+def _to_snake(name: str) -> str:
+    name = re.sub(r"[^\w]+", "_", name)
+    name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
+    return name.lower().strip("_")
+
+
+def _get_xlsx(folder: str) -> set[str]:
     """Return the set of .xlsx filenames currently present in the provided folder."""
     return {_ for _ in os.listdir(folder) if _.endswith(".xlsx")}
 
@@ -325,17 +452,17 @@ def main(argv: Sequence[str] | None = None):
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser(description="Fetch RateAcuity utility rates")
-    parser.add_argument(
+    _ = parser.add_argument(
         "--username",
         default=os.getenv("RATEACUITY_USERNAME"),
         help="Rateacuity Username (defaults to RATEACUITY_USERNAME environment variable)",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--password",
         default=os.getenv("RATEACUITY_PASSWORD"),
         help="RateAcuity password (defaults to RATEACUITY_PASSWORD environment variable)",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "-o",
         "--output",
         default="rateacuity_utility_rates.csv",
@@ -344,10 +471,10 @@ def main(argv: Sequence[str] | None = None):
 
     args = parser.parse_args(list(argv) if argv is not None else None)
 
-    username = args.username
+    username = cast(str | None, args.username)
     if not username:
         parser.error("Username must be provided via --username or RATEACUITY_USERNAME environment variable")
-    password = args.password
+    password = cast(str | None, args.password)
     if not password:
         parser.error("Password must be provided via --password or RATEACUITY_PASSWORD environment variable")
 
@@ -366,20 +493,20 @@ def main(argv: Sequence[str] | None = None):
         schedules = state.get_schedules()
         filtered = [_ for _ in schedules if "residential" in _.lower()]
 
-        frames = []
+        frames: list[pl.DataFrame] = []
 
         for schedule in filtered:
             if "residential" not in schedule.lower():
                 continue
             state = state.select_schedule(schedule)
             df = state.as_dataframe()
-            df = df.with_columns(pl.lit(schedule).alias("Schedule"))
-            df = df.select(["Schedule", *[name for name in df.columns if name != "Schedule"]])
+            df = df.with_columns(pl.lit(schedule).alias("Schedule"))  # pyright: ignore[reportUnknownMemberType]
+            df = df.select(["Schedule", *[name for name in df.columns if name != "Schedule"]])  # pyright: ignore[reportUnknownMemberType]
             frames.append(df)
 
             state = state.back_to_selections()
 
-        output_path = Path(args.output)
+        output_path = Path(cast(str, args.output))
         combined_df = pl.concat(frames, how="diagonal_relaxed", rechunk=True) if frames else pl.DataFrame()
         combined_df.write_csv(output_path)
 

@@ -21,6 +21,11 @@ repos:
       - id: check-merge-conflict
       - id: check-case-conflict
 
+  - repo: https://github.com/DetachHead/basedpyright-prek-mirror
+    rev: 1.38.1
+    hooks:
+        - id: basedpyright
+
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.10.0-1
     hooks:
@@ -35,8 +40,3 @@ repos:
         language: python
         types: [markdown]
         additional_dependencies: [dprint-py]
-
-      - id: ty
-        name: ty check
-        entry: uv run ty check . --ignore unresolved-import
-        language: system
