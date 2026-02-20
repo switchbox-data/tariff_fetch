@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, cast
 
 import polars as pl
 import questionary
@@ -30,19 +30,22 @@ def prompt_state() -> StateCode:
 
 
 def prompt_providers() -> list[Provider]:
-    return questionary.checkbox(
-        message="Select providers",
-        choices=[questionary.Choice(title=_.value, value=_) for _ in Provider],
-        validate=lambda x: True if x else "Select at least one provider",
-    ).ask()
+    return cast(
+        list[Provider],
+        questionary.checkbox(
+            message="Select providers",
+            choices=[questionary.Choice(title=_.value, value=_) for _ in Provider],
+            validate=lambda x: True if x else "Select at least one provider",
+        ).ask(),
+    )
 
 
 def prompt_utility(state: str) -> Utility:
     with console.status("Fetching utilities..."):
         yearly_sales_df = (
-            pl.read_parquet(CORE_EIA861_Yearly_Sales.https)
+            pl.read_parquet(CORE_EIA861_Yearly_Sales.https)  # pyright: ignore[reportUnknownMemberType]
             .filter(pl.col("state") == state.upper())
-            .filter(pl.col("report_date") == pl.col("report_date").max().over("utility_id_eia"))
+            .filter(pl.col("report_date") == pl.col("report_date").max().over("utility_id_eia"))  # pyright: ignore[reportUnknownMemberType]
             .filter(pl.col("entity_type").is_in(ENTITY_TYPES_SORTORDER))
             .group_by("utility_id_eia")
             .agg(
@@ -59,9 +62,9 @@ def prompt_utility(state: str) -> Utility:
         rows = list(yearly_sales_df.iter_rows(named=True))
         rows.sort(
             key=lambda _: (
-                ENTITY_TYPES_SORTORDER.index(_["entity_type"])
+                ENTITY_TYPES_SORTORDER.index(_["entity_type"])  # pyright: ignore[reportAny]
                 if _["entity_type"] in ENTITY_TYPES_SORTORDER
-                else abs(hash(_["entity_type"])) + 4,
+                else abs(hash(_["entity_type"])) + 4,  # pyright: ignore[reportAny]
                 -_["customers"],
                 _["utility_name"],
             )
@@ -78,11 +81,11 @@ def prompt_utility(state: str) -> Utility:
     revenue_header = "Revenue ($)"
     customers_header = "Customers"
 
-    largest_utility_name = max(len(utility_name_header), *(len(row["utility_name"]) for row in rows))
-    largest_entity_type = max(len(entity_type_header), *(len(row["entity_type"][:18]) for row in rows))
-    largest_sales_col = max(len(sales_header), *(len(fmt_number(row["sales_mwh"])) for row in rows))
-    largest_revenue_col = max(len(revenue_header), *(len(fmt_number(row["sales_revenue"])) for row in rows))
-    largest_customers_col = max(len(customers_header), *(len(fmt_number(row["customers"])) for row in rows))
+    largest_utility_name = max(len(utility_name_header), *(len(row["utility_name"]) for row in rows))  # pyright: ignore[reportAny]
+    largest_entity_type = max(len(entity_type_header), *(len(row["entity_type"][:18]) for row in rows))  # pyright: ignore[reportAny]
+    largest_sales_col = max(len(sales_header), *(len(fmt_number(row["sales_mwh"])) for row in rows))  # pyright: ignore[reportAny]
+    largest_revenue_col = max(len(revenue_header), *(len(fmt_number(row["sales_revenue"])) for row in rows))  # pyright: ignore[reportAny]
+    largest_customers_col = max(len(customers_header), *(len(fmt_number(row["customers"])) for row in rows))  # pyright: ignore[reportAny]
 
     header_str_utility_name = utility_name_header.ljust(largest_utility_name)
     header_str_entity_type = entity_type_header.ljust(largest_entity_type)
@@ -97,27 +100,30 @@ def prompt_utility(state: str) -> Utility:
         value=0,
     )
 
-    def build_choice(row: dict) -> questionary.Choice:
-        name_col = row["utility_name"].ljust(largest_utility_name)
-        entity_type = (row["entity_type"] or "-")[:18].ljust(largest_entity_type)
-        sales_col = fmt_number(row["sales_mwh"]).ljust(largest_sales_col)
-        revenue_col = fmt_number(row["sales_revenue"]).ljust(largest_revenue_col)
-        customers_col = fmt_number(row["customers"]).ljust(largest_customers_col)
+    def build_choice(row: dict[str, str | int | float | None]) -> questionary.Choice:
+        name_col = cast(str, row["utility_name"]).ljust(largest_utility_name)
+        entity_type = (cast(str, row["entity_type"]) or "-")[:18].ljust(largest_entity_type)
+        sales_col = fmt_number(cast(float, row["sales_mwh"])).ljust(largest_sales_col)
+        revenue_col = fmt_number(cast(float, row["sales_revenue"])).ljust(largest_revenue_col)
+        customers_col = fmt_number(cast(float, row["customers"])).ljust(largest_customers_col)
         title = f"{name_col} | {entity_type} | {sales_col} | {revenue_col} | {customers_col}"
         return questionary.Choice(
             title=title,
-            value=Utility(eia_id=row["utility_id_eia"], name=row["utility_name"]),
+            value=Utility(eia_id=cast(int, row["utility_id_eia"]), name=cast(str, row["utility_name"])),
         )
 
     result = 0
     while result == 0:
-        result = questionary.select(
-            message="Select a utility",
-            choices=[header, separator, *[build_choice(row) for row in rows]],
-            use_search_filter=True,
-            use_jk_keys=False,
-            use_shortcuts=False,
-        ).ask()
+        result = cast(
+            Utility,
+            questionary.select(
+                message="Select a utility",
+                choices=[header, separator, *[build_choice(row) for row in rows]],
+                use_search_filter=True,
+                use_jk_keys=False,
+                use_shortcuts=False,
+            ).ask(),
+        )
     return result
 
 
@@ -131,13 +137,10 @@ def main(
     ] = "./outputs",
 ):
     # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
-    if (state_ := (state or prompt_state()).value) is None:
-        return
-    if (providers_ := providers or prompt_providers()) is None:
-        return
+    state_ = state or prompt_state().value
+    providers_ = providers or prompt_providers()
     output_folder_ = Path(output_folder)
-    if (utility := prompt_utility(state_)) is None:
-        return
+    utility = prompt_utility(state_)
     if Provider.GENABILITY in providers_:
         console.print("Processing [blue]Genability[/]")
         try:
