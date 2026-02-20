@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import cast
 
 import questionary
 import tenacity

@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import Annotated, TypedDict, cast
+from typing import TypedDict, cast
 
-from pydantic import Field, TypeAdapter
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
