@@ -77,3 +77,4 @@ ignore = ["E501"]
 
 [tool.basedpyright]
 include = ["tariff_fetch"]
+pythonVersion = "3.11"

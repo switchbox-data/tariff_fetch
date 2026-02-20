@@ -2,10 +2,11 @@ import contextlib
 from collections.abc import Iterator
 from datetime import datetime
 from math import inf
-from typing import Any, cast, final, override
+from typing import Any, cast, final
 
 import polars as pl
 from pydantic import BaseModel, TypeAdapter, ValidationError
+from typing_extensions import override
 
 from .exceptions import IncorrectDataframeSchemaMonths, IncorrectDataframeSchemaMultipleYears
 from .shared import is_date_column_name, kwh_multiplier
