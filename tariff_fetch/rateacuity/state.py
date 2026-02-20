@@ -502,7 +502,8 @@ def main(argv: Sequence[str] | None = None):
             state = state.select_schedule(schedule)
             df = state.as_dataframe()
             df = df.with_columns(pl.lit(schedule).alias("Schedule"))  # pyright: ignore[reportUnknownMemberType]
-            df = df.select(["Schedule", *[name for name in df.columns if name != "Schedule"]])  # pyright: ignore[reportUnknownMemberType]
+            cols: list[str] = [name for name in df.columns if name != "Schedule"]
+            df = cast(pl.DataFrame, df.select(["Schedule", *cols]))
             frames.append(df)
 
             state = state.back_to_selections()

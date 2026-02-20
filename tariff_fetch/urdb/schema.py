@@ -97,7 +97,7 @@ DemandRateStructure = list[list[DemandTier]]
 CoincidentRateStructure = list[list[CoincidentTier]]
 EnergyRateStructure = list[list[EnergyTier]]
 
-Attrs = list[dict[str, Any]]  # docs say “attribute/value pairs” :contentReference[oaicite:3]{index=3}
+Attrs = list[dict[str, Any]]  # pyright: ignore[reportExplicitAny]
 
 
 class URDBRate(TypedDict, total=False):

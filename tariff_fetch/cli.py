@@ -10,13 +10,15 @@ from rich.prompt import Prompt
 from tariff_fetch._cli.genability import process_genability
 from tariff_fetch._cli.openei import process_openei
 from tariff_fetch._cli.rateacuity import process_rateacuity
-from tariff_fetch.openeia import CORE_EIA861_Yearly_Sales
 from tariff_fetch.rateacuity.base import AuthorizationError
 
 from ._cli import console
 from ._cli.types import Provider, StateCode, Utility
 
 ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
+CORE_EIA861_YEARLY_SALES_HTTPS = (
+    "https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/core_eia861__yearly_sales.parquet"
+)
 
 
 def prompt_state() -> StateCode:
@@ -43,7 +45,7 @@ def prompt_providers() -> list[Provider]:
 def prompt_utility(state: str) -> Utility:
     with console.status("Fetching utilities..."):
         yearly_sales_df = (
-            pl.read_parquet(CORE_EIA861_Yearly_Sales.https)  # pyright: ignore[reportUnknownMemberType]
+            pl.read_parquet(CORE_EIA861_YEARLY_SALES_HTTPS)  # pyright: ignore[reportUnknownMemberType]
             .filter(pl.col("state") == state.upper())
             .filter(pl.col("report_date") == pl.col("report_date").max().over("utility_id_eia"))  # pyright: ignore[reportUnknownMemberType]
             .filter(pl.col("entity_type").is_in(ENTITY_TYPES_SORTORDER))
