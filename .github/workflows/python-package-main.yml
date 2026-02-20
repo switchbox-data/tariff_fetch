@@ -42,7 +42,7 @@ jobs:
         run: uv run python -m pytest tests
 
       - name: Check typing
-        run: PYTHONPATH=. uv run basedpyright
+        run: uv run basedpyright
 
   check-docs:
     runs-on: ubuntu-latest
