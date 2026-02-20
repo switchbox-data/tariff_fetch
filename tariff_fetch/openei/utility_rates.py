@@ -8,7 +8,7 @@ from typing import Any, Literal, TypeAlias, TypedDict, cast
 
 from typing_extensions import Unpack
 
-from .base import api_request_json
+from .base import api_request_json  # pyright: ignore[reportUnknownVariableType]
 
 __all__ = [
     "UTILITY_RATES_API_PATH",
@@ -55,7 +55,7 @@ UtilityRateSector: TypeAlias = (
     Literal["Residential"] | Literal["Commercial"] | Literal["Industrial"] | Literal["Lighting"]
 )
 ScheduleMatrix: TypeAlias = list[list[int]]
-AttributeList: TypeAlias = list[dict[str, Any]]
+AttributeList: TypeAlias = list[dict[str, Any]]  # pyright: ignore[reportExplicitAny]
 
 
 class FlatDemandTier(TypedDict, total=False):
@@ -296,7 +296,7 @@ def utility_rates(
           at which point version 2 database updates ceased, with all updates now appearing only
           in version 3 or greater.
     """
-    return cast(
+    return cast(  # pyright: ignore[reportInvalidCast]
         UtilityRatesResponse,
         api_request_json(path=UTILITY_RATES_API_PATH, api_key=api_key, format=format, version=version, **kwargs),
     )
@@ -304,16 +304,16 @@ def utility_rates(
 
 def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Fetch OpenEI utility rates and write them to a JSON file.")
-    parser.add_argument(
+    _ = parser.add_argument(
         "ratesforutility",
         help="Utility label (see OpenEI utility companies) to request rates for.",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--api-key",
         default=os.getenv("OPENEI_API_KEY"),
         help="OpenEI API key (defaults to OPENEI_API_KEY environment variable).",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "-o",
         "--output",
         default="openai_utility_rates.json",
@@ -321,9 +321,14 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
     args = parser.parse_args(list(argv) if argv is not None else None)
 
-    api_key = args.api_key
+    api_key = cast(str | None, args.api_key)
     if not api_key:
         parser.error("API key must be provided via --api-key or OPENEI_API_KEY environment variable.")
+
+    rates_for_utility = cast(str | None, args.ratesforutility)
+
+    if rates_for_utility is None:
+        parser.error("ratesforutility must be set")
 
     effective_on_date = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
     records = list(
@@ -331,15 +336,15 @@ def main(argv: Sequence[str] | None = None) -> None:
             api_key=api_key,
             format="json",
             version="latest",
-            ratesforutility=args.ratesforutility,
+            ratesforutility=rates_for_utility,
             detail="minimal",
             sector="Residential",
             effective_on_date=effective_on_date,
         )
     )
 
-    output_path = Path(args.output)
-    output_path.write_text(json.dumps(records, indent=2))
+    output_path = Path(cast(str, args.output))
+    _ = output_path.write_text(json.dumps(records, indent=2))
     print(f"Wrote {len(records)} records to {output_path}")
 
 

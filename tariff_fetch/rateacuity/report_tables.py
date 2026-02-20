@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import TypedDict, cast
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+
+from .schema import Section
 
 
 class TableJson(TypedDict):
@@ -14,23 +16,23 @@ class TableJson(TypedDict):
 
 
 class SectionJson(TypedDict):
-    section: str
+    section: str | None
     tables: list[TableJson]
 
 
 def _headers_from_table(table: WebElement) -> list[str]:
-    ths = table.find_elements(By.CSS_SELECTOR, "thead th")
-    result = []
+    ths = table.find_elements(By.CSS_SELECTOR, "thead th")  # pyright: ignore[reportUnknownMemberType]
+    result: list[str] = []
     for th in ths:
-        links = th.find_elements(By.TAG_NAME, "a")
+        links = th.find_elements(By.TAG_NAME, "a")  # pyright: ignore[reportUnknownMemberType]
         result.append(links[0].text if links else th.text)
     return result
 
 
-def _rows_from_table(table: WebElement) -> list[str]:
-    rows = []
-    for tr in table.find_elements(By.CSS_SELECTOR, "tbody tr"):
-        tds = tr.find_elements(By.TAG_NAME, "td")
+def _rows_from_table(table: WebElement) -> list[list[str]]:
+    rows: list[list[str]] = []
+    for tr in table.find_elements(By.CSS_SELECTOR, "tbody tr"):  # pyright: ignore[reportUnknownMemberType]
+        tds = tr.find_elements(By.TAG_NAME, "td")  # pyright: ignore[reportUnknownMemberType]
         rows.append([td.text for td in tds])
     return rows
 
@@ -48,7 +50,7 @@ def _table_json(table: WebElement) -> TableJson | None:
         v = {}
         for c, r in zip(columns, row, strict=False):
             v[c] = r
-        values.append(v)
+        values.append(v)  # pyright: ignore[reportUnknownMemberType]
 
     return TableJson(
         {
@@ -59,11 +61,11 @@ def _table_json(table: WebElement) -> TableJson | None:
     )
 
 
-def sections_to_json(driver: WebDriver) -> list[SectionJson]:
+def sections_to_json(driver: WebDriver) -> list[Section]:
     seq = driver.find_elements(By.CSS_SELECTOR, "h3, table.eamwebgrid-table")
 
-    sections = []
-    current = {"section": None, "tables": []}
+    sections: list[SectionJson] = []
+    current: SectionJson = {"section": None, "tables": []}
     for el in seq:
         tag = el.tag_name.lower()
         if tag == "h3":
@@ -78,4 +80,8 @@ def sections_to_json(driver: WebDriver) -> list[SectionJson]:
     if current["section"] is not None or current["tables"]:
         sections.append(current)
 
-    return sections
+    # Schema is not yet complete, ignore validation
+    return cast(list[Section], sections)
+    # ta = TypeAdapter(list[Section])
+
+    # return ta.validate_python(sections, by_alias=True)

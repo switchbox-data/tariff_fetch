@@ -45,9 +45,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
-from tariff_fetch.rateacuity.report_tables import SectionJson, sections_to_json
+from tariff_fetch.rateacuity.report_tables import sections_to_json
 
 from .base import AuthorizationError, ScrapingContext, create_context, login
+from .schema import Section
 
 logger = logging.getLogger(__name__)
 
@@ -314,7 +315,7 @@ class ReportState(State):
         filename = next(iter(_get_xlsx(download_path) ^ initial_state))
         return Path(download_path, filename)
 
-    def as_sections(self) -> list[SectionJson]:
+    def as_sections(self) -> list[Section]:
         return sections_to_json(self._context.driver)
 
     def as_dataframe(self, timeout: int = 20) -> pl.DataFrame:
@@ -501,7 +502,8 @@ def main(argv: Sequence[str] | None = None):
             state = state.select_schedule(schedule)
             df = state.as_dataframe()
             df = df.with_columns(pl.lit(schedule).alias("Schedule"))  # pyright: ignore[reportUnknownMemberType]
-            df = df.select(["Schedule", *[name for name in df.columns if name != "Schedule"]])  # pyright: ignore[reportUnknownMemberType]
+            cols: list[str] = [name for name in df.columns if name != "Schedule"]
+            df = cast(pl.DataFrame, df.select(["Schedule", *cols]))
             frames.append(df)
 
             state = state.back_to_selections()
