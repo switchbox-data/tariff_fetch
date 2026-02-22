@@ -178,42 +178,42 @@ A customer in **July** using **500 kWh**, default supply (Standard Offer), secon
 
 ### Delivery Charges
 
-| Charge              | Calculation                     | Amount       |
-| ------------------- | ------------------------------- | ------------ |
-| Customer Charge     | $6.00                           | $6.00        |
-| Distribution        | 500 kWh × $0.0458               | $22.90       |
-| O&M Exp             | 500 kWh × $0.00223              | $1.12        |
-| O&M Recon           | (varies)                        | ~$0.20       |
-| CapEx Factor        | 500 kWh × $0.00832              | $4.16        |
-| CapEx Recon         | (varies)                        | ~$0.20       |
-| RDM Adj             | (varies)                        | ~$0.30       |
-| Pension Adj         | 500 kWh × $0.00339              | $1.70        |
-| Storm Fund          | (varies)                        | ~$0.10       |
-| Arrearage Mgmt      | 500 kWh × $0.00006              | $0.03        |
-| LMI Recovery        | 500 kWh × $0.00251              | $1.26        |
-| Net Metering        | 500 kWh × $0.01457              | $7.29        |
-| Long Term Contracting | (varies)                      | ~$0.50       |
-| RE Growth           | (varies)                        | ~$0.50       |
-| LIHEAP              | (varies)                        | ~$0.25       |
-| Transmission        | 500 kWh × $0.04773              | $23.87       |
-| Transition          | 500 kWh × $0.00001              | $0.01        |
-| EE Programs         | (varies)                        | ~$2.50       |
-| **Subtotal Delivery** |                             | **~$71.89**  |
+| Charge                | Calculation        | Amount      |
+| --------------------- | ------------------ | ----------- |
+| Customer Charge       | $6.00              | $6.00       |
+| Distribution          | 500 kWh × $0.0458  | $22.90      |
+| O&M Exp               | 500 kWh × $0.00223 | $1.12       |
+| O&M Recon             | (varies)           | ~$0.20      |
+| CapEx Factor          | 500 kWh × $0.00832 | $4.16       |
+| CapEx Recon           | (varies)           | ~$0.20      |
+| RDM Adj               | (varies)           | ~$0.30      |
+| Pension Adj           | 500 kWh × $0.00339 | $1.70       |
+| Storm Fund            | (varies)           | ~$0.10      |
+| Arrearage Mgmt        | 500 kWh × $0.00006 | $0.03       |
+| LMI Recovery          | 500 kWh × $0.00251 | $1.26       |
+| Net Metering          | 500 kWh × $0.01457 | $7.29       |
+| Long Term Contracting | (varies)           | ~$0.50      |
+| RE Growth             | (varies)           | ~$0.50      |
+| LIHEAP                | (varies)           | ~$0.25      |
+| Transmission          | 500 kWh × $0.04773 | $23.87      |
+| Transition            | 500 kWh × $0.00001 | $0.01       |
+| EE Programs           | (varies)           | ~$2.50      |
+| **Subtotal Delivery** |                    | **~$71.89** |
 
 ### Supply Charges
 
-| Charge           | Calculation                     | Amount       |
-| ---------------- | ------------------------------- | ------------ |
-| Standard Offer   | 500 kWh × ~$0.08 (varies)       | ~$40.00      |
-| Renewable Standard | 500 kWh × ~$0.002 (varies)     | ~$1.00       |
-| **Subtotal Supply** |                             | **~$41.00**  |
+| Charge              | Calculation                | Amount      |
+| ------------------- | -------------------------- | ----------- |
+| Standard Offer      | 500 kWh × ~$0.08 (varies)  | ~$40.00     |
+| Renewable Standard  | 500 kWh × ~$0.002 (varies) | ~$1.00      |
+| **Subtotal Supply** |                            | **~$41.00** |
 
 ### Other (Taxes)
 
-| Charge       | Calculation   | Amount   |
-| ------------ | ------------- | -------- |
-| Gross Earnings Tax | (quantity-based) | ~$4.17  |
-| **Subtotal Other** |             | **~$4.17** |
+| Charge             | Calculation      | Amount     |
+| ------------------ | ---------------- | ---------- |
+| Gross Earnings Tax | (quantity-based) | ~$4.17     |
+| **Subtotal Other** |                  | **~$4.17** |
 
 ### Total
 
@@ -221,12 +221,12 @@ A customer in **July** using **500 kWh**, default supply (Standard Offer), secon
 
 ### Breakdown by Category
 
-| Category              | Amount   | % of Bill |
-| --------------------- | -------- | --------- |
-| Fixed Charges         | $6.00    | 5%        |
-| Delivery (Volumetric)  | ~$65.89  | 56%       |
-| Supply                | ~$41.00  | 35%       |
-| Other (e.g. GET)      | ~$4.17   | 4%        |
+| Category              | Amount  | % of Bill |
+| --------------------- | ------- | --------- |
+| Fixed Charges         | $6.00   | 5%        |
+| Delivery (Volumetric) | ~$65.89 | 56%       |
+| Supply                | ~$41.00 | 35%       |
+| Other (e.g. GET)      | ~$4.17  | 4%        |
 
 **Key insight**: Delivery has many line items—distribution, transmission, O&M, CapEx, net metering, RDM, and various factors—so the delivery section is granular. Transmission ($0.04773/kWh) and distribution ($0.0458/kWh) are the largest fixed-rate delivery components. Standard Offer (supply) is variable and often a large share of the total; the exact bill depends heavily on current lookup values and the default supply rate.
 

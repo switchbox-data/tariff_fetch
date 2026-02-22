@@ -169,37 +169,37 @@ A customer in the **East** territory in July using 500 kWh, with default supply 
 
 ### Delivery Charges
 
-| Charge               | Calculation                     | Amount       |
-| -------------------- | ------------------------------- | ------------ |
-| Customer Charge      | $19.00                          | $19.00       |
-| Bill Issuance Charge | $0.89                           | $0.89        |
-| Energy Charge        | 500 kWh × $0.09507             | $47.54       |
-| Revenue Decoupling   | 500 kWh × ~$0.001 (varies)     | ~$0.50       |
-| Make-Whole Energy    | 500 kWh × $0.00276             | $1.38        |
-| Transition Charge    | 500 kWh × ~$0.001 (varies)     | ~$0.50       |
-| SBC                  | 500 kWh × ~$0.004 (varies)     | ~$2.00       |
-| CES Surcharge        | 500 kWh × ~$0.003 (varies)     | ~$1.50       |
-| **Subtotal Delivery**|                                 | **~$73.31**  |
+| Charge                | Calculation                | Amount      |
+| --------------------- | -------------------------- | ----------- |
+| Customer Charge       | $19.00                     | $19.00      |
+| Bill Issuance Charge  | $0.89                      | $0.89       |
+| Energy Charge         | 500 kWh × $0.09507         | $47.54      |
+| Revenue Decoupling    | 500 kWh × ~$0.001 (varies) | ~$0.50      |
+| Make-Whole Energy     | 500 kWh × $0.00276         | $1.38       |
+| Transition Charge     | 500 kWh × ~$0.001 (varies) | ~$0.50      |
+| SBC                   | 500 kWh × ~$0.004 (varies) | ~$2.00      |
+| CES Surcharge         | 500 kWh × ~$0.003 (varies) | ~$1.50      |
+| **Subtotal Delivery** |                            | **~$73.31** |
 
 ### Supply Charges
 
-| Charge        | Calculation                         | Amount      |
-| ------------- | ----------------------------------- | ----------- |
-| Supply (East) | 500 kWh × ~$0.07 (varies by zone)  | ~$35.00     |
-| Merchant Function | 500 kWh × ~$0.002 (varies)       | ~$1.00      |
-| **Subtotal Supply** |                                 | **~$36.00** |
+| Charge              | Calculation                       | Amount      |
+| ------------------- | --------------------------------- | ----------- |
+| Supply (East)       | 500 kWh × ~$0.07 (varies by zone) | ~$35.00     |
+| Merchant Function   | 500 kWh × ~$0.002 (varies)        | ~$1.00      |
+| **Subtotal Supply** |                                   | **~$36.00** |
 
 ### Riders & Other
 
-| Charge      | Calculation              | Amount      |
-| ----------- | ------------------------ | ----------- |
-| RAM         | 500 kWh × ~$0.0005 (varies) | ~$0.25    |
-| EAM         | 500 kWh × $0.00032       | $0.16       |
-| DLM         | 500 kWh × ~$0.0001 (varies) | ~$0.05    |
-| EV Make Ready | 500 kWh × $0.000127    | $0.06       |
-| Recovery Charge | 500 kWh × $0.009922   | $4.96       |
-| CBC (no solar) | $0                    | $0.00       |
-| **Subtotal Riders** |                         | **~$5.48**  |
+| Charge              | Calculation                 | Amount     |
+| ------------------- | --------------------------- | ---------- |
+| RAM                 | 500 kWh × ~$0.0005 (varies) | ~$0.25     |
+| EAM                 | 500 kWh × $0.00032          | $0.16      |
+| DLM                 | 500 kWh × ~$0.0001 (varies) | ~$0.05     |
+| EV Make Ready       | 500 kWh × $0.000127         | $0.06      |
+| Recovery Charge     | 500 kWh × $0.009922         | $4.96      |
+| CBC (no solar)      | $0                          | $0.00      |
+| **Subtotal Riders** |                             | **~$5.48** |
 
 ### Total
 
@@ -207,12 +207,12 @@ A customer in the **East** territory in July using 500 kWh, with default supply 
 
 ### Breakdown by Category
 
-| Category              | Amount   | % of Bill |
-| --------------------- | -------- | --------- |
-| Fixed Charges         | $19.89   | 17%       |
-| Delivery (Volumetric) | ~$53.42  | 47%       |
-| Supply                | ~$36.00  | 31%       |
-| Riders & Other        | ~$5.48   | 5%        |
+| Category              | Amount  | % of Bill |
+| --------------------- | ------- | --------- |
+| Fixed Charges         | $19.89  | 17%       |
+| Delivery (Volumetric) | ~$53.42 | 47%       |
+| Supply                | ~$36.00 | 31%       |
+| Riders & Other        | ~$5.48  | 5%        |
 
 **Key insight**: Delivery (fixed plus volumetric) and supply each make up a large share of the bill. The Recovery Charge is a meaningful fixed per-kWh rider; supply rate differs by territory (East, West, Lower Hudson Valley), so the same usage can yield a different total depending on where you are.
 

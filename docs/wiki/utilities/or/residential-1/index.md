@@ -67,15 +67,15 @@ Delivery charges are **seasonal** (Summer: June–September; Winter: October–M
 
 #### Summer Rate — tiered (first 250 kWh / over 250 kWh)
 
-- **First 250 kWh**: $0.11052/kWh  
-- **Over 250 kWh**: $0.13822/kWh  
+- **First 250 kWh**: $0.11052/kWh
+- **Over 250 kWh**: $0.13822/kWh
 
 The main volumetric delivery rate in summer. The second tier is higher to reflect the marginal cost of serving additional usage during the summer peak. Typical residential customers exceed 250 kWh in summer, so part of their usage is at the higher tier.
 
 #### Winter Rate — tiered (first 250 kWh / over 250 kWh)
 
-- **First 250 kWh**: $0.11052/kWh  
-- **Over 250 kWh**: $0.11052/kWh  
+- **First 250 kWh**: $0.11052/kWh
+- **Over 250 kWh**: $0.11052/kWh
 
 In winter the second tier is the same as the first in the tariff (no incremental rate above 250 kWh). Winter delivery costs are lower than summer, so the blended winter rate is effectively flat at $0.11052/kWh for any usage level.
 
@@ -157,35 +157,35 @@ A customer in **July** (summer), using **500 kWh**, default supply, no solar, no
 
 ### Delivery Charges
 
-| Charge           | Calculation                                    | Amount       |
-| ---------------- | ---------------------------------------------- | ------------ |
-| Customer Charge  | $22.50                                         | $22.50       |
-| Billing & Payment | $2.10                                          | $2.10        |
-| Summer Rate      | 250 × $0.11052 + 250 × $0.13822                | $62.19       |
-| RDM              | 500 kWh × ~$0.001 (varies)                     | ~$0.50       |
-| SBC              | 500 kWh × ~$0.004 (varies)                     | ~$2.00       |
-| DLM Surcharge    | 500 kWh × ~$0.0002 (varies)                    | ~$0.10       |
-| Delivery Revenue Surcharge | 500 kWh × ~$0.001 (varies)              | ~$0.50       |
-| Transition Adj.  | 500 kWh × ~$0.002 (varies)                     | ~$1.00       |
-| **Subtotal Delivery** |                                             | **~$90.89**  |
+| Charge                     | Calculation                     | Amount      |
+| -------------------------- | ------------------------------- | ----------- |
+| Customer Charge            | $22.50                          | $22.50      |
+| Billing & Payment          | $2.10                           | $2.10       |
+| Summer Rate                | 250 × $0.11052 + 250 × $0.13822 | $62.19      |
+| RDM                        | 500 kWh × ~$0.001 (varies)      | ~$0.50      |
+| SBC                        | 500 kWh × ~$0.004 (varies)      | ~$2.00      |
+| DLM Surcharge              | 500 kWh × ~$0.0002 (varies)     | ~$0.10      |
+| Delivery Revenue Surcharge | 500 kWh × ~$0.001 (varies)      | ~$0.50      |
+| Transition Adj.            | 500 kWh × ~$0.002 (varies)      | ~$1.00      |
+| **Subtotal Delivery**      |                                 | **~$90.89** |
 
 ### Supply Charges
 
-| Charge        | Calculation                     | Amount      |
-| ------------- | ------------------------------- | ----------- |
-| Market Supply | 500 kWh × ~$0.07 (varies)      | ~$35.00     |
-| Energy Cost Adj. | 500 kWh × ~$0.002 (varies)   | ~$1.00      |
-| MFC           | 500 kWh × ~$0.002 (varies)      | ~$1.00      |
+| Charge              | Calculation                | Amount      |
+| ------------------- | -------------------------- | ----------- |
+| Market Supply       | 500 kWh × ~$0.07 (varies)  | ~$35.00     |
+| Energy Cost Adj.    | 500 kWh × ~$0.002 (varies) | ~$1.00      |
+| MFC                 | 500 kWh × ~$0.002 (varies) | ~$1.00      |
 | **Subtotal Supply** |                            | **~$37.00** |
 
 ### Riders & Other
 
-| Charge      | Calculation                | Amount      |
-| ----------- | -------------------------- | ----------- |
-| CBC (no solar) | $0                      | $0.00       |
-| Energy Storage | 500 kWh × $0.00002       | $0.01       |
-| EV Make-Ready | 500 kWh × $0.00236       | $1.18       |
-| **Subtotal Riders** |                     | **~$1.19**  |
+| Charge              | Calculation        | Amount     |
+| ------------------- | ------------------ | ---------- |
+| CBC (no solar)      | $0                 | $0.00      |
+| Energy Storage      | 500 kWh × $0.00002 | $0.01      |
+| EV Make-Ready       | 500 kWh × $0.00236 | $1.18      |
+| **Subtotal Riders** |                    | **~$1.19** |
 
 ### Total
 
@@ -193,12 +193,12 @@ A customer in **July** (summer), using **500 kWh**, default supply, no solar, no
 
 ### Breakdown by Category
 
-| Category              | Amount   | % of Bill |
-| --------------------- | -------- | --------- |
-| Fixed Charges         | $24.60   | 19%       |
-| Delivery (Volumetric) | ~$66.29  | 51%       |
-| Supply                | ~$37.00  | 29%       |
-| Riders & Other        | ~$1.19   | 1%        |
+| Category              | Amount  | % of Bill |
+| --------------------- | ------- | --------- |
+| Fixed Charges         | $24.60  | 19%       |
+| Delivery (Volumetric) | ~$66.29 | 51%       |
+| Supply                | ~$37.00 | 29%       |
+| Riders & Other        | ~$1.19  | 1%        |
 
 **Key insight**: Delivery dominates the bill—fixed charges plus tiered summer delivery (with the higher tier above 250 kWh) make up about 70% of the total. Supply is a smaller share. Seasonal delivery rates mean winter bills for the same usage are lower because the winter second tier equals the first tier.
 

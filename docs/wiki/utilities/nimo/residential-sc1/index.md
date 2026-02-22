@@ -192,40 +192,40 @@ A customer in the **Central** zone in **July** using **500 kWh**, default supply
 
 ### Delivery Charges
 
-| Charge              | Calculation                     | Amount       |
-| ------------------- | ------------------------------- | ------------ |
-| Basic Service       | $19.00                           | $19.00       |
-| Energy Charge       | 500 kWh × $0.08889              | $44.45       |
-| Delivery Adj (Central) | 500 kWh × ~$0.002 (varies by zone) | ~$1.00    |
-| RDM                 | 500 kWh × ~$0.001 (varies)      | ~$0.50       |
-| Transmission Rev Adj | 500 kWh × ~$0.002 (varies)     | ~$1.00       |
-| Legacy Transition   | 500 kWh × ~$0.001 (varies)      | ~$0.50       |
-| SBC                 | 500 kWh × ~$0.004 (varies)      | ~$2.00       |
-| CES Delivery        | 500 kWh × ~$0.003 (varies)      | ~$1.50       |
-| DLM Surcharge       | 500 kWh × ~$0.0002 (varies)     | ~$0.10       |
-| EAM                 | 500 kWh × ~$0.0005 (varies)     | ~$0.25       |
-| RAM                 | 500 kWh × $0.00671              | $3.36        |
-| EV Make Ready       | 500 kWh × $0.00147              | $0.74        |
-| Arrears Recovery    | 500 kWh × $0.00087              | $0.44        |
-| **Subtotal Delivery** |                             | **~$74.29**  |
+| Charge                 | Calculation                        | Amount      |
+| ---------------------- | ---------------------------------- | ----------- |
+| Basic Service          | $19.00                             | $19.00      |
+| Energy Charge          | 500 kWh × $0.08889                 | $44.45      |
+| Delivery Adj (Central) | 500 kWh × ~$0.002 (varies by zone) | ~$1.00      |
+| RDM                    | 500 kWh × ~$0.001 (varies)         | ~$0.50      |
+| Transmission Rev Adj   | 500 kWh × ~$0.002 (varies)         | ~$1.00      |
+| Legacy Transition      | 500 kWh × ~$0.001 (varies)         | ~$0.50      |
+| SBC                    | 500 kWh × ~$0.004 (varies)         | ~$2.00      |
+| CES Delivery           | 500 kWh × ~$0.003 (varies)         | ~$1.50      |
+| DLM Surcharge          | 500 kWh × ~$0.0002 (varies)        | ~$0.10      |
+| EAM                    | 500 kWh × ~$0.0005 (varies)        | ~$0.25      |
+| RAM                    | 500 kWh × $0.00671                 | $3.36       |
+| EV Make Ready          | 500 kWh × $0.00147                 | $0.74       |
+| Arrears Recovery       | 500 kWh × $0.00087                 | $0.44       |
+| **Subtotal Delivery**  |                                    | **~$74.29** |
 
 ### Supply Charges
 
-| Charge           | Calculation                         | Amount       |
-| ---------------- | ----------------------------------- | ------------ |
-| Supply (Central)  | 500 kWh × ~$0.07 (varies by zone)  | ~$35.00      |
-| Supply Recon     | (varies by zone)                    | ~$0.50       |
-| CES Supply       | 500 kWh × ~$0.003 (varies)         | ~$1.50       |
-| MFC (Working Cap, Uncollectible, Procurement, etc.) | (varies by zone) | ~$2.00   |
-| **Subtotal Supply** |                             | **~$39.00**  |
+| Charge                                              | Calculation                       | Amount      |
+| --------------------------------------------------- | --------------------------------- | ----------- |
+| Supply (Central)                                    | 500 kWh × ~$0.07 (varies by zone) | ~$35.00     |
+| Supply Recon                                        | (varies by zone)                  | ~$0.50      |
+| CES Supply                                          | 500 kWh × ~$0.003 (varies)        | ~$1.50      |
+| MFC (Working Cap, Uncollectible, Procurement, etc.) | (varies by zone)                  | ~$2.00      |
+| **Subtotal Supply**                                 |                                   | **~$39.00** |
 
 ### Riders & Other
 
-| Charge        | Calculation   | Amount  |
-| ------------- | ------------- | ------- |
-| GreenUp (none) | $0          | $0.00   |
-| CBC (no solar) | $0          | $0.00   |
-| **Subtotal Riders** |           | **$0.00** |
+| Charge              | Calculation | Amount    |
+| ------------------- | ----------- | --------- |
+| GreenUp (none)      | $0          | $0.00     |
+| CBC (no solar)      | $0          | $0.00     |
+| **Subtotal Riders** |             | **$0.00** |
 
 ### Total
 
@@ -233,12 +233,12 @@ A customer in the **Central** zone in **July** using **500 kWh**, default supply
 
 ### Breakdown by Category
 
-| Category              | Amount   | % of Bill |
-| --------------------- | -------- | --------- |
-| Fixed Charges         | $19.00   | 17%       |
-| Delivery (Volumetric)  | ~$55.29  | 49%       |
-| Supply                | ~$39.00  | 34%       |
-| Riders & Other        | $0.00    | 0%        |
+| Category              | Amount  | % of Bill |
+| --------------------- | ------- | --------- |
+| Fixed Charges         | $19.00  | 17%       |
+| Delivery (Volumetric) | ~$55.29 | 49%       |
+| Supply                | ~$39.00 | 34%       |
+| Riders & Other        | $0.00   | 0%        |
 
 **Key insight**: Delivery (fixed plus energy and zone-specific adjustment plus RDM, SBC, CES, RAM, EV, etc.) and supply each contribute a large share. The same 500 kWh in a different zone (e.g. Adirondack, Frontier) will have a different total because both delivery adjustment and supply rates are zone-specific. RAM and EV Make Ready are fixed per-kWh riders that are visible on the bill; the rest depend on lookups.
 

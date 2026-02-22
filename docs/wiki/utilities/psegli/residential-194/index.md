@@ -165,35 +165,35 @@ A customer **outside Suffolk County** in **July** (summer), using **500 kWh** wi
 
 ### Delivery Charges
 
-| Charge              | Calculation                                      | Amount       |
-| ------------------- | ------------------------------------------------ | ------------ |
-| Service Charge      | 30 days × $0.56                                  | $16.80       |
-| Energy (Summer Peak) | 200 kWh × $0.2217                                | $44.34       |
-| Energy (Summer Off-Peak) | 300 kWh × $0.1093                           | $32.79       |
-| SPT (outside Suffolk) | (varies)                                         | ~$2.00       |
-| DER Cost Recovery   | (varies)                                         | ~$1.50       |
-| NY State Assessment | (varies)                                         | ~$1.00       |
-| RDM                 | (varies)                                         | ~$0.50       |
-| Delivery Service Adj.| (varies)                                         | ~$0.50       |
-| **Subtotal Delivery** |                                                  | **~$99.43**  |
+| Charge                   | Calculation       | Amount      |
+| ------------------------ | ----------------- | ----------- |
+| Service Charge           | 30 days × $0.56   | $16.80      |
+| Energy (Summer Peak)     | 200 kWh × $0.2217 | $44.34      |
+| Energy (Summer Off-Peak) | 300 kWh × $0.1093 | $32.79      |
+| SPT (outside Suffolk)    | (varies)          | ~$2.00      |
+| DER Cost Recovery        | (varies)          | ~$1.50      |
+| NY State Assessment      | (varies)          | ~$1.00      |
+| RDM                      | (varies)          | ~$0.50      |
+| Delivery Service Adj.    | (varies)          | ~$0.50      |
+| **Subtotal Delivery**    |                   | **~$99.43** |
 
 ### Supply Charges
 
-| Charge                | Calculation                                    | Amount       |
-| --------------------- | ---------------------------------------------- | ------------ |
-| Power Supply (Peak)   | 200 kWh × $0.286622                             | $57.32       |
-| Power Supply (Off-Peak) | 300 kWh × $0.121967                           | $36.59       |
-| Securitization (net)  | (varies)                                       | ~$2.00       |
-| Merchant Function     | 500 kWh × $0.001764                             | $0.88        |
-| **Subtotal Supply**   |                                                | **~$96.79**  |
+| Charge                  | Calculation         | Amount      |
+| ----------------------- | ------------------- | ----------- |
+| Power Supply (Peak)     | 200 kWh × $0.286622 | $57.32      |
+| Power Supply (Off-Peak) | 300 kWh × $0.121967 | $36.59      |
+| Securitization (net)    | (varies)            | ~$2.00      |
+| Merchant Function       | 500 kWh × $0.001764 | $0.88       |
+| **Subtotal Supply**     |                     | **~$96.79** |
 
 ### Riders & Other
 
-| Charge   | Calculation                    | Amount      |
-| -------- | ------------------------------ | ----------- |
-| CBC (no solar) | $0                         | $0.00       |
-| Cities/Villages (pilot) | (quantity-based)        | ~$3.00      |
-| **Subtotal Riders** |                            | **~$3.00**  |
+| Charge                  | Calculation      | Amount     |
+| ----------------------- | ---------------- | ---------- |
+| CBC (no solar)          | $0               | $0.00      |
+| Cities/Villages (pilot) | (quantity-based) | ~$3.00     |
+| **Subtotal Riders**     |                  | **~$3.00** |
 
 ### Total
 
@@ -201,12 +201,12 @@ A customer **outside Suffolk County** in **July** (summer), using **500 kWh** wi
 
 ### Breakdown by Category
 
-| Category              | Amount    | % of Bill |
-| --------------------- | --------- | --------- |
-| Fixed (Service)       | $16.80    | 8%        |
-| Delivery (Volumetric) | ~$82.63   | 42%       |
-| Supply                | ~$96.79   | 48%       |
-| Riders & Other        | ~$3.00    | 2%        |
+| Category              | Amount  | % of Bill |
+| --------------------- | ------- | --------- |
+| Fixed (Service)       | $16.80  | 8%        |
+| Delivery (Volumetric) | ~$82.63 | 42%       |
+| Supply                | ~$96.79 | 48%       |
+| Riders & Other        | ~$3.00  | 2%        |
 
 **Key insight**: Rate 194 is TOU and seasonal: peak usage (200 kWh at summer peak rates) drives a large share of both delivery and supply. Shifting load to off-peak reduces the bill; the same 500 kWh with more off-peak usage would be lower. Supply and delivery each contribute roughly half of the total in this example.
 

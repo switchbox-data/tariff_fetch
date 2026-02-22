@@ -145,37 +145,37 @@ A customer in **July** using **500 kWh**, default supply, no solar, no LMI disco
 
 ### Delivery Charges
 
-| Charge        | Calculation                    | Amount       |
-| ------------- | ------------------------------ | ------------ |
-| Customer Charge | $22.50                       | $22.50       |
-| Energy Charge | 500 kWh × $0.1386            | $69.30       |
-| RDM           | 500 kWh × ~$0.001 (varies)    | ~$0.50       |
-| Transition Adj. | 500 kWh × ~$0.002 (varies)   | ~$1.00       |
-| Purchased Power Adj. | 500 kWh × ~$0.001 (varies) | ~$0.50       |
-| Electric Bill Credit | (varies; often $0)        | $0.00        |
-| Miscellaneous | 500 kWh × ~$0.001 (varies)    | ~$0.50       |
-| SBC           | 500 kWh × ~$0.004 (varies)     | ~$2.00       |
-| EAM Surcharge | 500 kWh × ~$0.0005 (varies)    | ~$0.25       |
-| RAM Surcharge | 500 kWh × ~$0.0005 (varies)    | ~$0.25       |
-| **Subtotal Delivery** |                             | **~$96.30**  |
+| Charge                | Calculation                 | Amount      |
+| --------------------- | --------------------------- | ----------- |
+| Customer Charge       | $22.50                      | $22.50      |
+| Energy Charge         | 500 kWh × $0.1386           | $69.30      |
+| RDM                   | 500 kWh × ~$0.001 (varies)  | ~$0.50      |
+| Transition Adj.       | 500 kWh × ~$0.002 (varies)  | ~$1.00      |
+| Purchased Power Adj.  | 500 kWh × ~$0.001 (varies)  | ~$0.50      |
+| Electric Bill Credit  | (varies; often $0)          | $0.00       |
+| Miscellaneous         | 500 kWh × ~$0.001 (varies)  | ~$0.50      |
+| SBC                   | 500 kWh × ~$0.004 (varies)  | ~$2.00      |
+| EAM Surcharge         | 500 kWh × ~$0.0005 (varies) | ~$0.25      |
+| RAM Surcharge         | 500 kWh × ~$0.0005 (varies) | ~$0.25      |
+| **Subtotal Delivery** |                             | **~$96.30** |
 
 ### Supply Charges
 
-| Charge           | Calculation                     | Amount       |
-| ---------------- | ------------------------------- | ------------ |
-| Market Price Charge | 500 kWh × ~$0.07 (varies)     | ~$35.00      |
-| Market Price Adj. | 500 kWh × ~$0.002 (varies)     | ~$1.00       |
-| MFC Lost Revenue | 500 kWh × ~$0.001 (varies)      | ~$0.50       |
-| Base MFC Supply  | 500 kWh × ~$0.002 (varies)      | ~$1.00       |
-| MFC Admin        | 500 kWh × ~$0.001 (varies)      | ~$0.50       |
-| **Subtotal Supply** |                             | **~$38.00**  |
+| Charge              | Calculation                | Amount      |
+| ------------------- | -------------------------- | ----------- |
+| Market Price Charge | 500 kWh × ~$0.07 (varies)  | ~$35.00     |
+| Market Price Adj.   | 500 kWh × ~$0.002 (varies) | ~$1.00      |
+| MFC Lost Revenue    | 500 kWh × ~$0.001 (varies) | ~$0.50      |
+| Base MFC Supply     | 500 kWh × ~$0.002 (varies) | ~$1.00      |
+| MFC Admin           | 500 kWh × ~$0.001 (varies) | ~$0.50      |
+| **Subtotal Supply** |                            | **~$38.00** |
 
 ### Riders & Other
 
-| Charge        | Calculation   | Amount  |
-| ------------- | ------------- | ------- |
-| CBC (no solar) | $0          | $0.00   |
-| **Subtotal Riders** |           | **$0.00** |
+| Charge              | Calculation | Amount    |
+| ------------------- | ----------- | --------- |
+| CBC (no solar)      | $0          | $0.00     |
+| **Subtotal Riders** |             | **$0.00** |
 
 ### Total
 
@@ -183,12 +183,12 @@ A customer in **July** using **500 kWh**, default supply, no solar, no LMI disco
 
 ### Breakdown by Category
 
-| Category              | Amount   | % of Bill |
-| --------------------- | -------- | --------- |
-| Fixed Charges         | $22.50   | 17%       |
-| Delivery (Volumetric) | ~$73.80  | 55%       |
-| Supply                | ~$38.00  | 28%       |
-| Riders & Other        | $0.00    | 0%        |
+| Category              | Amount  | % of Bill |
+| --------------------- | ------- | --------- |
+| Fixed Charges         | $22.50  | 17%       |
+| Delivery (Volumetric) | ~$73.80 | 55%       |
+| Supply                | ~$38.00 | 28%       |
+| Riders & Other        | $0.00   | 0%        |
 
 **Key insight**: The single Energy Charge ($0.1386/kWh) is the largest volumetric component; delivery (fixed plus energy and adjustments) makes up most of the bill. Supply is broken into multiple MFC and market price pieces—all variable—so the exact split depends on current lookups.
 

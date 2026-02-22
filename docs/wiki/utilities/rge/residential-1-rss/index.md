@@ -165,36 +165,36 @@ A customer in July using 500 kWh, with default supply (RSS), no solar, no RAD, a
 
 ### Delivery Charges
 
-| Charge                | Calculation                     | Amount       |
-| --------------------- | ------------------------------- | ------------ |
-| Customer Charge       | $23.00                          | $23.00       |
-| Bill Issuance Charge  | $0.99                           | $0.99        |
-| Energy Delivery       | 500 kWh × $0.08316             | $41.58       |
-| Make-Whole Energy     | 500 kWh × $0.00221             | $1.11        |
-| SBC (EE + CEF)        | 500 kWh × ~$0.004 (varies)     | ~$2.00       |
-| Transition Charge     | 500 kWh × ~$0.001 (varies)     | ~$0.50       |
-| Revenue Decoupling    | 500 kWh × ~$0.001 (varies)     | ~$0.50       |
-| **Subtotal Delivery** |                                 | **~$69.68**  |
+| Charge                | Calculation                | Amount      |
+| --------------------- | -------------------------- | ----------- |
+| Customer Charge       | $23.00                     | $23.00      |
+| Bill Issuance Charge  | $0.99                      | $0.99       |
+| Energy Delivery       | 500 kWh × $0.08316         | $41.58      |
+| Make-Whole Energy     | 500 kWh × $0.00221         | $1.11       |
+| SBC (EE + CEF)        | 500 kWh × ~$0.004 (varies) | ~$2.00      |
+| Transition Charge     | 500 kWh × ~$0.001 (varies) | ~$0.50      |
+| Revenue Decoupling    | 500 kWh × ~$0.001 (varies) | ~$0.50      |
+| **Subtotal Delivery** |                            | **~$69.68** |
 
 ### Supply Charges
 
-| Charge        | Calculation                    | Amount      |
-| ------------- | ------------------------------ | ----------- |
-| Supply Charge | 500 kWh × ~$0.07 (varies)      | ~$35.00     |
-| Merchant Function | 500 kWh × ~$0.002 (varies)  | ~$1.00      |
-| **Subtotal Supply** |                             | **~$36.00** |
+| Charge              | Calculation                | Amount      |
+| ------------------- | -------------------------- | ----------- |
+| Supply Charge       | 500 kWh × ~$0.07 (varies)  | ~$35.00     |
+| Merchant Function   | 500 kWh × ~$0.002 (varies) | ~$1.00      |
+| **Subtotal Supply** |                            | **~$36.00** |
 
 ### Riders & Other
 
-| Charge        | Calculation                     | Amount      |
-| ------------- | ------------------------------- | ----------- |
-| REC           | 500 kWh × $0.00103             | $0.52       |
-| ZEC           | 500 kWh × $0.00299             | $1.50       |
-| RAM           | 500 kWh × $0.00029             | $0.15       |
-| EAM           | 500 kWh × $0.000047            | $0.02       |
-| DLM           | 500 kWh × $0.000084            | $0.04       |
-| CBC (no solar)| $0                              | $0.00       |
-| **Subtotal Riders** |                             | **~$2.23**  |
+| Charge              | Calculation         | Amount     |
+| ------------------- | ------------------- | ---------- |
+| REC                 | 500 kWh × $0.00103  | $0.52      |
+| ZEC                 | 500 kWh × $0.00299  | $1.50      |
+| RAM                 | 500 kWh × $0.00029  | $0.15      |
+| EAM                 | 500 kWh × $0.000047 | $0.02      |
+| DLM                 | 500 kWh × $0.000084 | $0.04      |
+| CBC (no solar)      | $0                  | $0.00      |
+| **Subtotal Riders** |                     | **~$2.23** |
 
 ### Total
 
@@ -202,12 +202,12 @@ A customer in July using 500 kWh, with default supply (RSS), no solar, no RAD, a
 
 ### Breakdown by Category
 
-| Category              | Amount   | % of Bill |
-| --------------------- | -------- | --------- |
-| Fixed Charges         | $23.99   | 22%       |
-| Delivery (Volumetric) | ~$45.69  | 42%       |
-| Supply                | ~$36.00  | 33%       |
-| Riders & Other        | ~$2.23   | 2%        |
+| Category              | Amount  | % of Bill |
+| --------------------- | ------- | --------- |
+| Fixed Charges         | $23.99  | 22%       |
+| Delivery (Volumetric) | ~$45.69 | 42%       |
+| Supply                | ~$36.00 | 33%       |
+| Riders & Other        | ~$2.23  | 2%        |
 
 **Key insight**: On 1-RSS, delivery (fixed plus volumetric) and supply each make up a large share of the bill. The flat delivery rate and fixed REC/ZEC/RAM/EAM/DLM amounts make the bill easy to approximate for a given usage once supply and variable delivery components are known from lookups.
 
