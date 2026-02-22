@@ -1,7 +1,7 @@
 # Tariff Fetch
 
-[![Release](https://img.shields.io/github/v/release/switchbox-data/tariff_fetch)](https://img.shields.io/github/v/release/switchbox-data/tariff_fetch)
-[![Build status](https://img.shields.io/github/actions/workflow/status/switchbox-data/tariff-fetch/main.yml?branch=main)](https://github.com/switchbox-data/tariff_fetch/actions/workflows/main.yml?query=branch%3Amain)
+[![PyPI version](https://img.shields.io/pypi/v/tariff_fetch)](https://pypi.org/project/tariff_fetch/)
+[![Build status](https://img.shields.io/github/actions/workflow/status/switchbox-data/tariff_fetch/python-package-main.yml?branch=main)](https://github.com/switchbox-data/tariff_fetch/actions/workflows/python-package-main.yml?query=branch%3Amain)
 [![Commit activity](https://img.shields.io/github/commit-activity/m/switchbox-data/tariff_fetch)](https://img.shields.io/github/commit-activity/m/switchbox-data/tariff_fetch)
 [![License](https://img.shields.io/github/license/switchbox-data/tariff_fetch)](https://img.shields.io/github/license/switchbox-data/tariff_fetch)
 
