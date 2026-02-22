@@ -25,16 +25,16 @@ This wiki explains what all of that means so you can actually use the data.
 
 ## Utilities Covered
 
-| Utility                                                       | Region       | Guides Available              |
-| ------------------------------------------------------------- | ------------ | ----------------------------- |
-| [Consolidated Edison (ConEd)](utilities/coned/index.md)       | New York     | EL1 Residential               |
-| [PSEG Long Island](utilities/psegli/index.md)                  | New York     | Rate 194 (default)           |
-| [RG&E](utilities/rge/index.md)                                | New York     | 1-RSS (default)              |
-| [NYSEG](utilities/nyseg/index.md)                             | New York     | SC1 (default)                |
-| [National Grid – NY](utilities/nimo/index.md)                  | New York     | SC1 (default)                 |
-| [Orange & Rockland](utilities/or/index.md)                     | New York     | Rate 1 (default)              |
-| [Central Hudson](utilities/cenhud/index.md)                   | New York     | Rate 1 (default)              |
-| [Rhode Island Energy](utilities/rie/index.md)                  | Rhode Island | A-16 (default)                |
+| Utility                                                 | Region       | Guides Available   |
+| ------------------------------------------------------- | ------------ | ------------------ |
+| [Consolidated Edison (ConEd)](utilities/coned/index.md) | New York     | EL1 Residential    |
+| [PSEG Long Island](utilities/psegli/index.md)           | New York     | Rate 194 (default) |
+| [RG&E](utilities/rge/index.md)                          | New York     | 1-RSS (default)    |
+| [NYSEG](utilities/nyseg/index.md)                       | New York     | SC1 (default)      |
+| [National Grid – NY](utilities/nimo/index.md)           | New York     | SC1 (default)      |
+| [Orange & Rockland](utilities/or/index.md)              | New York     | Rate 1 (default)   |
+| [Central Hudson](utilities/cenhud/index.md)             | New York     | Rate 1 (default)   |
+| [Rhode Island Energy](utilities/rie/index.md)           | Rhode Island | A-16 (default)     |
 
 See also [NY default rate comparison](utilities/ny-comparison/index.md) for a cross-utility charge comparison.
 

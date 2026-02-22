@@ -10,16 +10,16 @@ New York State Electric & Gas Corporation (NYSEG) serves Upstate New York across
 
 ## Service Territory
 
-| Territory         | Territory ID | Area               |
-| ----------------- | ------------ | ------------------ |
-| East              | 3690         | Eastern NY         |
-| Lower Hudson Valley | 5337       | Lower Hudson       |
-| West              | 3689         | Western NY         |
+| Territory           | Territory ID | Area         |
+| ------------------- | ------------ | ------------ |
+| East                | 3690         | Eastern NY   |
+| Lower Hudson Valley | 5337         | Lower Hudson |
+| West                | 3689         | Western NY   |
 
 ## Residential Tariffs
 
-| Tariff | Name       | Type    | Key Feature                 | Guide                                |
-| ------ | ---------- | ------- | --------------------------- | ------------------------------------ |
+| Tariff | Name        | Type    | Key Feature                   | Guide                                  |
+| ------ | ----------- | ------- | ----------------------------- | -------------------------------------- |
 | SC1    | Residential | Default | Flat delivery; supply by zone | [View Guide](residential-sc1/index.md) |
 
 ## Key Characteristics

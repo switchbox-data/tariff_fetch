@@ -14,8 +14,8 @@ Single primary territory (territoryId 760) for default residential; connection t
 
 ## Residential Tariffs
 
-| Tariff | Name       | Type    | Key Feature           | Guide                              |
-| ------ | ---------- | ------- | --------------------- | ---------------------------------- |
+| Tariff | Name        | Type    | Key Feature                    | Guide                                |
+| ------ | ----------- | ------- | ------------------------------ | ------------------------------------ |
 | 1      | Residential | Default | Seasonal delivery; flat supply | [View Guide](residential-1/index.md) |
 
 ## Key Characteristics

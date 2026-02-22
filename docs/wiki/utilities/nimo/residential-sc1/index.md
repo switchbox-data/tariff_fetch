@@ -20,55 +20,55 @@ This is a **flat, non-TOU** rate: no time-of-use differentiation. Charges includ
 
 ## Quick Reference: All Charges
 
-| Rate Group | Rate Name | Charge Type | Charge Class | Zone | Season | Tiered | Rate Value |
-| ---------- | --------- | ----------- | ------------ | :--: | :----: | :----: | ---------- |
-| Rider | Delivery Charge Adjustment (Residentia | — | — | ❌ | ❌ | ❌ | — |
-| Customer Charge | Basic Service Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $19.0 |
-| Energy Charge | Energy Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.08889 |
-| Income Eligible Basic Servic | Income Eligible Basic Service Credit | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ✅ | tiered |
-| RDM | Revenue Decoupling Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Transmission Revenue Adjustm | Transmission Revenue Adjustment | CONSUMPTION_BASED | TRANSMISSION | ❌ | ❌ | ❌ | _Lookup_ |
-| Legacy Transition Charge | Legacy Transition Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Electricity Supply Charge | Electricity Supply Reconciliation Mech | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| SBC | System Benefits Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Clean Energy Standard | Clean Energy Standard Supply Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Clean Energy Standard | Clean Energy Standard Delivery Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Dynamic Load Management Surc | Dynamic Load Management Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Minimum | Minimum | MINIMUM | — | ❌ | ❌ | ❌ | $19.0 |
-| Merchant Function Charge - S | Merchant Function Charge - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| GreenUp Rider | GreenUp Rider | — | — | ❌ | ❌ | ❌ | — |
-| CBC Rider | CBC Rider | — | — | ❌ | ❌ | ❌ | — |
-| Electric Vehicle Make Ready  | Electric Vehicle Make Ready Surcharge  | — | — | ❌ | ❌ | ❌ | — |
-| Arrears Management Program R | Arrears Management Program Recovery Su | — | — | ❌ | ❌ | ❌ | — |
-| Net Utility Plant and Deprec | Net Utility Plant and Depreciation Exp | — | — | ❌ | ❌ | ❌ | — |
-| Rate Adjustment Mechanism -  | Rate Adjustment Mechanism - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| Delivery Charge Adjustment | Electricity Supply Charge - Adirondack | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Delivery Charge Adjustment - Adirondac | CONSUMPTION_BASED | DISTRIBUTION | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Electric Supply Charge - Capital Zone | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Delivery Charge Adjustment- Capital Zo | CONSUMPTION_BASED | DISTRIBUTION | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Electric Supply Charge - Central Zone | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Delivery Charge Adjustment - Central Z | CONSUMPTION_BASED | DISTRIBUTION | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Electric Supply Charge - Frontier Zone | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Delivery Charge Adjustment - Frontier  | CONSUMPTION_BASED | DISTRIBUTION | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Electric Supply Charge - Genesee Zone | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Delivery Charge Adjustment - Genesee Z | CONSUMPTION_BASED | DISTRIBUTION | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Electric Supply Charge - Utica Zone | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Delivery Charge Adjustment | Delivery Charge Adjustment - Utica Zon | CONSUMPTION_BASED | DISTRIBUTION | ✅ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Working Capital on Purchased Power Cos | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Working Capital on Purchased Power Cos | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Electricity Supply Uncollectible Expen | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Electricity Supply Uncollectible Expen | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Electricity Supply Uncollectible Expen | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Electricity Supply Procurement Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Electricity Supply Credit and Collecti | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| GreenUp Charge | GreenUp Charge | CONSUMPTION_BASED | SUPPLY | ❌ | ❌ | ✅ | tiered |
-| Customer Benefit Contributio | Customer Benefit Contribution | QUANTITY | — | ❌ | ❌ | ❌ | $0.97 |
-| Electric Vehicle Make Ready  | Electric Vehicle Make Ready Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00147 |
-| Arrears Management Program R | Arrears Management Program Recovery Su | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | — |
-| Arrears Management Program R | Arrears Management Program Recovery Su | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00087 |
-| Net Utility Plant and Deprec | Net Utility Plant and Depreciation Exp | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | — |
-| Rate Adjustment Mechanism | Rate Adjustment Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00671 |
+| Rate Group                   | Rate Name                              | Charge Type       | Charge Class      | Zone | Season | Tiered | Rate Value |
+| ---------------------------- | -------------------------------------- | ----------------- | ----------------- | :--: | :----: | :----: | ---------- |
+| Rider                        | Delivery Charge Adjustment (Residentia | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Customer Charge              | Basic Service Charge                   | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $19.0      |
+| Energy Charge                | Energy Charge                          | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.08889   |
+| Income Eligible Basic Servic | Income Eligible Basic Service Credit   | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ✅   | tiered     |
+| RDM                          | Revenue Decoupling Mechanism           | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Transmission Revenue Adjustm | Transmission Revenue Adjustment        | CONSUMPTION_BASED | TRANSMISSION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Legacy Transition Charge     | Legacy Transition Charge               | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Electricity Supply Charge    | Electricity Supply Reconciliation Mech | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| SBC                          | System Benefits Charge                 | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Clean Energy Standard        | Clean Energy Standard Supply Charge    | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Clean Energy Standard        | Clean Energy Standard Delivery Charge  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Dynamic Load Management Surc | Dynamic Load Management Surcharge      | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism          | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Minimum                      | Minimum                                | MINIMUM           | —                 |  ❌  |   ❌   |   ❌   | $19.0      |
+| Merchant Function Charge - S | Merchant Function Charge - SC1         | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| GreenUp Rider                | GreenUp Rider                          | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| CBC Rider                    | CBC Rider                              | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Electric Vehicle Make Ready  | Electric Vehicle Make Ready Surcharge  | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Arrears Management Program R | Arrears Management Program Recovery Su | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Net Utility Plant and Deprec | Net Utility Plant and Depreciation Exp | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Rate Adjustment Mechanism -  | Rate Adjustment Mechanism - SC1        | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Delivery Charge Adjustment   | Electricity Supply Charge - Adirondack | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Delivery Charge Adjustment - Adirondac | CONSUMPTION_BASED | DISTRIBUTION      |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Electric Supply Charge - Capital Zone  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Delivery Charge Adjustment- Capital Zo | CONSUMPTION_BASED | DISTRIBUTION      |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Electric Supply Charge - Central Zone  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Delivery Charge Adjustment - Central Z | CONSUMPTION_BASED | DISTRIBUTION      |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Electric Supply Charge - Frontier Zone | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Delivery Charge Adjustment - Frontier  | CONSUMPTION_BASED | DISTRIBUTION      |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Electric Supply Charge - Genesee Zone  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Delivery Charge Adjustment - Genesee Z | CONSUMPTION_BASED | DISTRIBUTION      |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Electric Supply Charge - Utica Zone    | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Charge Adjustment   | Delivery Charge Adjustment - Utica Zon | CONSUMPTION_BASED | DISTRIBUTION      |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Working Capital on Purchased Power Cos | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Working Capital on Purchased Power Cos | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Electricity Supply Uncollectible Expen | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Electricity Supply Uncollectible Expen | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Electricity Supply Uncollectible Expen | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Electricity Supply Procurement Charge  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Electricity Supply Credit and Collecti | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| GreenUp Charge               | GreenUp Charge                         | CONSUMPTION_BASED | SUPPLY            |  ❌  |   ❌   |   ✅   | tiered     |
+| Customer Benefit Contributio | Customer Benefit Contribution          | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $0.97      |
+| Electric Vehicle Make Ready  | Electric Vehicle Make Ready Surcharge  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00147   |
+| Arrears Management Program R | Arrears Management Program Recovery Su | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | —          |
+| Arrears Management Program R | Arrears Management Program Recovery Su | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00087   |
+| Net Utility Plant and Deprec | Net Utility Plant and Depreciation Exp | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | —          |
+| Rate Adjustment Mechanism    | Rate Adjustment Mechanism              | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00671   |
 
 ---
 

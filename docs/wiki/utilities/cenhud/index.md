@@ -14,8 +14,8 @@ Single primary territory (territoryId 2285) for default residential.
 
 ## Residential Tariffs
 
-| Tariff | Name       | Type    | Key Feature        | Guide                              |
-| ------ | ---------- | ------- | ------------------ | ---------------------------------- |
+| Tariff | Name        | Type    | Key Feature                       | Guide                                |
+| ------ | ----------- | ------- | --------------------------------- | ------------------------------------ |
 | 1      | Residential | Default | Flat; MFC split into 3 components | [View Guide](residential-1/index.md) |
 
 ## Key Characteristics

@@ -8,7 +8,6 @@ This page compares **default residential electric rates** across the seven major
 
 Rows are **charge categories** (merged so that equivalent charges under different names count as one). Columns are the seven NY utilities. Cell content: a fixed value when the tariff shows one, “Lookup” when the rate is variable (Arcadia Lookups API), “—” when that charge does not appear on that tariff, or a short note. “(+)” indicates multiple sub-rates (e.g. by zone or season) for that category.
 
-
 | Charge type                           | ConEd                       | PSEG-LI                       | RGE             | NYSEG           | National Grid   | O&R           | Central Hudson            |
 | ------------------------------------- | --------------------------- | ----------------------------- | --------------- | --------------- | --------------- | ------------- | ------------------------- |
 | Customer charge (fixed)               | $20/mo                      | $0.56/day                     | $23/mo          | $19/mo          | Yes (zone)      | Yes           | $22.50/mo                 |
@@ -43,7 +42,6 @@ Rows are **charge categories** (merged so that equivalent charges under differen
 | GreenUp (National Grid)               | —                           | —                             | —               | —               | Optional        | —             | —                         |
 | Market price / purchased power        | —                           | —                             | —               | —               | —               | Lookup        | Lookup                    |
 | MFC components (Central Hudson)       | —                           | —                             | —               | —               | —               | —             | Lost revenue; base; admin |
-
 
 ---
 
@@ -98,4 +96,3 @@ For these, “overcollection” is possible only to the extent the mechanism is 
 - **Supply** is a **pass-through**; **MFC** recovers utility supply-related costs.
 - **SBC, CES, GRT, VDER, arrears, EV, Shoreham, securitization, pilot, state assessment** are **policy or pass-through** charges with their own rules; they are not part of the core delivery revenue requirement.
 - Structural differences (TOU, zones, customer/minimum charges, low-income and RAD, and utility-specific riders) are what to watch when comparing bills or building models across the seven NY default rates.
-

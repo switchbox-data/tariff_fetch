@@ -18,32 +18,32 @@
 
 ## Quick Reference: All Charges
 
-| Rate Group | Rate Name | Charge Type | Charge Class | Zone | Season | Tiered | Rate Value |
-| ---------- | --------- | ----------- | ------------ | :--: | :----: | :----: | ---------- |
-| Customer Charge | Customer Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $22.5 |
-| Billing and Payment Processi | Billing and Payment Processing Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $2.1 |
-| Delivery Charge | Summer Rate | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ✅ | ✅ | tiered |
-| Delivery Charge | Winter Rate | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ✅ | ✅ | tiered |
-| Energy Cost Adjustment | Energy Cost Adjustment | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Market Supply Charge | Market Supply Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Merchant Function Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Revenue Decoupling Mechanism | Revenue Decoupling Mechanism Adjustmen | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| System Benefits Charge | System Benefits Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Dynamic Load Management Surc | Dynamic Load Management Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Delivery Revenue Surcharge | Delivery Revenue Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Transition Adjustment for Co | Transition Adjustment for Competitive  | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Transition Adjustment for Co | Transition Adjustment for Competitive  | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Minimum Charge | Minimum Charge | MINIMUM | — | ❌ | ❌ | ❌ | $24.6 |
-| Low Income Bill Credit | Low Income Bill Credit | — | — | ❌ | ❌ | ❌ | — |
-| CBC Rider | CBC Rider | — | — | ❌ | ❌ | ❌ | — |
-| Energy Storage Surcharge - S | Energy Storage Surcharge - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| Electric Vehicle Make-Ready  | Electric Vehicle Make-Ready Surcharge  | — | — | ❌ | ❌ | ❌ | — |
-| Enhanced Energy Affordabilit | Enhanced Energy Affordability Credits | — | — | ❌ | ❌ | ❌ | — |
-| Low Income Bill Credit | Low Income Bill Credit | FIXED_PRICE | — | ❌ | ❌ | ✅ | tiered |
-| Customer Benefit Contributio | Customer Benefit Contribution | QUANTITY | — | ❌ | ❌ | ❌ | $1.0 |
-| Energy Storage Surcharge | Energy Storage Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $2e-05 |
-| Electric Vehicle Make-Ready  | Electric Vehicle Make-Ready Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00236 |
-| Enhanced Energy Affordabilit | Enhanced Energy Affordability Credits | FIXED_PRICE | — | ❌ | ❌ | ✅ | tiered |
+| Rate Group                   | Rate Name                              | Charge Type       | Charge Class      | Zone | Season | Tiered | Rate Value |
+| ---------------------------- | -------------------------------------- | ----------------- | ----------------- | :--: | :----: | :----: | ---------- |
+| Customer Charge              | Customer Charge                        | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $22.5      |
+| Billing and Payment Processi | Billing and Payment Processing Charge  | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $2.1       |
+| Delivery Charge              | Summer Rate                            | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ✅   |   ✅   | tiered     |
+| Delivery Charge              | Winter Rate                            | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ✅   |   ✅   | tiered     |
+| Energy Cost Adjustment       | Energy Cost Adjustment                 | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Market Supply Charge         | Market Supply Charge                   | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Merchant Function Charge               | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Revenue Decoupling Mechanism | Revenue Decoupling Mechanism Adjustmen | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| System Benefits Charge       | System Benefits Charge                 | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Dynamic Load Management Surc | Dynamic Load Management Surcharge      | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Revenue Surcharge   | Delivery Revenue Surcharge             | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Transition Adjustment for Co | Transition Adjustment for Competitive  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Transition Adjustment for Co | Transition Adjustment for Competitive  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Minimum Charge               | Minimum Charge                         | MINIMUM           | —                 |  ❌  |   ❌   |   ❌   | $24.6      |
+| Low Income Bill Credit       | Low Income Bill Credit                 | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| CBC Rider                    | CBC Rider                              | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Energy Storage Surcharge - S | Energy Storage Surcharge - SC1         | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Electric Vehicle Make-Ready  | Electric Vehicle Make-Ready Surcharge  | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Enhanced Energy Affordabilit | Enhanced Energy Affordability Credits  | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Low Income Bill Credit       | Low Income Bill Credit                 | FIXED_PRICE       | —                 |  ❌  |   ❌   |   ✅   | tiered     |
+| Customer Benefit Contributio | Customer Benefit Contribution          | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $1.0       |
+| Energy Storage Surcharge     | Energy Storage Surcharge               | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $2e-05     |
+| Electric Vehicle Make-Ready  | Electric Vehicle Make-Ready Surcharge  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00236   |
+| Enhanced Energy Affordabilit | Enhanced Energy Affordability Credits  | FIXED_PRICE       | —                 |  ❌  |   ❌   |   ✅   | tiered     |
 
 ---
 

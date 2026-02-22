@@ -22,34 +22,34 @@ Territory can affect certain charges: **Suffolk County** vs **Outside Suffolk Co
 
 ## Quick Reference: All Charges
 
-| Rate Group | Rate Name | Charge Type | Charge Class | Zone | Season | Tiered | Rate Value |
-| ---------- | --------- | ----------- | ------------ | :--: | :----: | :----: | ---------- |
-| Service Charge | Service Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $0.56 |
-| Energy Charge | Energy Charge - Summer Peak | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ✅ | ❌ | $0.2217 |
-| Energy Charge | Energy Charge - Summer Off-Peak | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ✅ | ❌ | $0.1093 |
-| Energy Charge | Energy Charge - Winter Peak | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ✅ | ❌ | $0.1885 |
-| Energy Charge | Energy Charge - Winter Off-Peak | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ✅ | ❌ | $0.0929 |
-| Shoreham Property Tax (SPT)  | Shoreham Property Tax (SPT) Settlement | QUANTITY | — | ✅ | ❌ | ❌ | _Lookup_ |
-| Shoreham Property Tax (SPT)  | Shoreham Property Tax (SPT) Settlement | QUANTITY | — | ✅ | ❌ | ❌ | — |
-| Distributed Energy Resources | Distributed Energy Resources Cost Reco | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | _Lookup_ |
-| New York State Assessment | New York State Assessment | QUANTITY | — | ❌ | ❌ | ❌ | _Lookup_ |
-| Revenue Decoupling Mechanism | Revenue Decoupling Mechanism | QUANTITY | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Securitization Offset Charge | Securitization Offset Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Securitization Charge | Securitization Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Delivery Service Adjustment | Delivery Service Adjustment | QUANTITY | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Minimum | Minimum | MINIMUM | — | ❌ | ❌ | ❌ | $0.56 |
-| Increase in Rates and  Charg | Increase in Rates and  Charges to Reco | — | — | ❌ | ❌ | ❌ | — |
-| Costumer Benefit Contributio | Costumer Benefit Contribution - Reside | — | — | ❌ | ❌ | ❌ | — |
-| Merchant Function Charge - R | Merchant Function Charge - Residential | — | — | ❌ | ❌ | ❌ | — |
-| Power Supply Charge - 194 | Power Supply Charge - 194 | — | — | ❌ | ❌ | ❌ | — |
-| Rates and Charges to Recover | Rate for Cities and Incorporated Villa | QUANTITY | — | ❌ | ❌ | ❌ | $1.1404 |
-| Rates and Charges to Recover | Rate for Cities and Incorporated Villa | QUANTITY | — | ❌ | ❌ | ❌ | $3.5921 |
-| Costumer Benefit Contributio | Costumer Benefit Contribution | QUANTITY | — | ❌ | ❌ | ❌ | $0.0372 |
-| Merchant Function Charge | Merchant Function Charge | CONSUMPTION_BASED | SUPPLY | ❌ | ❌ | ❌ | $0.001764 |
-| Power Supply Charge | Power Supply Charge - Summer Peak | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ✅ | ❌ | $0.286622 |
-| Power Supply Charge | Power Supply Charge - Summer Off-Peak | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ✅ | ❌ | $0.121967 |
-| Power Supply Charge | Power Supply Charge - Winter On-Peak | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ✅ | ❌ | $0.313587 |
-| Power Supply Charge | Power Supply Charge - Winter Off-Peak | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ✅ | ❌ | $0.121967 |
+| Rate Group                   | Rate Name                              | Charge Type       | Charge Class      | Zone | Season | Tiered | Rate Value |
+| ---------------------------- | -------------------------------------- | ----------------- | ----------------- | :--: | :----: | :----: | ---------- |
+| Service Charge               | Service Charge                         | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.56      |
+| Energy Charge                | Energy Charge - Summer Peak            | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ✅   |   ❌   | $0.2217    |
+| Energy Charge                | Energy Charge - Summer Off-Peak        | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ✅   |   ❌   | $0.1093    |
+| Energy Charge                | Energy Charge - Winter Peak            | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ✅   |   ❌   | $0.1885    |
+| Energy Charge                | Energy Charge - Winter Off-Peak        | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ✅   |   ❌   | $0.0929    |
+| Shoreham Property Tax (SPT)  | Shoreham Property Tax (SPT) Settlement | QUANTITY          | —                 |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Shoreham Property Tax (SPT)  | Shoreham Property Tax (SPT) Settlement | QUANTITY          | —                 |  ✅  |   ❌   |   ❌   | —          |
+| Distributed Energy Resources | Distributed Energy Resources Cost Reco | CONSUMPTION_BASED | —                 |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| New York State Assessment    | New York State Assessment              | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Revenue Decoupling Mechanism | Revenue Decoupling Mechanism           | QUANTITY          | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Securitization Offset Charge | Securitization Offset Charge           | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Securitization Charge        | Securitization Charge                  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Service Adjustment  | Delivery Service Adjustment            | QUANTITY          | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Minimum                      | Minimum                                | MINIMUM           | —                 |  ❌  |   ❌   |   ❌   | $0.56      |
+| Increase in Rates and Charg  | Increase in Rates and Charges to Reco  | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Costumer Benefit Contributio | Costumer Benefit Contribution - Reside | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Merchant Function Charge - R | Merchant Function Charge - Residential | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Power Supply Charge - 194    | Power Supply Charge - 194              | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Rates and Charges to Recover | Rate for Cities and Incorporated Villa | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $1.1404    |
+| Rates and Charges to Recover | Rate for Cities and Incorporated Villa | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $3.5921    |
+| Costumer Benefit Contributio | Costumer Benefit Contribution          | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $0.0372    |
+| Merchant Function Charge     | Merchant Function Charge               | CONSUMPTION_BASED | SUPPLY            |  ❌  |   ❌   |   ❌   | $0.001764  |
+| Power Supply Charge          | Power Supply Charge - Summer Peak      | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ✅   |   ❌   | $0.286622  |
+| Power Supply Charge          | Power Supply Charge - Summer Off-Peak  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ✅   |   ❌   | $0.121967  |
+| Power Supply Charge          | Power Supply Charge - Winter On-Peak   | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ✅   |   ❌   | $0.313587  |
+| Power Supply Charge          | Power Supply Charge - Winter Off-Peak  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ✅   |   ❌   | $0.121967  |
 
 ---
 
@@ -133,9 +133,9 @@ These are the default supply (commodity) rates for customers who do not choose a
 
 Example: Summer month, 500 kWh, 300 kWh off-peak and 200 kWh peak (simplified).
 
-**Delivery:** Service $0.56×30 ≈ $16.80; Energy 200×$0.2217 + 300×$0.1093 ≈ $99.21; other delivery adjustments (lookups) ≈ $5–15.  
-**Supply:** 200×$0.286622 + 300×$0.121967 ≈ $97.47; MFC 500×$0.001764 ≈ $0.88.  
-**Riders/other:** CBC (if no solar $0), pilot, SPT, etc. (lookups).  
+**Delivery:** Service $0.56×30 ≈ $16.80; Energy 200×$0.2217 + 300×$0.1093 ≈ $99.21; other delivery adjustments (lookups) ≈ $5–15.
+**Supply:** 200×$0.286622 + 300×$0.121967 ≈ $97.47; MFC 500×$0.001764 ≈ $0.88.
+**Riders/other:** CBC (if no solar $0), pilot, SPT, etc. (lookups).
 **Minimum:** At least $0.56×30 = $16.80.
 
 Total will vary with actual TOU split and lookup values.

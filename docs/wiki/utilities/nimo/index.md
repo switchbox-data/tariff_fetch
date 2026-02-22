@@ -10,19 +10,19 @@ National Grid – New York (formerly Niagara Mohawk) serves a large portion of U
 
 ## Service Territory
 
-| Zone       | Territory ID | Area         |
-| ---------- | ------------ | ------------ |
-| Adirondack | 3628         | North        |
-| Capital    | 3631         | Albany area  |
-| Central    | 3627         | Syracuse area|
-| Frontier   | 3625         | Western NY   |
+| Zone       | Territory ID | Area           |
+| ---------- | ------------ | -------------- |
+| Adirondack | 3628         | North          |
+| Capital    | 3631         | Albany area    |
+| Central    | 3627         | Syracuse area  |
+| Frontier   | 3625         | Western NY     |
 | Genesee    | 3626         | Rochester area |
-| Utica      | 3629         | Utica area   |
+| Utica      | 3629         | Utica area     |
 
 ## Residential Tariffs
 
-| Tariff | Name               | Type    | Key Feature        | Guide                                |
-| ------ | ------------------ | ------- | ------------------ | ------------------------------------ |
+| Tariff | Name                 | Type    | Key Feature                 | Guide                                  |
+| ------ | -------------------- | ------- | --------------------------- | -------------------------------------- |
 | SC1    | Residential and Farm | Default | Zone-specific; flat, no TOU | [View Guide](residential-sc1/index.md) |
 
 ## Key Characteristics

@@ -20,38 +20,38 @@ This is a **flat, non–time-of-use rate** for delivery: one customer charge, on
 
 ## Quick Reference: All Charges
 
-| Rate Group | Rate Name | Charge Type | Charge Class | Zone | Season | Tiered | Rate Value |
-| ---------- | --------- | ----------- | ------------ | :--: | :----: | :----: | ---------- |
-| Delivery Charge | Customer Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $19.0 |
-| Delivery Charge | Bill Issuance Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $0.89 |
-| Delivery Charge | Energy Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.09507 |
-| Delivery Charge | Revenue Decoupling Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Make-Whole Energy Charge | Make-Whole Energy Charge | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | $0.00276 |
-| Residential Agricultural Dis | Residential Agricultural Discount | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | _Lookup_ |
-| Transition Charge Statement | Transition Charge Statement | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Merchant Function Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| System Benefits Charge | System Benefits Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Supply Service Charge | Supply Service Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Supply Service Charge | Supply Service Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| Clean Energy Standard Surcha | Clean Energy Standard Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Supply Service Charge | Supply Service Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ✅ | ❌ | ❌ | _Lookup_ |
-| DLM Surcharge | DLM Surcharge | — | — | ❌ | ❌ | ❌ | — |
-| Rate Adjustment Mechanism -  | Rate Adjustment Mechanism - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| CBC Rider | CBC Rider | — | — | ❌ | ❌ | ❌ | — |
-| Electric Vehicle Make Ready  | Electric Vehicle Make Ready Surcharge  | — | — | ❌ | ❌ | ❌ | — |
-| Late Payment Charge and Othe | Late Payment Charge and Other Waived F | — | — | ❌ | ❌ | ❌ | — |
-| Arrears Relief Program - SC1 | Arrears Relief Program - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| Recovery Charge Statement | Recovery Charge Statement | — | — | ❌ | ❌ | ❌ | — |
-| Dynamic Load Management | Dynamic Load Management | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | _Lookup_ |
-| Rate Adjustment Mechanism | Rate Adjustment Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00032 |
-| Customer Benefit Contributio | Customer Benefit Contribution | QUANTITY | — | ❌ | ❌ | ❌ | $1.1917 |
-| Electric Vehicle Make Ready  | Electric Vehicle Make Ready Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.000127 |
-| Late Payment Charge and Othe | Late Payment Charge and Other Waived F | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | — |
-| Arrears Relief Program | Arrears Relief Program - Phase 1 | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | — |
-| Arrears Relief Program | Arrears Relief Program - Phase 2 | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | — |
-| Recovery Charge | Recovery Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.009922 |
+| Rate Group                   | Rate Name                              | Charge Type       | Charge Class      | Zone | Season | Tiered | Rate Value |
+| ---------------------------- | -------------------------------------- | ----------------- | ----------------- | :--: | :----: | :----: | ---------- |
+| Delivery Charge              | Customer Charge                        | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $19.0      |
+| Delivery Charge              | Bill Issuance Charge                   | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.89      |
+| Delivery Charge              | Energy Charge                          | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.09507   |
+| Delivery Charge              | Revenue Decoupling Charge              | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Make-Whole Energy Charge     | Make-Whole Energy Charge               | CONSUMPTION_BASED | —                 |  ❌  |   ❌   |   ❌   | $0.00276   |
+| Residential Agricultural Dis | Residential Agricultural Discount      | CONSUMPTION_BASED | —                 |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Transition Charge Statement  | Transition Charge Statement            | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Merchant Function Charge               | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| System Benefits Charge       | System Benefits Charge                 | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Supply Service Charge        | Supply Service Charge                  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Supply Service Charge        | Supply Service Charge                  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| Clean Energy Standard Surcha | Clean Energy Standard Surcharge        | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Supply Service Charge        | Supply Service Charge                  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ✅  |   ❌   |   ❌   | _Lookup_   |
+| DLM Surcharge                | DLM Surcharge                          | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Rate Adjustment Mechanism -  | Rate Adjustment Mechanism - SC1        | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism - SC1    | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| CBC Rider                    | CBC Rider                              | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Electric Vehicle Make Ready  | Electric Vehicle Make Ready Surcharge  | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Late Payment Charge and Othe | Late Payment Charge and Other Waived F | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Arrears Relief Program - SC1 | Arrears Relief Program - SC1           | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Recovery Charge Statement    | Recovery Charge Statement              | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Dynamic Load Management      | Dynamic Load Management                | CONSUMPTION_BASED | —                 |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Rate Adjustment Mechanism    | Rate Adjustment Mechanism              | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism          | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00032   |
+| Customer Benefit Contributio | Customer Benefit Contribution          | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $1.1917    |
+| Electric Vehicle Make Ready  | Electric Vehicle Make Ready Surcharge  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.000127  |
+| Late Payment Charge and Othe | Late Payment Charge and Other Waived F | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | —          |
+| Arrears Relief Program       | Arrears Relief Program - Phase 1       | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | —          |
+| Arrears Relief Program       | Arrears Relief Program - Phase 2       | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | —          |
+| Recovery Charge              | Recovery Charge                        | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.009922  |
 
 ---
 
@@ -59,8 +59,8 @@ This is a **flat, non–time-of-use rate** for delivery: one customer charge, on
 
 ### Delivery Charge (Customer / Bill / Energy)
 
-**Customer Charge — $19.00/month**  
-**Bill Issuance Charge — $0.89/month**  
+**Customer Charge — $19.00/month**
+**Bill Issuance Charge — $0.89/month**
 **Energy Charge — $0.09507/kWh**
 
 Fixed and volumetric delivery components that recover distribution revenue requirement.

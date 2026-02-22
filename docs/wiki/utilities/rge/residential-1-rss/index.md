@@ -20,34 +20,34 @@ This is a **flat, non–time-of-use rate**: one delivery rate and one supply rat
 
 ## Quick Reference: All Charges
 
-| Rate Group | Rate Name | Charge Type | Charge Class | Zone | Season | Tiered | Rate Value |
-| ---------- | --------- | ----------- | ------------ | :--: | :----: | :----: | ---------- |
-| Customer Charge | Customer Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $23.0 |
-| Bill Issuance Charge | Bill Issuance Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $0.99 |
-| Energy Delivery Charge | Energy Delivery Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.08316 |
-| Energy Delivery Charge | Make-Whole Energy | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00221 |
-| System Benefits Charge | System Benefits Charge - Energy Effici | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Merchant Function Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Transition Charge | Transition Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| System Benefits Charge | System Benefits Charge (Clean Energy F | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Revenue Decoupling Mechanism | Revenue Decoupling Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Supply Charge | Supply Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Minimum | Minimum | MINIMUM | — | ❌ | ❌ | ❌ | $23.99 |
-| Residential Agricultural Dis | Residential Agricultural Discount | — | — | ❌ | ❌ | ❌ | — |
-| Clean Energy Standard | Clean Energy Standard | — | — | ❌ | ❌ | ❌ | — |
-| Rate Adjustment Mechanism -  | Rate Adjustment Mechanism - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| Dynamic Load Management - SC | Dynamic Load Management - SC1 | — | — | ❌ | ❌ | ❌ | — |
-| Low Income Program Discount | Low Income Program Discount | — | — | ❌ | ❌ | ❌ | — |
-| CBC Rider | CBC Rider | — | — | ❌ | ❌ | ❌ | — |
-| Residential Agricultural Dis | Residential Agricultural Discount | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Clean Energy Standard | Renewable Energy Credit | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | $0.00103 |
-| Clean Energy Standard | Zero Emission Credit | CONSUMPTION_BASED | — | ❌ | ❌ | ❌ | $0.00299 |
-| Rate Adjustment Mechanism | Rate Adjustment Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00029 |
-| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $4.7e-05 |
-| Dynamic Load Management | Dynamic Load Management | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $8.4e-05 |
-| Low Income Program Discount | Low Income Program Discount | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ✅ | tiered |
-| Customer Benefit Contributio | Customer Benefit Contribution | QUANTITY | — | ❌ | ❌ | ❌ | $1.3056 |
+| Rate Group                   | Rate Name                              | Charge Type       | Charge Class      | Zone | Season | Tiered | Rate Value |
+| ---------------------------- | -------------------------------------- | ----------------- | ----------------- | :--: | :----: | :----: | ---------- |
+| Customer Charge              | Customer Charge                        | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $23.0      |
+| Bill Issuance Charge         | Bill Issuance Charge                   | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.99      |
+| Energy Delivery Charge       | Energy Delivery Charge                 | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.08316   |
+| Energy Delivery Charge       | Make-Whole Energy                      | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00221   |
+| System Benefits Charge       | System Benefits Charge - Energy Effici | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Merchant Function Charge               | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Transition Charge            | Transition Charge                      | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| System Benefits Charge       | System Benefits Charge (Clean Energy F | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Revenue Decoupling Mechanism | Revenue Decoupling Mechanism           | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Supply Charge                | Supply Charge                          | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Minimum                      | Minimum                                | MINIMUM           | —                 |  ❌  |   ❌   |   ❌   | $23.99     |
+| Residential Agricultural Dis | Residential Agricultural Discount      | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Clean Energy Standard        | Clean Energy Standard                  | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Rate Adjustment Mechanism -  | Rate Adjustment Mechanism - SC1        | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism - SC1    | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Dynamic Load Management - SC | Dynamic Load Management - SC1          | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Low Income Program Discount  | Low Income Program Discount            | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| CBC Rider                    | CBC Rider                              | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Residential Agricultural Dis | Residential Agricultural Discount      | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Clean Energy Standard        | Renewable Energy Credit                | CONSUMPTION_BASED | —                 |  ❌  |   ❌   |   ❌   | $0.00103   |
+| Clean Energy Standard        | Zero Emission Credit                   | CONSUMPTION_BASED | —                 |  ❌  |   ❌   |   ❌   | $0.00299   |
+| Rate Adjustment Mechanism    | Rate Adjustment Mechanism              | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00029   |
+| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism          | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $4.7e-05   |
+| Dynamic Load Management      | Dynamic Load Management                | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $8.4e-05   |
+| Low Income Program Discount  | Low Income Program Discount            | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ✅   | tiered     |
+| Customer Benefit Contributio | Customer Benefit Contribution          | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $1.3056    |
 
 ---
 

@@ -14,9 +14,9 @@ Single primary territory (territoryId 1114) for default residential rates; no zo
 
 ## Residential Tariffs
 
-| Tariff  | Name       | Type    | Key Feature              | Guide                                        |
-| ------- | ---------- | ------- | ------------------------ | -------------------------------------------- |
-| 1-RSS   | Residential | Default | Flat rate, no TOU        | [View Guide](residential-1-rss/index.md)     |
+| Tariff | Name        | Type    | Key Feature       | Guide                                    |
+| ------ | ----------- | ------- | ----------------- | ---------------------------------------- |
+| 1-RSS  | Residential | Default | Flat rate, no TOU | [View Guide](residential-1-rss/index.md) |
 
 ## Key Characteristics
 

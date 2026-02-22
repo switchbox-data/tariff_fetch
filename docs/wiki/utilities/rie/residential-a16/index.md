@@ -20,33 +20,33 @@ This is a **flat, non-TOU** rate. Delivery components in the tariff include: cus
 
 ## Quick Reference: All Charges
 
-| Rate Group | Rate Name | Charge Type | Charge Class | Zone | Season | Tiered | Rate Value |
-| ---------- | --------- | ----------- | ------------ | :--: | :----: | :----: | ---------- |
-| Delivery Service Charge | Customer Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $6.0 |
-| Delivery Service Charge | Distribution Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.0458 |
-| Delivery Service Charge | Operating & Maintenance Exp Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00223 |
-| Delivery Service Charge | O&M Reconciliation Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Delivery Service Charge | CapEx Factor Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00832 |
-| Delivery Service Charge | CapEx Reconciliation Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Delivery Service Charge | RDM Adjustment Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Delivery Service Charge | Pension Adjustment Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00339 |
-| Delivery Service Charge | Storm Fund Replenishment Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | — |
-| Delivery Service Charge | Arrearage Management Adjustment Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $6e-05 |
-| Delivery Service Charge | Low-Income Discount Recovery Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.00251 |
-| Delivery Service Charge | Performance Incentive Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | — |
-| Delivery Service Charge | Last Resort Adjustment Factor | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | — |
-| Renewable Energy Distributio | Net Metering Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.01457 |
-| Renewable Energy Distributio | Long Term Contracting Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| RE Growth Charge | RE Growth Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| LIHEAP Enhancement Charge | LIHEAP Enhancement Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Transmission Charge | Transmission Charge | CONSUMPTION_BASED | TRANSMISSION | ❌ | ❌ | ❌ | $0.04773 |
-| Transition Charge | Transition Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $1e-05 |
-| Energy Efficiency Programs C | Energy Efficiency Programs Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Standard Offer Service Charg | Standard Offer Service Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Minimum | Minimum | MINIMUM | — | ❌ | ❌ | ❌ | $6.0 |
-| Renewable Standard Energy Ch | Renewable Standard Energy Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Gross Earnings Tax | Gross Earnings Tax | — | — | ❌ | ❌ | ❌ | — |
-| Gross Earnings Tax | Gross Earnings Tax | QUANTITY | — | ❌ | ❌ | ❌ | $4.166667 |
+| Rate Group                   | Rate Name                              | Charge Type       | Charge Class      | Zone | Season | Tiered | Rate Value |
+| ---------------------------- | -------------------------------------- | ----------------- | ----------------- | :--: | :----: | :----: | ---------- |
+| Delivery Service Charge      | Customer Charge                        | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $6.0       |
+| Delivery Service Charge      | Distribution Charge                    | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.0458    |
+| Delivery Service Charge      | Operating & Maintenance Exp Charge     | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00223   |
+| Delivery Service Charge      | O&M Reconciliation Factor              | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Service Charge      | CapEx Factor Charge                    | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00832   |
+| Delivery Service Charge      | CapEx Reconciliation Factor            | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Service Charge      | RDM Adjustment Factor                  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Delivery Service Charge      | Pension Adjustment Factor              | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00339   |
+| Delivery Service Charge      | Storm Fund Replenishment Factor        | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | —          |
+| Delivery Service Charge      | Arrearage Management Adjustment Factor | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $6e-05     |
+| Delivery Service Charge      | Low-Income Discount Recovery Factor    | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.00251   |
+| Delivery Service Charge      | Performance Incentive Factor           | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | —          |
+| Delivery Service Charge      | Last Resort Adjustment Factor          | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | —          |
+| Renewable Energy Distributio | Net Metering Charge                    | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.01457   |
+| Renewable Energy Distributio | Long Term Contracting Charge           | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| RE Growth Charge             | RE Growth Charge                       | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| LIHEAP Enhancement Charge    | LIHEAP Enhancement Charge              | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Transmission Charge          | Transmission Charge                    | CONSUMPTION_BASED | TRANSMISSION      |  ❌  |   ❌   |   ❌   | $0.04773   |
+| Transition Charge            | Transition Charge                      | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $1e-05     |
+| Energy Efficiency Programs C | Energy Efficiency Programs Charge      | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Standard Offer Service Charg | Standard Offer Service Charge          | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Minimum                      | Minimum                                | MINIMUM           | —                 |  ❌  |   ❌   |   ❌   | $6.0       |
+| Renewable Standard Energy Ch | Renewable Standard Energy Charge       | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Gross Earnings Tax           | Gross Earnings Tax                     | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Gross Earnings Tax           | Gross Earnings Tax                     | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $4.166667  |
 
 ---
 

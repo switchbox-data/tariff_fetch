@@ -14,8 +14,8 @@ Statewide Rhode Island (territoryId 545). Connection type and phase affect appli
 
 ## Residential Tariffs
 
-| Tariff | Name       | Type    | Key Feature              | Guide                                  |
-| ------ | ---------- | ------- | ------------------------ | -------------------------------------- |
+| Tariff | Name        | Type    | Key Feature                 | Guide                                  |
+| ------ | ----------- | ------- | --------------------------- | -------------------------------------- |
 | A-16   | Residential | Default | Flat; many delivery factors | [View Guide](residential-a16/index.md) |
 
 ## Key Characteristics

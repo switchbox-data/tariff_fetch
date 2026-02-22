@@ -18,28 +18,28 @@
 
 ## Quick Reference: All Charges
 
-| Rate Group | Rate Name | Charge Type | Charge Class | Zone | Season | Tiered | Rate Value |
-| ---------- | --------- | ----------- | ------------ | :--: | :----: | :----: | ---------- |
-| Customer Charge | Customer Charge | FIXED_PRICE | DISTRIBUTION | ❌ | ❌ | ❌ | $22.5 |
-| Energy Charge | Energy Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | $0.1386 |
-| Merchant Function Charge | Allocation of MFC Lost Revenue Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | Base MFC Supply Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Merchant Function Charge | MFC Administration Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Miscellaneous Charges  | Miscellaneous Charges  | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Market Price Charge | Market Price Charge | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| Revenue Decoupling Mechanism | Revenue Decoupling Mechanism | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Transition Adjustment | Transition Adjustment | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Purchased Power Adjustment  | Purchased Power Adjustment  | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Electric Bill Credit  | Electric Bill Credit  | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Market Price Adjustment | Market Price Adjustment | CONSUMPTION_BASED | SUPPLY,CONTRACTED | ❌ | ❌ | ❌ | _Lookup_ |
-| System Benefits Charge | System Benefits Charge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism Surcharg | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Rate Adjustment Mechanism Su | Rate Adjustment Mechanism Surcharge | CONSUMPTION_BASED | DISTRIBUTION | ❌ | ❌ | ❌ | _Lookup_ |
-| Minimum Charge | Minimum Charge | MINIMUM | — | ❌ | ❌ | ❌ | $22.5 |
-| Low Income Bill Discount | Low Income Bill Discount | — | — | ❌ | ❌ | ❌ | — |
-| CBC Rider | CBC Rider | — | — | ❌ | ❌ | ❌ | — |
-| Low Income Discount | Low Income Discount | FIXED_PRICE | — | ❌ | ❌ | ✅ | tiered |
-| Customer Benefit Contributio | Customer Benefit Contribution | QUANTITY | — | ❌ | ❌ | ❌ | $1.67 |
+| Rate Group                   | Rate Name                              | Charge Type       | Charge Class      | Zone | Season | Tiered | Rate Value |
+| ---------------------------- | -------------------------------------- | ----------------- | ----------------- | :--: | :----: | :----: | ---------- |
+| Customer Charge              | Customer Charge                        | FIXED_PRICE       | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $22.5      |
+| Energy Charge                | Energy Charge                          | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | $0.1386    |
+| Merchant Function Charge     | Allocation of MFC Lost Revenue Charge  | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | Base MFC Supply Charge                 | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Merchant Function Charge     | MFC Administration Charge              | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Miscellaneous Charges        | Miscellaneous Charges                  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Market Price Charge          | Market Price Charge                    | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Revenue Decoupling Mechanism | Revenue Decoupling Mechanism           | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Transition Adjustment        | Transition Adjustment                  | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Purchased Power Adjustment   | Purchased Power Adjustment             | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Electric Bill Credit         | Electric Bill Credit                   | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Market Price Adjustment      | Market Price Adjustment                | CONSUMPTION_BASED | SUPPLY,CONTRACTED |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| System Benefits Charge       | System Benefits Charge                 | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Earnings Adjustment Mechanis | Earnings Adjustment Mechanism Surcharg | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Rate Adjustment Mechanism Su | Rate Adjustment Mechanism Surcharge    | CONSUMPTION_BASED | DISTRIBUTION      |  ❌  |   ❌   |   ❌   | _Lookup_   |
+| Minimum Charge               | Minimum Charge                         | MINIMUM           | —                 |  ❌  |   ❌   |   ❌   | $22.5      |
+| Low Income Bill Discount     | Low Income Bill Discount               | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| CBC Rider                    | CBC Rider                              | —                 | —                 |  ❌  |   ❌   |   ❌   | —          |
+| Low Income Discount          | Low Income Discount                    | FIXED_PRICE       | —                 |  ❌  |   ❌   |   ✅   | tiered     |
+| Customer Benefit Contributio | Customer Benefit Contribution          | QUANTITY          | —                 |  ❌  |   ❌   |   ❌   | $1.67      |
 
 ---
 

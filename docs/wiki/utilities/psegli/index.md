@@ -10,16 +10,16 @@ PSEG Long Island operates the electric grid for the Long Island Power Authority 
 
 ## Service Territory
 
-| Territory | Territory ID | Area                    |
-| --------- | ------------ | ----------------------- |
-| Suffolk   | 3567         | Suffolk County          |
-| Outside Suffolk | 3711 | Nassau, Rockaways |
+| Territory       | Territory ID | Area              |
+| --------------- | ------------ | ----------------- |
+| Suffolk         | 3567         | Suffolk County    |
+| Outside Suffolk | 3711         | Nassau, Rockaways |
 
 ## Residential Tariffs
 
-| Tariff | Name       | Type    | Key Feature                    | Guide                                  |
-| ------ | ---------- | ------- | ------------------------------ | -------------------------------------- |
-| 194    | Residential | Default | TOU (peak 3–7 PM weekdays)     | [View Guide](residential-194/index.md) |
+| Tariff | Name        | Type    | Key Feature                | Guide                                  |
+| ------ | ----------- | ------- | -------------------------- | -------------------------------------- |
+| 194    | Residential | Default | TOU (peak 3–7 PM weekdays) | [View Guide](residential-194/index.md) |
 
 ## Key Characteristics
 
