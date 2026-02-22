@@ -53,71 +53,163 @@ This is a **flat, non–time-of-use rate**: one delivery rate and one supply rat
 
 ## Charge-by-Charge Breakdown
 
-### Customer Charge — $23.00/month
+### Basic Service Charges
 
-Fixed monthly charge for account and metering.
+#### Customer Charge — $23.00/month
 
-### Bill Issuance Charge — $0.99/month
+A flat monthly fee that covers the cost of having an account: metering, billing systems, customer service. Everyone pays this regardless of usage. RG&E's customer charge is set in rate cases and remains fixed until the next case.
 
-Covers billing and payment processing.
+#### Bill Issuance Charge — $0.99/month
 
-### Energy Delivery Charge — $0.08316/kWh
+Covers the cost of generating and mailing bills and processing payments. Like other NY utilities, RG&E unbundled this from the base customer charge so the recovery of billing costs is transparent. All residential customers pay it.
 
-Main volumetric delivery rate. Recover distribution revenue requirement set in rate cases.
+---
 
-### Make-Whole Energy — $0.00221/kWh
+### Delivery Charges
 
-Delivery-side adjustment (make-whole energy) per kWh.
+These are charges for using RG&E's distribution network (wires, poles, transformers) in the Rochester area. They are regulated by the NY PSC.
 
-### System Benefits Charge (Energy Efficiency / Clean Energy Fund) — _Lookup_
+#### Energy Delivery Charge — $0.08316/kWh
 
-NYSERDA-related programs; values from lookup.
+The main volumetric delivery rate. It recovers the distribution revenue requirement set in rate cases—the cost of building and maintaining the local grid. This is a flat rate: the same per-kWh amount regardless of time of day or season. It applies to every kWh you use.
 
-### Merchant Function Charge — _Lookup_
+#### Make-Whole Energy — $0.00221/kWh
 
-Cost to administer default supply; lookup.
+A small per-kWh delivery adjustment that true-ups energy-related costs that are not fully captured in the base energy delivery charge. It is set to recover specific cost shortfalls or deferrals approved by the PSC. The rate is fixed in the tariff but the mechanism may be reconciled periodically.
 
-### Transition Charge — _Lookup_
+#### System Benefits Charge (Energy Efficiency) — _Variable_
 
-Legacy restructuring costs; lookup.
+Funds energy efficiency programs administered by NYSERDA and related initiatives. The amount is set by the PSC and can change; use the Arcadia Lookups API for current values. All customers pay this as a per-kWh charge on delivery.
 
-### Supply Charge — _Lookup_
+#### System Benefits Charge (Clean Energy Fund) — _Variable_
 
-Default commodity supply; variable, from lookup.
+Supports NY's clean energy fund and related programs (renewables, research, low-income energy assistance). Like the energy efficiency component, it is a variable per-kWh delivery charge; current values require a lookup.
 
-### Minimum — $23.99/month
+#### Transition Charge — _Variable_
 
-Floor on total bill (customer + bill issuance level).
+Recovers legacy costs from New York's electricity restructuring in the 1990s. These are deferred or stranded costs that utilities are allowed to collect over time. The rate changes as the balance is paid down; use the Lookups API for the current value.
 
-### Residential Agricultural Discount — _Lookup_
+#### Revenue Decoupling Mechanism — _Variable_
 
-Credit for RAD participants; applicability and amount from lookup.
+Part of NY's decoupling policy: RG&E's allowed delivery revenue is decoupled from sales volume. If customers use less than forecast, this adjustment moves up (and vice versa) so the utility neither gains nor loses from conservation. Typically reconciled on an annual or periodic basis. Value from lookup.
 
-### Clean Energy Standard (REC / ZEC) — $0.00103 + $0.00299/kWh
+---
 
-Renewable Energy Credit and Zero Emission Credit components; fixed rates in JSON.
+### Supply Charges
 
-### Rate Adjustment Mechanism / Earnings Adjustment Mechanism — $0.00029, $0.000047/kWh
+These charges apply only if you take default supply from RG&E (RSS). If you choose an ESCO, you do not pay RG&E's supply charge or merchant function charge.
 
-Delivery adjustment mechanisms; true-ups to allowed revenue/earnings.
+#### Merchant Function Charge — _Variable_
 
-### Dynamic Load Management — $0.000084/kWh
+Covers RG&E's costs to administer default supply service: procurement, risk management, billing, and related staff and systems. It is a per-kWh charge that varies; use the Lookups API. Only default-supply customers pay it.
 
-Demand response program recovery.
+#### Supply Charge — _Variable_
 
-### Low Income Program Discount
+The commodity cost of electricity. RG&E purchases power and passes it through at a variable price that reflects market conditions and the utility's supply portfolio. The rate changes frequently (e.g. monthly or as filed); always use the Lookups API for current supply rates.
 
-Tiered bill credit for HEAP-eligible customers (Tier 1–4); see `lowIncomeHEAPTier` property.
+---
 
-### Customer Benefit Contribution — $1.3056/kW (solar)
+### Clean Energy Standard
 
-Per-kW charge for solar customers (VDER/CBC).
+#### Renewable Energy Credit — $0.00103/kWh
+
+Recovers the cost of Renewable Energy Credits (RECs) that RG&E or the state acquires to meet NY's clean energy targets. This fixed per-kWh rate is in the tariff; it funds renewable generation support.
+
+#### Zero Emission Credit — $0.00299/kWh
+
+Recovers the cost of Zero Emission Credits (ZECs), which support upstate nuclear plants under NY policy. The rate is fixed in the tariff. All customers pay REC and ZEC as part of the Clean Energy Standard.
+
+---
+
+### Minimum Charge
+
+#### Minimum — $23.99/month
+
+If your total bill (before any taxes or credits) is less than $23.99, you pay $23.99 anyway. The minimum is set at the level of the customer charge plus the bill issuance charge, so RG&E recovers at least the fixed cost of serving the account. Very low usage or net-metered customers may hit this floor.
+
+---
+
+### Rider Charges
+
+Riders are add-on tariff components that apply across rate schedules. They are updated separately from the base rate case.
+
+#### Rate Adjustment Mechanism — $0.00029/kWh
+
+A delivery adjustment that true-ups actual revenue or costs to the levels allowed by the PSC. It can be a small surcharge or credit depending on whether the utility over- or under-collected. The rate shown here is from the tariff; it may be updated periodically.
+
+#### Earnings Adjustment Mechanism — $0.000047/kWh
+
+Another delivery true-up that aligns actual earnings with allowed earnings. It is typically a small per-kWh amount. Together with the Rate Adjustment Mechanism, it keeps delivery revenue in line with the commission's decisions.
+
+#### Dynamic Load Management — $0.000084/kWh
+
+Recovers the cost of RG&E's demand response programs: paying customers or batteries to reduce load during peak periods. Part of NY's grid modernization and reliability efforts. All customers pay this small per-kWh amount.
+
+#### Low Income Program Discount
+
+A bill credit for customers who receive HEAP (Home Energy Assistance Program) benefits. The credit is tiered (Tier 1–4) based on the type of HEAP grant and add-on benefits; see the `lowIncomeHEAPTier` property in the tariff. If you do not receive HEAP, this is $0. Not a charge—a credit that reduces the bill.
+
+#### Customer Benefit Contribution — $1.3056/kW of solar system size
+
+**Only applies to customers with solar panels.** A monthly fee based on your system's nameplate capacity (kW). Created under NY's VDER reforms so solar customers contribute to grid costs. If you do not have solar (`systemSize = 0`), this is $0. Billed per kW of capacity, not per kWh.
+
+#### Residential Agricultural Discount — _Variable_
+
+A credit for customers who qualify under the Residential Agricultural Discount (RAD) program. Eligibility and the credit amount are determined by RG&E and the PSC; the tariff references a lookup or applicability rule. Most residential customers do not receive RAD; if you do not qualify, this line is $0.
 
 ---
 
 ## Example Bill Calculation
 
-500 kWh, no solar, no RAD, no LMI: Customer $23 + Bill $0.99 + Delivery 500×$0.08316 + Make-Whole 500×$0.00221 ≈ $44.19 delivery; Supply and MFC from lookup; RAM/EAM/DLM/CBC/other add small amounts. Minimum $23.99. Total varies with supply lookup.
+A customer in July using 500 kWh, with default supply (RSS), no solar, no RAD, and no low-income discount:
+
+### Delivery Charges
+
+| Charge                | Calculation                     | Amount       |
+| --------------------- | ------------------------------- | ------------ |
+| Customer Charge       | $23.00                          | $23.00       |
+| Bill Issuance Charge  | $0.99                           | $0.99        |
+| Energy Delivery       | 500 kWh × $0.08316             | $41.58       |
+| Make-Whole Energy     | 500 kWh × $0.00221             | $1.11        |
+| SBC (EE + CEF)        | 500 kWh × ~$0.004 (varies)     | ~$2.00       |
+| Transition Charge     | 500 kWh × ~$0.001 (varies)     | ~$0.50       |
+| Revenue Decoupling    | 500 kWh × ~$0.001 (varies)     | ~$0.50       |
+| **Subtotal Delivery** |                                 | **~$69.68**  |
+
+### Supply Charges
+
+| Charge        | Calculation                    | Amount      |
+| ------------- | ------------------------------ | ----------- |
+| Supply Charge | 500 kWh × ~$0.07 (varies)      | ~$35.00     |
+| Merchant Function | 500 kWh × ~$0.002 (varies)  | ~$1.00      |
+| **Subtotal Supply** |                             | **~$36.00** |
+
+### Riders & Other
+
+| Charge        | Calculation                     | Amount      |
+| ------------- | ------------------------------- | ----------- |
+| REC           | 500 kWh × $0.00103             | $0.52       |
+| ZEC           | 500 kWh × $0.00299             | $1.50       |
+| RAM           | 500 kWh × $0.00029             | $0.15       |
+| EAM           | 500 kWh × $0.000047            | $0.02       |
+| DLM           | 500 kWh × $0.000084            | $0.04       |
+| CBC (no solar)| $0                              | $0.00       |
+| **Subtotal Riders** |                             | **~$2.23**  |
+
+### Total
+
+**~$107.91** for 500 kWh (assuming approximate variable rates above). Supply and some delivery components (SBC, transition, RDM, MFC) vary; use the Lookups API for a given month. Minimum charge is $23.99; this example is well above that.
+
+### Breakdown by Category
+
+| Category              | Amount   | % of Bill |
+| --------------------- | -------- | --------- |
+| Fixed Charges         | $23.99   | 22%       |
+| Delivery (Volumetric) | ~$45.69  | 42%       |
+| Supply                | ~$36.00  | 33%       |
+| Riders & Other        | ~$2.23   | 2%        |
+
+**Key insight**: On 1-RSS, delivery (fixed plus volumetric) and supply each make up a large share of the bill. The flat delivery rate and fixed REC/ZEC/RAM/EAM/DLM amounts make the bill easy to approximate for a given usage once supply and variable delivery components are known from lookups.
 
 ---
 

@@ -57,75 +57,164 @@ This is a **flat, non–time-of-use rate** for delivery: one customer charge, on
 
 ## Charge-by-Charge Breakdown
 
-### Delivery Charge (Customer / Bill / Energy)
+### Basic Service Charges
 
-**Customer Charge — $19.00/month**
-**Bill Issuance Charge — $0.89/month**
-**Energy Charge — $0.09507/kWh**
+#### Customer Charge — $19.00/month
 
-Fixed and volumetric delivery components that recover distribution revenue requirement.
+A flat monthly fee that covers the cost of having an account: metering, billing systems, customer service. Everyone pays this regardless of usage. NYSEG's customer charge is set in rate cases and applies across the East, West, and Lower Hudson Valley territories.
 
-### Revenue Decoupling Charge — _Lookup_
+#### Bill Issuance Charge — $0.89/month
 
-Decoupling adjustment; value from lookup.
+Covers the cost of generating and mailing bills and processing payments. Unbundled from the base customer charge so billing cost recovery is transparent. All SC1 customers pay it.
 
-### Make-Whole Energy Charge — $0.00276/kWh
+---
 
-Delivery make-whole component.
+### Delivery Charges
 
-### Residential Agricultural Discount — _Lookup_
+These are charges for using NYSEG's distribution network across Upstate New York (East, West, and Lower Hudson Valley). They are regulated by the NY PSC.
 
-Credit for RAD participants; applicability and amount from lookup.
+#### Energy Charge — $0.09507/kWh
 
-### Transition Charge Statement — _Lookup_
+The main volumetric delivery rate. It recovers the distribution revenue requirement set in rate cases—the cost of the local wires, poles, and transformers. Flat rate: same per-kWh amount regardless of time of day or season. Applies to every kWh you use.
 
-Legacy restructuring; lookup.
+#### Revenue Decoupling Charge — _Variable_
 
-### Merchant Function Charge — _Lookup_
+Part of NY's decoupling policy: NYSEG's allowed delivery revenue is decoupled from sales volume. If customers use less than forecast, this charge adjusts upward (and vice versa) so the utility is neutral to conservation. Typically reconciled periodically. Use the Lookups API for current value.
 
-Default supply administration; lookup.
+#### Make-Whole Energy Charge — $0.00276/kWh
 
-### System Benefits Charge — _Lookup_
+A per-kWh delivery adjustment that true-ups energy-related costs not fully captured in the base energy charge. It recovers specific shortfalls or deferrals approved by the PSC. The rate is fixed in the tariff.
 
-NYSERDA programs; lookup.
+#### Residential Agricultural Discount — _Variable_
 
-### Supply Service Charge — _Lookup_ (by territory)
+A credit for customers who qualify under the Residential Agricultural Discount (RAD) program. Eligibility is based on participation in the RAD program for SC1, SC8, and SC12. If you are not a RAD participant, this line is $0. Amount from lookup when applicable.
 
-Default supply; zone-specific (East, Lower Hudson Valley, West).
+#### Transition Charge Statement — _Variable_
 
-### Clean Energy Standard Surcharge — _Lookup_
+Recovers legacy costs from New York's electricity restructuring. These are deferred or stranded costs that utilities collect over time. The rate changes as the balance is paid down; use the Lookups API for the current value.
 
-REC/ZEC and CES delivery; lookup.
+---
 
-### DLM Surcharge / Rate Adjustment / Earnings Adjustment — _Lookup_ or fixed
+### Supply Charges
 
-Dynamic load management and delivery adjustment mechanisms; EAM $0.00032/kWh in JSON.
+These charges apply only if you take default supply from NYSEG (NSS). If you choose an ESCO, you do not pay NYSEG's supply or merchant function charges.
 
-### Customer Benefit Contribution — $1.1917/kW (solar)
+#### Merchant Function Charge — _Variable_
 
-CBC for solar customers.
+Covers NYSEG's costs to administer default supply: procurement, risk management, billing. It is a per-kWh charge that varies; use the Lookups API. Only default-supply customers pay it.
 
-### Electric Vehicle Make Ready Surcharge — $0.000127/kWh
+#### Supply Service Charge — _Variable, by territory_
 
-EV infrastructure recovery.
+The commodity cost of electricity. NYSEG's default supply price **varies by territory**: East, Lower Hudson Valley, and West each have their own supply rate because wholesale and delivery costs differ across the service area. Use the Lookups API with the appropriate territory to get the current supply rate for your zone.
 
-### Late Payment / Waived Fees Surcharge — $0 (or variable)
+---
 
-Can be zero in tariff; may vary by program.
+### System Benefits Charge
 
-### Arrears Relief Program — Phase 1 & 2 — $0 (or variable)
+#### System Benefits Charge — _Variable_
 
-COVID-era arrears recovery; phases may be zero or lookup.
+Funds NY's clean energy programs administered by NYSERDA: energy efficiency rebates, low-income assistance, renewable energy research. Set by the PSC; all customers pay. The per-kWh rate changes; use the Lookups API for current values.
 
-### Recovery Charge — $0.009922/kWh
+---
 
-Additional recovery charge.
+### Clean Energy Standard Surcharge
+
+#### Clean Energy Standard Surcharge — _Variable_
+
+Recovers NYSEG's costs to comply with NY's Clean Energy Standard: RECs, ZECs, and related distribution-side compliance. The rate is variable; use the Lookups API.
+
+---
+
+### Rider Charges
+
+Riders are add-on tariff components that apply across rate schedules. NYSEG updates them separately from the base rate case.
+
+#### Rate Adjustment Mechanism — _Variable_
+
+A delivery adjustment that true-ups actual revenue or costs to PSC-allowed levels. It can be a small surcharge or credit. Value from lookup.
+
+#### Earnings Adjustment Mechanism — $0.00032/kWh
+
+Another delivery true-up that aligns actual earnings with allowed earnings. This fixed per-kWh rate appears in the tariff; it keeps delivery revenue in line with the commission's decisions.
+
+#### Dynamic Load Management — _Variable_
+
+Recovers the cost of NYSEG's demand response programs. Part of NY's grid modernization. All customers pay; amount from lookup.
+
+#### Customer Benefit Contribution — $1.1917/kW of solar system size
+
+**Only applies to customers with solar panels.** A monthly fee based on your system's nameplate capacity (kW). Part of NY's VDER reforms so solar customers contribute to grid costs. If you do not have solar (`systemSize = 0`), this is $0.
+
+#### Electric Vehicle Make Ready Surcharge — $0.000127/kWh
+
+Recovers NYSEG's costs for EV charging infrastructure: make-ready conduit and wiring for public and fleet charging. All customers pay this small per-kWh amount. Part of NY's EV infrastructure push.
+
+#### Late Payment Charge and Other Waived Fees Surcharge — $0 or _Variable_
+
+Can appear as zero in the tariff when waived fees are not being recovered; may be a small per-kWh amount in some periods. Check the tariff or lookup for current applicability.
+
+#### Arrears Relief Program — Phase 1 & Phase 2 — $0 or _Variable_
+
+Recovers costs from NYSEG's COVID-era arrears forgiveness and relief programs. Phases may be zero or a small per-kWh charge depending on recovery status. Many customers see $0 when the program is not actively recovering.
+
+#### Recovery Charge — $0.009922/kWh
+
+An additional per-kWh recovery charge that true-ups specific costs or revenue shortfalls approved by the PSC. Fixed in the tariff at this rate. All delivery customers pay it.
 
 ---
 
 ## Example Bill Calculation
 
-500 kWh, East territory, no solar, no RAD: Customer $19 + Bill $0.89 + Energy 500×$0.09507 ≈ $67.42 delivery; Make-Whole 500×$0.00276 ≈ $1.38; Supply (lookup by zone); Riders (RAM, EAM, DLM, EV, Recovery, etc.). Total varies with supply and lookups.
+A customer in the **East** territory in July using 500 kWh, with default supply (NSS), no solar, and no RAD:
+
+### Delivery Charges
+
+| Charge               | Calculation                     | Amount       |
+| -------------------- | ------------------------------- | ------------ |
+| Customer Charge      | $19.00                          | $19.00       |
+| Bill Issuance Charge | $0.89                           | $0.89        |
+| Energy Charge        | 500 kWh × $0.09507             | $47.54       |
+| Revenue Decoupling   | 500 kWh × ~$0.001 (varies)     | ~$0.50       |
+| Make-Whole Energy    | 500 kWh × $0.00276             | $1.38        |
+| Transition Charge    | 500 kWh × ~$0.001 (varies)     | ~$0.50       |
+| SBC                  | 500 kWh × ~$0.004 (varies)     | ~$2.00       |
+| CES Surcharge        | 500 kWh × ~$0.003 (varies)     | ~$1.50       |
+| **Subtotal Delivery**|                                 | **~$73.31**  |
+
+### Supply Charges
+
+| Charge        | Calculation                         | Amount      |
+| ------------- | ----------------------------------- | ----------- |
+| Supply (East) | 500 kWh × ~$0.07 (varies by zone)  | ~$35.00     |
+| Merchant Function | 500 kWh × ~$0.002 (varies)       | ~$1.00      |
+| **Subtotal Supply** |                                 | **~$36.00** |
+
+### Riders & Other
+
+| Charge      | Calculation              | Amount      |
+| ----------- | ------------------------ | ----------- |
+| RAM         | 500 kWh × ~$0.0005 (varies) | ~$0.25    |
+| EAM         | 500 kWh × $0.00032       | $0.16       |
+| DLM         | 500 kWh × ~$0.0001 (varies) | ~$0.05    |
+| EV Make Ready | 500 kWh × $0.000127    | $0.06       |
+| Recovery Charge | 500 kWh × $0.009922   | $4.96       |
+| CBC (no solar) | $0                    | $0.00       |
+| **Subtotal Riders** |                         | **~$5.48**  |
+
+### Total
+
+**~$114.79** for 500 kWh in July, East territory (assuming approximate variable rates above). Supply and several delivery components (RDM, transition, SBC, CES, RAM, DLM, MFC) vary; use the Lookups API for a given month and territory.
+
+### Breakdown by Category
+
+| Category              | Amount   | % of Bill |
+| --------------------- | -------- | --------- |
+| Fixed Charges         | $19.89   | 17%       |
+| Delivery (Volumetric) | ~$53.42  | 47%       |
+| Supply                | ~$36.00  | 31%       |
+| Riders & Other        | ~$5.48   | 5%        |
+
+**Key insight**: Delivery (fixed plus volumetric) and supply each make up a large share of the bill. The Recovery Charge is a meaningful fixed per-kWh rider; supply rate differs by territory (East, West, Lower Hudson Valley), so the same usage can yield a different total depending on where you are.
 
 ---
 

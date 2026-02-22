@@ -74,51 +74,173 @@ This is a **flat, non-TOU** rate: no time-of-use differentiation. Charges includ
 
 ## Charge-by-Charge Breakdown
 
-### Customer Charge / Energy Charge
+National Grid serves Upstate New York across **six zones**: Adirondack, Capital, Central, Frontier, Genesee, and Utica. The **base** customer and energy charges are the same everywhere; **zone-specific** delivery and supply adjustments (Delivery Charge Adjustment and Electric Supply Charge by zone) apply on top. Use the tariff or Lookups API with the correct zone (territoryId) to get delivery and supply amounts for your location.
 
-Fixed and volumetric delivery rates; **zone-specific** (Adirondack, Capital, Central, Frontier, Genesee, Utica). Core revenue requirement from rate cases.
+### Basic Service Charges
 
-### Income Eligible Basic Service Credit
+#### Basic Service Charge — $19.00/month
 
-Credit for qualifying low-income customers.
+A flat monthly fee that covers the cost of having an account: metering, billing systems, customer service. Everyone on SC1 pays it. Same in all zones. Set in National Grid's NY PSC rate cases.
 
-### RDM / Transmission Revenue Adjustment / Legacy Transition Charge
+#### Income Eligible Basic Service Credit — tiered (credit)
 
-Revenue decoupling, transmission true-ups, and restructuring legacy costs; often lookups.
+A **credit** (reduction) for qualifying low-income customers. Eligibility and tier determine the amount. Not applicable for most customers; when applicable it reduces the basic service (and possibly other) charges. Use the tariff applicability for income-eligible tiers.
 
-### Electricity Supply Charge
+---
 
-Default supply; **zone-specific**; many entries for each zone. Use territoryId to select zone.
+### Delivery Charges
 
-### SBC / Clean Energy Standard (Supply & Delivery)
+#### Energy Charge — $0.08889/kWh
 
-System benefits and CES; lookups or fixed.
+The main volumetric delivery rate. Recovers the distribution revenue requirement—the cost of the local wires, poles, and transformers. Flat rate; same in all zones. Applies to every kWh. Set in National Grid's rate cases.
 
-### Dynamic Load Management / Earnings Adjustment / Rate Adjustment Mechanism
+#### Delivery Charge Adjustment — _Variable, by zone_
 
-Demand response and delivery/revenue adjustment mechanisms.
+A **zone-specific** adjustment to the delivery charge. Each zone (Adirondack, Capital, Central, Frontier, Genesee, Utica) has its own adjustment factor or rate. It can be a surcharge or credit depending on the zone's cost allocation. Use the Lookups API with the correct zone to get the current delivery adjustment for your location.
 
-### Merchant Function Charge
+#### Revenue Decoupling Mechanism — _Variable_
 
-Default supply administration.
+Part of NY's decoupling policy: National Grid's allowed delivery revenue is decoupled from sales. This charge adjusts so the utility is neutral to conservation. Value from lookup.
 
-### GreenUp Rider / GreenUp Charge
+#### Transmission Revenue Adjustment — _Variable_
 
-Optional renewable product; only if customer opts in (greenUpProgramChoice property).
+True-up for transmission revenue or costs. Pass-through of FERC or state transmission rates. Value from lookup.
 
-### CBC / EV Make Ready / Arrears Management Recovery
+#### Legacy Transition Charge — _Variable_
 
-Customer benefit contribution (solar), EV infrastructure, arrears recovery; NY-mandated.
+Recovers legacy costs from New York's electricity restructuring (stranded costs, deferrals). Value from lookup.
 
-### Net Utility Plant and Depreciation Expense Reconciliation / Rate Adjustment Mechanism
+#### System Benefits Charge — _Variable_
 
-Reconciliation and adjustment mechanisms.
+Funds NY clean energy and efficiency programs (e.g. NYSERDA). Set by the PSC; all customers pay. Rate from lookup.
+
+#### Clean Energy Standard — Delivery Charge — _Variable_
+
+Recovers National Grid's delivery-side costs to comply with NY's Clean Energy Standard (RECs, ZECs, distribution compliance). Value from lookup.
+
+#### Dynamic Load Management Surcharge — _Variable_
+
+Recovers the cost of demand response and dynamic load management programs. Value from lookup.
+
+#### Earnings Adjustment Mechanism — _Variable_
+
+A delivery true-up that aligns actual earnings with PSC-allowed earnings. Value from lookup.
+
+#### Rate Adjustment Mechanism — $0.00671/kWh
+
+Another delivery adjustment; this per-kWh rate is fixed in the tariff. True-ups revenue or costs to allowed levels. All delivery customers pay it.
+
+#### Electric Vehicle Make Ready Surcharge — $0.00147/kWh
+
+Recovers National Grid's costs for EV charging infrastructure (make-ready conduit and wiring). Part of NY's EV infrastructure push. All customers pay this per-kWh amount.
+
+#### Arrears Management Program Recovery Surcharge — $0.00087/kWh
+
+Recovers costs of arrears management and forgiveness programs. Fixed per-kWh rate in the tariff. All customers pay it.
+
+#### Net Utility Plant and Depreciation Expense Reconciliation — _Variable_ or $0
+
+Reconciliation of net utility plant and depreciation expense; may be a surcharge or credit. Value from lookup when applicable.
+
+---
+
+### Supply Charges
+
+These apply only if you take default supply from National Grid. **Supply is zone-specific**: each zone has its own Electric Supply Charge (and related MFC components). If you choose an ESCO, you do not pay these supply charges.
+
+#### Electricity Supply Charge — _Variable, by zone_
+
+The default supply (commodity) rate. **Varies by zone**: Adirondack, Capital, Central, Frontier, Genesee, and Utica each have their own supply rate because wholesale and delivery costs differ. Use the Lookups API with your zone (territoryId) to get the current supply rate.
+
+#### Electricity Supply Reconciliation Mechanism — _Variable, by zone_
+
+A supply-side true-up that reconciles actual supply costs with the amount collected. Zone-specific. Value from lookup.
+
+#### Clean Energy Standard — Supply Charge — _Variable_
+
+Recovers the supply-side cost of meeting NY's Clean Energy Standard (RECs, ZECs). Only default-supply customers pay it. Value from lookup.
+
+#### Merchant Function Charge — Working Capital on Purchased Power / Uncollectible Expense / Procurement / Credit and Collection — _Variable, by zone or global_
+
+Covers National Grid's costs to administer default supply: working capital on purchased power (zone-specific), uncollectible expense (zone-specific and one global component), procurement, and credit/collection. Multiple line items in the tariff; all are variable. Use the Lookups API for your zone. Only default-supply customers pay MFC.
+
+---
+
+### Minimum Charge
+
+#### Minimum — $19.00/month
+
+If the bill before applying this floor is less than $19.00, the minimum applies. It equals the basic service charge. Very low usage or net-generation months can hit the minimum.
+
+---
+
+### Rider Charges (Optional and Mandatory)
+
+#### GreenUp Charge — tiered (optional)
+
+**Only if you opt in** to the GreenUp program (`greenUpProgramChoice` ≠ "None"). Voluntary renewable energy product (e.g. NewWind, EnviroGen, Sterling Green). If you do not opt in, this is $0. Tiered by product choice; use the tariff for the rate that applies to your selection.
+
+#### Customer Benefit Contribution — $0.97/kW of system size (solar)
+
+**Only applies to customers with solar.** A monthly charge based on nameplate capacity (kW). Part of NY's VDER reforms so solar customers contribute to grid costs. If you do not have solar, this is $0.
 
 ---
 
 ## Example Bill Calculation
 
-500 kWh, one zone (e.g. Central), no solar, no GreenUp: Use Customer + Energy (delivery) for that zone; Supply for that zone; add MFC, SBC, CES, DLM, EAM, RAM, etc. Minimum applies. Total depends on zone and lookups.
+A customer in the **Central** zone in **July** using **500 kWh**, default supply, no solar, no GreenUp:
+
+### Delivery Charges
+
+| Charge              | Calculation                     | Amount       |
+| ------------------- | ------------------------------- | ------------ |
+| Basic Service       | $19.00                           | $19.00       |
+| Energy Charge       | 500 kWh × $0.08889              | $44.45       |
+| Delivery Adj (Central) | 500 kWh × ~$0.002 (varies by zone) | ~$1.00    |
+| RDM                 | 500 kWh × ~$0.001 (varies)      | ~$0.50       |
+| Transmission Rev Adj | 500 kWh × ~$0.002 (varies)     | ~$1.00       |
+| Legacy Transition   | 500 kWh × ~$0.001 (varies)      | ~$0.50       |
+| SBC                 | 500 kWh × ~$0.004 (varies)      | ~$2.00       |
+| CES Delivery        | 500 kWh × ~$0.003 (varies)      | ~$1.50       |
+| DLM Surcharge       | 500 kWh × ~$0.0002 (varies)     | ~$0.10       |
+| EAM                 | 500 kWh × ~$0.0005 (varies)     | ~$0.25       |
+| RAM                 | 500 kWh × $0.00671              | $3.36        |
+| EV Make Ready       | 500 kWh × $0.00147              | $0.74        |
+| Arrears Recovery    | 500 kWh × $0.00087              | $0.44        |
+| **Subtotal Delivery** |                             | **~$74.29**  |
+
+### Supply Charges
+
+| Charge           | Calculation                         | Amount       |
+| ---------------- | ----------------------------------- | ------------ |
+| Supply (Central)  | 500 kWh × ~$0.07 (varies by zone)  | ~$35.00      |
+| Supply Recon     | (varies by zone)                    | ~$0.50       |
+| CES Supply       | 500 kWh × ~$0.003 (varies)         | ~$1.50       |
+| MFC (Working Cap, Uncollectible, Procurement, etc.) | (varies by zone) | ~$2.00   |
+| **Subtotal Supply** |                             | **~$39.00**  |
+
+### Riders & Other
+
+| Charge        | Calculation   | Amount  |
+| ------------- | ------------- | ------- |
+| GreenUp (none) | $0          | $0.00   |
+| CBC (no solar) | $0          | $0.00   |
+| **Subtotal Riders** |           | **$0.00** |
+
+### Total
+
+**~$113.29** for 500 kWh in July, **Central** zone, default supply, no solar or GreenUp. Zone-specific delivery adjustment and supply (and MFC) will differ by zone; use the Lookups API for your zone and month. **Minimum** is $19.00; this bill is above that.
+
+### Breakdown by Category
+
+| Category              | Amount   | % of Bill |
+| --------------------- | -------- | --------- |
+| Fixed Charges         | $19.00   | 17%       |
+| Delivery (Volumetric)  | ~$55.29  | 49%       |
+| Supply                | ~$39.00  | 34%       |
+| Riders & Other        | $0.00    | 0%        |
+
+**Key insight**: Delivery (fixed plus energy and zone-specific adjustment plus RDM, SBC, CES, RAM, EV, etc.) and supply each contribute a large share. The same 500 kWh in a different zone (e.g. Adirondack, Frontier) will have a different total because both delivery adjustment and supply rates are zone-specific. RAM and EV Make Ready are fixed per-kWh riders that are visible on the bill; the rest depend on lookups.
 
 ---
 

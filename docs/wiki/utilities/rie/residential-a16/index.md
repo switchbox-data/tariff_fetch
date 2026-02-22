@@ -52,59 +52,183 @@ This is a **flat, non-TOU** rate. Delivery components in the tariff include: cus
 
 ## Charge-by-Charge Breakdown
 
-### Delivery Service Charge
+### Basic Service Charges
 
-**Customer Charge** — Fixed monthly charge for account/metering.
+#### Customer Charge — $6.00/month
 
-**Distribution Charge** — Main volumetric distribution rate.
+A flat monthly fee that covers the cost of having an account: metering, billing systems, customer service. Everyone on A-16 pays it. Rhode Island Energy (formerly National Grid – Rhode Island) serves the state of Rhode Island; the charge is set in RI PUC rate cases. One of the lower customer charges among default residential rates in the region.
 
-**Operating & Maintenance Exp Charge / O&M Reconciliation Factor / CapEx Factor / CapEx Reconciliation Factor** — Delivery cost components and reconciliation factors (often variable).
+---
 
-**RDM Adjustment Factor / Pension Adjustment Factor / Storm Fund Replenishment Factor / Arrearage Management Adjustment Factor** — Revenue decoupling, pension, storm, and arrears true-ups.
+### Delivery Charges
 
-**Low-Income Discount Recovery Factor / Performance Incentive Factor / Last Resort Adjustment Factor** — Policy and program recovery; may be lookups.
+Delivery charges recover the cost of the distribution grid, transmission, and state-mandated programs. Many components use **variable factors** (lookups) that the utility updates periodically. Regulated by the RI PUC.
 
-**Net Metering Charge** — Net metering program cost recovery.
+#### Distribution Charge — $0.0458/kWh
 
-**Long Term Contracting Charge** — Long-term supply contracting costs.
+The main volumetric distribution rate. Recovers the cost of the local wires, poles, and transformers. Flat rate; applies to every kWh. Set in RIE's rate cases.
 
-### Renewable Energy Distribution Charge / RE Growth Charge
+#### Operating & Maintenance Exp Charge — $0.00223/kWh
 
-Renewable energy and RE growth program charges (distribution side).
+Recovers day-to-day O&M costs for the distribution system. Fixed per-kWh rate in the tariff. All delivery customers pay it.
 
-### LIHEAP Enhancement Charge
+#### O&M Reconciliation Factor — _Variable_
 
-Low-Income Home Energy Assistance Program enhancement; fixed or variable.
+True-up that reconciles actual O&M costs with the amount collected under the fixed O&M charge. Can be a small surcharge or credit. Value from lookup.
 
-### Transmission Charge / Transition Charge
+#### CapEx Factor Charge — $0.00832/kWh
 
-Transmission and restructuring transition charges.
+Recovers capital expenditure (infrastructure investment) for the distribution system. Fixed per-kWh rate in the tariff.
 
-### Energy Efficiency Programs Charge
+#### CapEx Reconciliation Factor — _Variable_
 
-Energy efficiency program recovery.
+True-up for capital cost recovery. Value from lookup. Ensures allowed CapEx recovery matches actual spending.
 
-### Standard Offer Service Charge
+#### RDM Adjustment Factor — _Variable_
 
-Default supply (Last Resort Service) for customers who do not choose a competitive supplier. Variable; often updated monthly.
+Revenue decoupling mechanism: RIE's allowed delivery revenue is decoupled from sales so the utility is neutral to conservation. This factor adjusts for differences between actual and forecast usage. Value from lookup.
 
-### Minimum
+#### Pension Adjustment Factor — $0.00339/kWh
 
-Floor on monthly bill.
+Recovers pension and benefit costs for distribution employees. Fixed per-kWh rate in the tariff. Part of labor-related cost recovery.
 
-### Renewable Standard Energy Charge
+#### Storm Fund Replenishment Factor — _Variable_ or $0
 
-Renewable/clean energy compliance on supply side.
+Recovers or replenishes storm-related costs (e.g. restoration, reserves). May be zero or a small amount; value from lookup when applicable.
 
-### Gross Earnings Tax
+#### Arrearage Management Adjustment Factor — $0.00006/kWh
 
-State/local gross earnings tax on utility revenue; passed through to customers.
+Recovers costs of arrearage management programs (payment plans, forgiveness programs). Very small fixed per-kWh rate. All customers pay it.
+
+#### Low-Income Discount Recovery Factor — $0.00251/kWh
+
+Recovers the cost of low-income bill discounts from non-participating customers. Spreads the cost of assistance programs across the rate base. Fixed per-kWh rate in the tariff.
+
+#### Performance Incentive Factor — _Variable_ or $0
+
+Ties delivery rates to performance metrics (e.g. reliability, customer service). May be a surcharge or credit. Value from lookup when applicable.
+
+#### Last Resort Adjustment Factor — _Variable_ or $0
+
+Delivery-side adjustment related to Last Resort (default) supply; may true-up costs. Value from lookup when applicable.
+
+#### Net Metering Charge — $0.01457/kWh
+
+Recovers the cost of net metering programs (solar and other DER). Spread across all customers. Fixed per-kWh rate in the tariff. Part of RI's renewable and distributed energy policy.
+
+#### Long Term Contracting Charge — _Variable_
+
+Recovers costs of long-term supply or capacity contracts that support reliability or clean energy. Value from lookup.
+
+#### RE Growth Charge — _Variable_
+
+Fixed monthly (or quantity-based) charge that supports renewable energy growth programs. Value from lookup.
+
+#### LIHEAP Enhancement Charge — _Variable_
+
+Supports the Low-Income Home Energy Assistance Program (LIHEAP). Typically a small fixed monthly amount or factor. Value from lookup.
+
+#### Transmission Charge — $0.04773/kWh
+
+Recovers the cost of high-voltage transmission (getting power to the distribution grid). Set by FERC or state; passed through to customers. Fixed per-kWh rate in the tariff. Often one of the larger delivery line items.
+
+#### Transition Charge — $0.00001/kWh
+
+Recovers legacy restructuring or transition costs. Very small fixed per-kWh rate in the tariff.
+
+#### Energy Efficiency Programs Charge — _Variable_
+
+Recovers the cost of energy efficiency programs (e.g. rebates, incentives) mandated by the state. All customers pay. Value from lookup.
+
+---
+
+### Supply Charges
+
+These apply only if you take default supply (Last Resort Service / Standard Offer) from RIE. If you choose a competitive supplier, you do not pay RIE's supply charges.
+
+#### Standard Offer Service Charge — _Variable_
+
+The default supply (commodity) rate for customers who do not choose a competitive supplier. Often updated monthly to reflect wholesale prices. Use the Lookups API for the current rate. This is typically the largest variable component of the bill for default-supply customers.
+
+#### Renewable Standard Energy Charge — _Variable_
+
+Recovers the cost of meeting Rhode Island's renewable/clean energy requirements on the supply side (e.g. RECs). Value from lookup. Only default-supply customers pay it.
+
+---
+
+### Minimum Charge
+
+#### Minimum — $6.00/month
+
+If the bill before applying this floor is less than $6.00, the minimum applies. It equals the customer charge. Very low usage or net-generation months can hit the minimum.
+
+---
+
+### Taxes and Other
+
+#### Gross Earnings Tax — $4.166667 (quantity-based)
+
+State (and/or local) gross earnings tax on utility revenue, passed through to customers. The tariff shows a quantity-based value (e.g. applied as a factor or fixed amount per month). Use the tariff or Lookups API for how it applies to your bill. Typically a few dollars per month.
 
 ---
 
 ## Example Bill Calculation
 
-500 kWh, default supply: Customer + Distribution (500 × rate) + O&M, CapEx, RDM, and other factors (lookups) + Transmission + Transition + RE charges + LIHEAP + EE + Standard Offer (500 × LRS rate) + Renewable Standard + GET. Minimum applies. Total depends on lookup values and LRS rate.
+A customer in **July** using **500 kWh**, default supply (Standard Offer), secondary connection:
+
+### Delivery Charges
+
+| Charge              | Calculation                     | Amount       |
+| ------------------- | ------------------------------- | ------------ |
+| Customer Charge     | $6.00                           | $6.00        |
+| Distribution        | 500 kWh × $0.0458               | $22.90       |
+| O&M Exp             | 500 kWh × $0.00223              | $1.12        |
+| O&M Recon           | (varies)                        | ~$0.20       |
+| CapEx Factor        | 500 kWh × $0.00832              | $4.16        |
+| CapEx Recon         | (varies)                        | ~$0.20       |
+| RDM Adj             | (varies)                        | ~$0.30       |
+| Pension Adj         | 500 kWh × $0.00339              | $1.70        |
+| Storm Fund          | (varies)                        | ~$0.10       |
+| Arrearage Mgmt      | 500 kWh × $0.00006              | $0.03        |
+| LMI Recovery        | 500 kWh × $0.00251              | $1.26        |
+| Net Metering        | 500 kWh × $0.01457              | $7.29        |
+| Long Term Contracting | (varies)                      | ~$0.50       |
+| RE Growth           | (varies)                        | ~$0.50       |
+| LIHEAP              | (varies)                        | ~$0.25       |
+| Transmission        | 500 kWh × $0.04773              | $23.87       |
+| Transition          | 500 kWh × $0.00001              | $0.01        |
+| EE Programs         | (varies)                        | ~$2.50       |
+| **Subtotal Delivery** |                             | **~$71.89**  |
+
+### Supply Charges
+
+| Charge           | Calculation                     | Amount       |
+| ---------------- | ------------------------------- | ------------ |
+| Standard Offer   | 500 kWh × ~$0.08 (varies)       | ~$40.00      |
+| Renewable Standard | 500 kWh × ~$0.002 (varies)     | ~$1.00       |
+| **Subtotal Supply** |                             | **~$41.00**  |
+
+### Other (Taxes)
+
+| Charge       | Calculation   | Amount   |
+| ------------ | ------------- | -------- |
+| Gross Earnings Tax | (quantity-based) | ~$4.17  |
+| **Subtotal Other** |             | **~$4.17** |
+
+### Total
+
+**~$117.06** for 500 kWh in July, default supply. Many delivery factors and Standard Offer are variable; use the Lookups API for a given month. **Minimum** is $6.00; this bill is above that.
+
+### Breakdown by Category
+
+| Category              | Amount   | % of Bill |
+| --------------------- | -------- | --------- |
+| Fixed Charges         | $6.00    | 5%        |
+| Delivery (Volumetric)  | ~$65.89  | 56%       |
+| Supply                | ~$41.00  | 35%       |
+| Other (e.g. GET)      | ~$4.17   | 4%        |
+
+**Key insight**: Delivery has many line items—distribution, transmission, O&M, CapEx, net metering, RDM, and various factors—so the delivery section is granular. Transmission ($0.04773/kWh) and distribution ($0.0458/kWh) are the largest fixed-rate delivery components. Standard Offer (supply) is variable and often a large share of the total; the exact bill depends heavily on current lookup values and the default supply rate.
 
 ---
 

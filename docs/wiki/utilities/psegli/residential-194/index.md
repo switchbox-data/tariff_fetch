@@ -55,90 +55,160 @@ Territory can affect certain charges: **Suffolk County** vs **Outside Suffolk Co
 
 ## Charge-by-Charge Breakdown
 
-### Service Charge
+### Basic Service Charges
 
-**Service Charge — $0.56/day**
+#### Service Charge — $0.56/day
 
-A daily fixed charge (approximately $17/month for a 30-day billing period) that covers account and metering costs. It is applied per day in the billing period.
+A daily fixed charge that covers account and metering costs. Billing is monthly but the charge is applied per day in the billing period (e.g. 30 days × $0.56 ≈ $16.80). Everyone on Rate 194 pays it. It is one of the lowest fixed charges among NY utilities.
 
-### Energy Charge (Delivery)
+---
 
-Delivery charges are **time-of-use and seasonal**:
+### Delivery Charges
 
-- **Summer Peak** (weekdays 3–7 PM): $0.2217/kWh
-- **Summer Off-Peak**: $0.1093/kWh
-- **Winter Peak** (weekdays 3–7 PM): $0.1885/kWh
-- **Winter Off-Peak**: $0.0929/kWh
+Delivery charges on Rate 194 are **time-of-use and seasonal**. Peak is weekdays 3–7 PM; all other hours (including weekends and holidays) are off-peak. Summer is June–September; Winter is October–May. This design encourages shifting load away from late-afternoon peaks.
 
-These are the main volumetric delivery rates that recover distribution and related costs set in LIPA/PSEG-LI rate cases.
+#### Energy Charge — Summer Peak — $0.2217/kWh
 
-### Shoreham Property Tax (SPT) Settlement Factors
+Delivery rate for summer weekdays 3–7 PM. The highest per-kWh delivery rate; it recovers the cost of serving load when the distribution system is most stressed. Set in LIPA/PSEG-LI rate cases.
 
-**Suffolk County / Outside Suffolk County** — _Lookup_
+#### Energy Charge — Summer Off-Peak — $0.1093/kWh
 
-Recovers costs tied to the former Shoreham nuclear plant (property taxes, settlements). Values differ by territory (Suffolk vs outside Suffolk) and are typically updated via lookup or adjustment mechanism.
+Delivery rate for all summer hours outside 3–7 PM weekdays. Roughly half of the summer peak rate. Applies to weekends, holidays, and weekday mornings and evenings.
 
-### Distributed Energy Resources Cost Recovery Rate — _Lookup_
+#### Energy Charge — Winter Peak — $0.1885/kWh
 
-Recovers costs of programs and grid integration for distributed energy resources (DER). Amount is variable.
+Delivery rate for winter weekdays 3–7 PM. Lower than summer peak but still the highest winter delivery rate. Winter peaks are typically lower than summer on Long Island.
 
-### New York State Assessment — _Lookup_
+#### Energy Charge — Winter Off-Peak — $0.0929/kWh
 
-State-level assessment; rate is obtained via lookup.
+Delivery rate for all winter hours outside 3–7 PM weekdays. The lowest of the four energy rates. Most winter usage falls here.
 
-### Revenue Decoupling Mechanism — _Lookup_
+#### Shoreham Property Tax (SPT) Settlement — _Variable, by territory_
 
-Part of New York's decoupling policy: adjusts for differences between allowed revenue and actual sales so the utility is neutral to conservation. Applied as a percentage or factor; value from lookup.
+Recovers costs tied to the former Shoreham nuclear plant (property taxes, settlements). **Territory matters**: Suffolk County and Outside Suffolk County (Nassau, Rockaways) have different SPT factors. Use the Lookups API with the correct territory. Typically a small per-kWh or percentage component.
 
-### Securitization Offset Charge / Securitization Charge — _Lookup_
+#### Distributed Energy Resources Cost Recovery — _Variable_
 
-Supply-side charges related to securitization of certain costs. Values from lookup.
+Recovers PSEG-LI's costs for DER programs and grid integration (solar, storage, demand response). The per-kWh rate is updated periodically; use the Lookups API.
 
-### Delivery Service Adjustment — _Lookup_
+#### New York State Assessment — _Variable_
 
-Adjustment to delivery charges (e.g. true-ups, cost changes). Value from lookup.
+State-level assessment that utilities pass through to customers. Rate is obtained via lookup. Covers state regulatory and policy costs.
 
-### Minimum — $0.56/day
+#### Revenue Decoupling Mechanism — _Variable_
 
-If the bill before this floor is less than the minimum, the minimum applies. Tied to the daily service charge level.
+Part of New York's decoupling policy: PSEG-LI's allowed delivery revenue is decoupled from sales. If customers use less than forecast, this charge adjusts so the utility is neutral to conservation. Value from lookup.
 
-### Pilot Payments / Cities and Incorporated Villages
+#### Securitization Offset Charge — _Variable_
 
-Rider for recovering pilot (payment-in-lieu-of-taxes) and similar payments. Includes commodity and transportation components at fixed percentage rates.
+Supply-side charge related to securitization of certain legacy or transition costs. Pass-through to customers; value from lookup.
 
-### Customer Benefit Contribution (CBC)
+#### Securitization Charge — _Variable_
 
-**CBC — $0.0372/kW of system size (solar)**
+Another supply-side securitization component. Often netted with the offset; use the Lookups API for the effective rate.
 
-Applies to customers with solar; based on nameplate capacity (kW). Same policy concept as other NY utilities (VDER/CBC).
+#### Delivery Service Adjustment — _Variable_
 
-### Merchant Function Charge — $0.001764/kWh
+True-up or adjustment to delivery charges (e.g. cost changes, deferrals). Value from lookup. Can be a small surcharge or credit.
 
-Covers PSEG-LI's costs to administer default supply service (procurement, billing, etc.). Only for customers taking default supply.
+---
 
-### Power Supply Charge
+### Minimum Charge
 
-Supply is **seasonal and time-of-use**:
+#### Minimum — $0.56/day
 
-- **Summer Peak**: $0.286622/kWh
-- **Summer Off-Peak**: $0.121967/kWh
-- **Winter On-Peak**: $0.313587/kWh
-- **Winter Off-Peak**: $0.121967/kWh
+If the bill before applying this floor is less than the minimum, the minimum applies. It is tied to the daily service charge (one day of service charge). In practice, most customers exceed it; it mainly affects very low usage or vacant accounts.
 
-These are the default supply (commodity) rates for customers who do not choose an ESCO.
+---
+
+### Rider Charges
+
+#### Increase in Rates and Charges to Recover / Rates for Cities and Incorporated Villages — $1.1404 and $3.5921 (quantity-based)
+
+Recovers payments in lieu of taxes (PILOT) and similar charges for cities and incorporated villages. The tariff includes quantity-based rates (e.g. per-kW or per-kWh components); the exact application (which rate applies to which component) may vary. Use the tariff or Lookups API for your scenario.
+
+#### Customer Benefit Contribution — $0.0372/kW of system size (solar)
+
+**Only applies to customers with solar.** A monthly charge based on nameplate capacity (kW). Part of NY's VDER reforms so solar customers contribute to grid costs. If you do not have solar (`systemSize = 0`), this is $0.
+
+---
+
+### Supply Charges
+
+These apply only if you take default supply from PSEG-LI. Supply rates are **seasonal and time-of-use**, aligned with the delivery peak/off-peak windows.
+
+#### Merchant Function Charge — $0.001764/kWh
+
+Covers PSEG-LI's costs to administer default supply: procurement, risk management, billing. Flat per-kWh; only default-supply customers pay it. Relatively small compared to the power supply charge.
+
+#### Power Supply Charge — Summer Peak — $0.286622/kWh
+
+Commodity rate for summer weekdays 3–7 PM. The highest supply rate. Reflects higher wholesale prices during peak demand.
+
+#### Power Supply Charge — Summer Off-Peak — $0.121967/kWh
+
+Commodity rate for summer off-peak hours. Less than half of summer peak. Most summer supply cost is in peak if usage is peak-heavy.
+
+#### Power Supply Charge — Winter On-Peak — $0.313587/kWh
+
+Commodity rate for winter weekdays 3–7 PM. Slightly higher than summer peak in the tariff. Winter peak hours are fewer on Long Island.
+
+#### Power Supply Charge — Winter Off-Peak — $0.121967/kWh
+
+Commodity rate for winter off-peak hours. Same as summer off-peak in the tariff. Bulk of winter usage typically falls here.
 
 ---
 
 ## Example Bill Calculation
 
-Example: Summer month, 500 kWh, 300 kWh off-peak and 200 kWh peak (simplified).
+A customer **outside Suffolk County** in **July** (summer), using **500 kWh** with **200 kWh peak** and **300 kWh off-peak**, default supply, no solar:
 
-**Delivery:** Service $0.56×30 ≈ $16.80; Energy 200×$0.2217 + 300×$0.1093 ≈ $99.21; other delivery adjustments (lookups) ≈ $5–15.
-**Supply:** 200×$0.286622 + 300×$0.121967 ≈ $97.47; MFC 500×$0.001764 ≈ $0.88.
-**Riders/other:** CBC (if no solar $0), pilot, SPT, etc. (lookups).
-**Minimum:** At least $0.56×30 = $16.80.
+### Delivery Charges
 
-Total will vary with actual TOU split and lookup values.
+| Charge              | Calculation                                      | Amount       |
+| ------------------- | ------------------------------------------------ | ------------ |
+| Service Charge      | 30 days × $0.56                                  | $16.80       |
+| Energy (Summer Peak) | 200 kWh × $0.2217                                | $44.34       |
+| Energy (Summer Off-Peak) | 300 kWh × $0.1093                           | $32.79       |
+| SPT (outside Suffolk) | (varies)                                         | ~$2.00       |
+| DER Cost Recovery   | (varies)                                         | ~$1.50       |
+| NY State Assessment | (varies)                                         | ~$1.00       |
+| RDM                 | (varies)                                         | ~$0.50       |
+| Delivery Service Adj.| (varies)                                         | ~$0.50       |
+| **Subtotal Delivery** |                                                  | **~$99.43**  |
+
+### Supply Charges
+
+| Charge                | Calculation                                    | Amount       |
+| --------------------- | ---------------------------------------------- | ------------ |
+| Power Supply (Peak)   | 200 kWh × $0.286622                             | $57.32       |
+| Power Supply (Off-Peak) | 300 kWh × $0.121967                           | $36.59       |
+| Securitization (net)  | (varies)                                       | ~$2.00       |
+| Merchant Function     | 500 kWh × $0.001764                             | $0.88        |
+| **Subtotal Supply**   |                                                | **~$96.79**  |
+
+### Riders & Other
+
+| Charge   | Calculation                    | Amount      |
+| -------- | ------------------------------ | ----------- |
+| CBC (no solar) | $0                         | $0.00       |
+| Cities/Villages (pilot) | (quantity-based)        | ~$3.00      |
+| **Subtotal Riders** |                            | **~$3.00**  |
+
+### Total
+
+**~$199.22** for 500 kWh in July (200 peak, 300 off-peak), outside Suffolk, no solar. Delivery and supply lookups (SPT, DER, RDM, securitization, etc.) will change the total; use the Lookups API for a given month and territory. **Minimum** would be 30 × $0.56 = $16.80; this bill is well above that.
+
+### Breakdown by Category
+
+| Category              | Amount    | % of Bill |
+| --------------------- | --------- | --------- |
+| Fixed (Service)       | $16.80    | 8%        |
+| Delivery (Volumetric) | ~$82.63   | 42%       |
+| Supply                | ~$96.79   | 48%       |
+| Riders & Other        | ~$3.00    | 2%        |
+
+**Key insight**: Rate 194 is TOU and seasonal: peak usage (200 kWh at summer peak rates) drives a large share of both delivery and supply. Shifting load to off-peak reduces the bill; the same 500 kWh with more off-peak usage would be lower. Supply and delivery each contribute roughly half of the total in this example.
 
 ---
 

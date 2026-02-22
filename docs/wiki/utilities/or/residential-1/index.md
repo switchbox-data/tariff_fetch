@@ -49,43 +49,158 @@
 
 ## Charge-by-Charge Breakdown
 
-### Customer Charge / Billing and Payment Processing
+### Basic Service Charges
 
-Fixed monthly charges for account and billing.
+#### Customer Charge — $22.50/month
 
-### Delivery Charge (Summer Rate / Winter Rate)
+A flat monthly fee that covers the cost of having an account: metering, customer service, and distribution-related fixed costs. Everyone on Rate 1 pays it. Set in O&R's NY PSC rate cases; applies in both NY and NJ portions of O&R's service territory.
 
-Seasonal volumetric delivery rates; summer vs winter.
+#### Billing and Payment Processing Charge — $2.10/month
 
-### Energy Cost Adjustment / Market Supply Charge
+Covers the cost of generating and mailing bills and processing payments. Unbundled from the customer charge so billing cost recovery is transparent. All Rate 1 customers pay it.
 
-Supply-side components; market supply typically lookup.
+---
 
-### Merchant Function Charge — _Lookup_
+### Delivery Charges
 
-Default supply administration.
+Delivery charges are **seasonal** (Summer: June–September; Winter: October–May) and **tiered** by monthly consumption. O&R serves Rockland County and parts of Orange County in NY and northern New Jersey. Rates are set by the NY PSC (and NJ BPU where applicable).
 
-### Revenue Decoupling Mechanism / System Benefits Charge / DLM / Delivery Revenue Surcharge / Transition Adjustment
+#### Summer Rate — tiered (first 250 kWh / over 250 kWh)
 
-Standard NY delivery and policy adjustments; lookups or fixed.
+- **First 250 kWh**: $0.11052/kWh  
+- **Over 250 kWh**: $0.13822/kWh  
+
+The main volumetric delivery rate in summer. The second tier is higher to reflect the marginal cost of serving additional usage during the summer peak. Typical residential customers exceed 250 kWh in summer, so part of their usage is at the higher tier.
+
+#### Winter Rate — tiered (first 250 kWh / over 250 kWh)
+
+- **First 250 kWh**: $0.11052/kWh  
+- **Over 250 kWh**: $0.11052/kWh  
+
+In winter the second tier is the same as the first in the tariff (no incremental rate above 250 kWh). Winter delivery costs are lower than summer, so the blended winter rate is effectively flat at $0.11052/kWh for any usage level.
+
+#### Revenue Decoupling Mechanism — _Variable_
+
+Part of NY's decoupling policy: O&R's allowed delivery revenue is decoupled from sales. Adjusts so the utility is neutral to conservation. Value from lookup.
+
+#### System Benefits Charge — _Variable_
+
+Funds NY clean energy and efficiency programs (e.g. NYSERDA). Set by the PSC; all customers pay. Rate from lookup.
+
+#### Dynamic Load Management Surcharge — _Variable_
+
+Recovers the cost of demand response and dynamic load management programs. Value from lookup.
+
+#### Delivery Revenue Surcharge — _Variable_
+
+A delivery true-up that aligns actual revenue with allowed revenue. Value from lookup.
+
+#### Transition Adjustment for Competitive — _Variable_
+
+Recovers legacy costs from restructuring (stranded costs, deferred balances). Often two components in the tariff; values from lookup.
+
+---
+
+### Supply Charges
+
+These apply only if you take default supply from O&R. If you choose an ESCO, you do not pay O&R's supply components.
+
+#### Energy Cost Adjustment — _Variable_
+
+Pass-through of energy-related supply costs that vary from the base market supply rate. Value from lookup.
+
+#### Market Supply Charge — _Variable_
+
+The commodity cost of default supply. Reflects wholesale market prices and procurement costs. Use the Lookups API for the current rate.
+
+#### Merchant Function Charge — _Variable_
+
+Covers O&R's costs to administer default supply: procurement, risk management, billing. Only default-supply customers pay it. Value from lookup.
+
+---
 
 ### Minimum Charge
 
-Floor on bill.
+#### Minimum Charge — $24.60/month
 
-### Low Income Bill Credit / Enhanced Energy Affordability Credits
+If the bill before applying this floor is less than $24.60, the minimum applies. It is slightly above the sum of the two fixed charges ($22.50 + $2.10 = $24.60), so it effectively guarantees at least the fixed charges. Very low usage or net-generation months can hit the floor.
 
-Credits for qualifying customers (see lowIncome2BillCredits691 property).
+---
 
-### CBC / Energy Storage Surcharge / EV Make-Ready Surcharge
+### Rider Charges and Credits
 
-Customer benefit contribution (solar), energy storage, EV infrastructure; NY-mandated.
+#### Low Income Bill Credit — tiered
+
+A **credit** (reduction) for qualifying low-income customers. Eligibility and tier (e.g. by income or program) are determined by the `lowIncome2BillCredits691` property. Reduces the total bill; not a charge.
+
+#### Enhanced Energy Affordability Credits — tiered
+
+Additional **credits** for qualifying customers under NY's energy affordability programs. Tiered by eligibility. Apply in addition to the Low Income Bill Credit when applicable. Use the tariff or Lookups API for your tier.
+
+#### Customer Benefit Contribution — $1.00/kW of system size (solar)
+
+**Only applies to customers with solar.** A monthly charge based on nameplate capacity (kW). Part of NY's VDER reforms so solar customers contribute to grid costs. If you do not have solar, this is $0.
+
+#### Energy Storage Surcharge — $0.00002/kWh
+
+A small per-kWh charge that recovers costs related to energy storage programs and grid integration. All customers pay it. The rate is fixed in the tariff.
+
+#### Electric Vehicle Make-Ready Surcharge — $0.00236/kWh
+
+Recovers O&R's costs for EV charging infrastructure (make-ready conduit and wiring). Part of NY's EV infrastructure push. All customers pay this per-kWh amount.
 
 ---
 
 ## Example Bill Calculation
 
-500 kWh summer: Customer + Billing + Summer delivery × 500 + Supply (lookup) + MFC + RDM, SBC, DLM, etc. Minimum applies. Total varies with lookups.
+A customer in **July** (summer), using **500 kWh**, default supply, no solar, no LMI/affordability credits, secondary connection:
+
+### Delivery Charges
+
+| Charge           | Calculation                                    | Amount       |
+| ---------------- | ---------------------------------------------- | ------------ |
+| Customer Charge  | $22.50                                         | $22.50       |
+| Billing & Payment | $2.10                                          | $2.10        |
+| Summer Rate      | 250 × $0.11052 + 250 × $0.13822                | $62.19       |
+| RDM              | 500 kWh × ~$0.001 (varies)                     | ~$0.50       |
+| SBC              | 500 kWh × ~$0.004 (varies)                     | ~$2.00       |
+| DLM Surcharge    | 500 kWh × ~$0.0002 (varies)                    | ~$0.10       |
+| Delivery Revenue Surcharge | 500 kWh × ~$0.001 (varies)              | ~$0.50       |
+| Transition Adj.  | 500 kWh × ~$0.002 (varies)                     | ~$1.00       |
+| **Subtotal Delivery** |                                             | **~$90.89**  |
+
+### Supply Charges
+
+| Charge        | Calculation                     | Amount      |
+| ------------- | ------------------------------- | ----------- |
+| Market Supply | 500 kWh × ~$0.07 (varies)      | ~$35.00     |
+| Energy Cost Adj. | 500 kWh × ~$0.002 (varies)   | ~$1.00      |
+| MFC           | 500 kWh × ~$0.002 (varies)      | ~$1.00      |
+| **Subtotal Supply** |                            | **~$37.00** |
+
+### Riders & Other
+
+| Charge      | Calculation                | Amount      |
+| ----------- | -------------------------- | ----------- |
+| CBC (no solar) | $0                      | $0.00       |
+| Energy Storage | 500 kWh × $0.00002       | $0.01       |
+| EV Make-Ready | 500 kWh × $0.00236       | $1.18       |
+| **Subtotal Riders** |                     | **~$1.19**  |
+
+### Total
+
+**~$129.08** for 500 kWh in July, default supply, no solar or LMI credits. Supply and several delivery components (RDM, SBC, DLM, transition, MFC) vary; use the Lookups API for a given month. **Minimum** is $24.60; this bill is above that.
+
+### Breakdown by Category
+
+| Category              | Amount   | % of Bill |
+| --------------------- | -------- | --------- |
+| Fixed Charges         | $24.60   | 19%       |
+| Delivery (Volumetric) | ~$66.29  | 51%       |
+| Supply                | ~$37.00  | 29%       |
+| Riders & Other        | ~$1.19   | 1%        |
+
+**Key insight**: Delivery dominates the bill—fixed charges plus tiered summer delivery (with the higher tier above 250 kWh) make up about 70% of the total. Supply is a smaller share. Seasonal delivery rates mean winter bills for the same usage are lower because the winter second tier equals the first tier.
 
 ---
 

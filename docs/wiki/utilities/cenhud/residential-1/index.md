@@ -45,51 +45,152 @@
 
 ## Charge-by-Charge Breakdown
 
-### Customer Charge — $22.50/month
+### Basic Service Charges
 
-Fixed monthly charge.
+#### Customer Charge — $22.50/month
 
-### Energy Charge
+A flat monthly fee that covers the cost of having an account: metering, billing systems, customer service, and distribution-related fixed costs. Everyone on Rate 1 pays it. Central Hudson serves the Mid-Hudson Valley (Ulster, Dutchess, and surrounding counties); the charge is set in NY PSC rate cases.
 
-Volumetric delivery rate; recovers distribution revenue requirement.
+---
 
-### Merchant Function (MFC) Components
+### Delivery Charges
 
-Allocation of MFC Lost Revenue, Base MFC Supply Charge, MFC Administration Charge—supply-side administration and true-ups.
+#### Energy Charge — $0.1386/kWh
 
-### Miscellaneous Charges / Market Price Charge / Market Price Adjustment / Purchased Power Adjustment / Electric Bill Credit
+The main volumetric delivery rate. It recovers the distribution revenue requirement—the cost of the local wires, poles, and transformers. Flat rate: same per-kWh amount regardless of time of day or season. Applies to every kWh you use. Set in Central Hudson's rate cases.
 
-Supply and delivery adjustments; market price and purchased power are typically variable (lookups).
+#### Revenue Decoupling Mechanism — _Variable_
 
-### Revenue Decoupling Mechanism / Transition Adjustment
+Part of NY's decoupling policy: Central Hudson's allowed delivery revenue is decoupled from sales volume. If customers use less than forecast, this charge adjusts so the utility is neutral to conservation. Value from lookup.
 
-Decoupling and restructuring adjustments.
+#### Transition Adjustment — _Variable_
 
-### System Benefits Charge
+Recovers legacy costs from New York's electricity restructuring (stranded costs, deferrals). The rate changes as balances are paid down; use the Lookups API for the current value.
 
-NYSERDA-related; lookup or fixed.
+#### Purchased Power Adjustment — _Variable_
 
-### Earnings Adjustment Mechanism / Rate Adjustment Mechanism Surcharges
+A delivery-side adjustment that true-ups the cost of purchased power used for delivery service. Value from lookup.
 
-Delivery/revenue adjustment mechanisms.
+#### Electric Bill Credit — _Variable_
+
+A **credit** (reduction) that can appear on the bill when certain conditions are met (e.g. refunds, over-recovery). When positive it reduces the bill; check the tariff or lookup for applicability.
+
+#### Miscellaneous Charges — _Variable_
+
+Covers other distribution-related costs not broken out elsewhere. Value from lookup.
+
+#### System Benefits Charge — _Variable_
+
+Funds NY clean energy and efficiency programs (e.g. NYSERDA). Set by the PSC; all customers pay. Rate from lookup.
+
+#### Earnings Adjustment Mechanism Surcharge — _Variable_
+
+A delivery true-up that aligns actual earnings with PSC-allowed earnings. Value from lookup.
+
+#### Rate Adjustment Mechanism Surcharge — _Variable_
+
+Another delivery adjustment that true-ups revenue or costs to allowed levels. Value from lookup.
+
+---
+
+### Supply Charges (MFC and Market Price)
+
+These apply when you take default supply from Central Hudson. The **Merchant Function Charge (MFC)** is split into three components; **market price** components reflect the cost of energy. If you choose an ESCO, you do not pay these supply charges.
+
+#### Allocation of MFC Lost Revenue Charge — _Variable_
+
+Recovers revenue that Central Hudson loses when customers switch to an ESCO or reduce usage (e.g. solar). Allocated across default-supply customers. Value from lookup.
+
+#### Base MFC Supply Charge — _Variable_
+
+The base component of the merchant function charge that covers procurement and supply administration. Only default-supply customers pay it. Value from lookup.
+
+#### MFC Administration Charge — _Variable_
+
+Covers Central Hudson's administrative costs to run default supply service (billing, risk management). Value from lookup.
+
+#### Market Price Charge — _Variable_
+
+The primary pass-through of wholesale energy (commodity) costs. Varies with market prices. Use the Lookups API for the current rate. Only default-supply customers pay it.
+
+#### Market Price Adjustment — _Variable_
+
+A true-up or adjustment to the market price charge (e.g. reconciliation of actual vs. forecast prices). Can be a surcharge or credit. Value from lookup.
+
+---
 
 ### Minimum Charge
 
-Floor on bill.
+#### Minimum Charge — $22.50/month
 
-### Low Income Bill Discount
+If the bill before applying this floor is less than $22.50, the minimum applies. It equals the customer charge, so the effective floor is "at least the fixed charge." Very low usage or net-generation months can hit the minimum.
 
-Tiered discount for qualifying customers (see property).
+---
 
-### Customer Benefit Contribution
+### Rider Charges and Credits
 
-CBC for solar customers (VDER).
+#### Low Income Bill Discount — tiered
+
+A **discount** (reduction) for qualifying low-income customers. Eligibility is based on enrollment in the company's low-income program (e.g. HEAP, SSI, TANF, SNAP, or Direct Vendor/Utility Guarantee). The tariff has tiers: Electric Heat vs. Non-Electric Heat, and Tier 1–4 within each. Use the `lowIncomeBillDiscount2033` property to determine tier and discount amount. Not applicable for most customers.
+
+#### Customer Benefit Contribution — $1.67/kW of system size (solar)
+
+**Only applies to customers with solar.** A monthly charge based on nameplate capacity (kW). Part of NY's VDER reforms so solar customers contribute to grid costs. If you do not have solar, this is $0.
 
 ---
 
 ## Example Bill Calculation
 
-500 kWh, no solar, no LMI: Customer $22.50 + Energy (500 × rate) + MFC components + Market Price (lookup) + RDM, Transition, SBC, EAM, RAM, etc. Minimum applies.
+A customer in **July** using **500 kWh**, default supply, no solar, no LMI discount:
+
+### Delivery Charges
+
+| Charge        | Calculation                    | Amount       |
+| ------------- | ------------------------------ | ------------ |
+| Customer Charge | $22.50                       | $22.50       |
+| Energy Charge | 500 kWh × $0.1386            | $69.30       |
+| RDM           | 500 kWh × ~$0.001 (varies)    | ~$0.50       |
+| Transition Adj. | 500 kWh × ~$0.002 (varies)   | ~$1.00       |
+| Purchased Power Adj. | 500 kWh × ~$0.001 (varies) | ~$0.50       |
+| Electric Bill Credit | (varies; often $0)        | $0.00        |
+| Miscellaneous | 500 kWh × ~$0.001 (varies)    | ~$0.50       |
+| SBC           | 500 kWh × ~$0.004 (varies)     | ~$2.00       |
+| EAM Surcharge | 500 kWh × ~$0.0005 (varies)    | ~$0.25       |
+| RAM Surcharge | 500 kWh × ~$0.0005 (varies)    | ~$0.25       |
+| **Subtotal Delivery** |                             | **~$96.30**  |
+
+### Supply Charges
+
+| Charge           | Calculation                     | Amount       |
+| ---------------- | ------------------------------- | ------------ |
+| Market Price Charge | 500 kWh × ~$0.07 (varies)     | ~$35.00      |
+| Market Price Adj. | 500 kWh × ~$0.002 (varies)     | ~$1.00       |
+| MFC Lost Revenue | 500 kWh × ~$0.001 (varies)      | ~$0.50       |
+| Base MFC Supply  | 500 kWh × ~$0.002 (varies)      | ~$1.00       |
+| MFC Admin        | 500 kWh × ~$0.001 (varies)      | ~$0.50       |
+| **Subtotal Supply** |                             | **~$38.00**  |
+
+### Riders & Other
+
+| Charge        | Calculation   | Amount  |
+| ------------- | ------------- | ------- |
+| CBC (no solar) | $0          | $0.00   |
+| **Subtotal Riders** |           | **$0.00** |
+
+### Total
+
+**~$134.30** for 500 kWh in July, default supply, no solar or LMI. All MFC and market price components are variable; use the Lookups API for a given month. **Minimum** is $22.50; this bill is above that.
+
+### Breakdown by Category
+
+| Category              | Amount   | % of Bill |
+| --------------------- | -------- | --------- |
+| Fixed Charges         | $22.50   | 17%       |
+| Delivery (Volumetric) | ~$73.80  | 55%       |
+| Supply                | ~$38.00  | 28%       |
+| Riders & Other        | $0.00    | 0%        |
+
+**Key insight**: The single Energy Charge ($0.1386/kWh) is the largest volumetric component; delivery (fixed plus energy and adjustments) makes up most of the bill. Supply is broken into multiple MFC and market price pieces—all variable—so the exact split depends on current lookups.
 
 ---
 
