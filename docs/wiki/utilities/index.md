@@ -4,9 +4,22 @@ Guides organized by utility company.
 
 ## Available Utilities
 
-| Utility                                       | LSE ID | Region                     | Service Type |
-| --------------------------------------------- | ------ | -------------------------- | ------------ |
-| [Consolidated Edison (ConEd)](coned/index.md) | 2252   | New York City, Westchester | Electricity  |
+| Utility                                                 | LSE ID | Region                          | Service Type   |
+| ------------------------------------------------------- | ------ | ------------------------------- | -------------- |
+| [Consolidated Edison (ConEd)](coned/index.md)           | 2252   | New York City, Westchester      | Electricity    |
+| [PSEG Long Island (PSEG-LI)](psegli/index.md)           | 200    | Long Island, NY                 | Electricity    |
+| [Rochester Gas and Electric (RG&E)](rge/index.md)       | 1007   | Rochester area, NY              | Electricity    |
+| [NYSEG](nyseg/index.md)                                 | 562    | Upstate NY                      | Electricity    |
+| [National Grid – NY (NIMO)](nimo/index.md)              | 579    | Upstate NY                      | Electricity    |
+| [Orange & Rockland (O&R)](or/index.md)                 | 691    | Rockland/Orange, NY; NJ         | Electricity    |
+| [Central Hudson](cenhud/index.md)                       | 2033   | Mid-Hudson Valley, NY           | Electricity    |
+| [Rhode Island Energy (RIE)](rie/index.md)              | 507    | Rhode Island                    | Electricity    |
+
+## Cross-Utility Comparison
+
+| Page                                           | Description                                              |
+| ---------------------------------------------- | -------------------------------------------------------- |
+| [NY default rate comparison](ny-comparison/index.md) | Charge-by-charge comparison of all seven NY default residential rates |
 
 ## Adding New Utilities
 

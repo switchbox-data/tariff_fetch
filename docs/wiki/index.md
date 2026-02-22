@@ -25,23 +25,62 @@ This wiki explains what all of that means so you can actually use the data.
 
 ## Utilities Covered
 
-| Utility                                                 | Region   | Guides Available |
-| ------------------------------------------------------- | -------- | ---------------- |
-| [Consolidated Edison (ConEd)](utilities/coned/index.md) | New York | EL1 Residential  |
+| Utility                                                       | Region       | Guides Available              |
+| ------------------------------------------------------------- | ------------ | ----------------------------- |
+| [Consolidated Edison (ConEd)](utilities/coned/index.md)       | New York     | EL1 Residential               |
+| [PSEG Long Island](utilities/psegli/index.md)                  | New York     | Rate 194 (default)           |
+| [RG&E](utilities/rge/index.md)                                | New York     | 1-RSS (default)              |
+| [NYSEG](utilities/nyseg/index.md)                             | New York     | SC1 (default)                |
+| [National Grid – NY](utilities/nimo/index.md)                  | New York     | SC1 (default)                 |
+| [Orange & Rockland](utilities/or/index.md)                     | New York     | Rate 1 (default)              |
+| [Central Hudson](utilities/cenhud/index.md)                   | New York     | Rate 1 (default)              |
+| [Rhode Island Energy](utilities/rie/index.md)                  | Rhode Island | A-16 (default)                |
+
+See also [NY default rate comparison](utilities/ny-comparison/index.md) for a cross-utility charge comparison.
 
 ## Structure
 
 ```
 wiki/
 ├── utilities/
-│   └── coned/                    # Consolidated Edison
-│       ├── index.md              # ConEd overview
-│       └── residential-el1/      # EL1 Residential tariff
-│           ├── index.md          # Tariff field guide
-│           ├── supply-charges.md # How supply charges work
-│           ├── delivery-adjustments.md
-│           ├── riders.md
-│           └── variable-rates-api.md
+│   ├── coned/                    # Consolidated Edison
+│   │   ├── index.md
+│   │   ├── residential-el1/
+│   │   │   └── index.md
+│   │   ├── delivery-adjustments.md
+│   │   ├── riders.md
+│   │   ├── supply-charges.md
+│   │   └── variable-rates-api.md
+│   ├── ny-comparison/            # NY default rate comparison
+│   │   └── index.md
+│   ├── psegli/                   # PSEG Long Island
+│   │   ├── index.md
+│   │   └── residential-194/
+│   │       └── index.md
+│   ├── rge/                      # RG&E
+│   │   ├── index.md
+│   │   └── residential-1-rss/
+│   │       └── index.md
+│   ├── nyseg/                    # NYSEG
+│   │   ├── index.md
+│   │   └── residential-sc1/
+│   │       └── index.md
+│   ├── nimo/                     # National Grid NY
+│   │   ├── index.md
+│   │   └── residential-sc1/
+│   │       └── index.md
+│   ├── or/                       # Orange & Rockland
+│   │   ├── index.md
+│   │   └── residential-1/
+│   │       └── index.md
+│   ├── cenhud/                   # Central Hudson
+│   │   ├── index.md
+│   │   └── residential-1/
+│   │       └── index.md
+│   └── rie/                      # Rhode Island Energy
+│       ├── index.md
+│       └── residential-a16/
+│           └── index.md
 ```
 
 ## Contributing
