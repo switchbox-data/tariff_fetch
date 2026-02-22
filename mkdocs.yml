@@ -24,6 +24,7 @@ nav:
     - wiki/index.md
     - Utilities:
       - wiki/utilities/index.md
+      - NY Default Rate Comparison: wiki/utilities/ny-comparison/index.md
       - ConEd:
         - wiki/utilities/coned/index.md
         - Delivery Adjustments: wiki/utilities/coned/delivery-adjustments.md
@@ -36,6 +37,27 @@ nav:
           - wiki/utilities/coned/residential-el1-tou/index.md
         - SC4 Residential Demand:
           - wiki/utilities/coned/residential-el1-demand/index.md
+      - PSEG Long Island:
+        - wiki/utilities/psegli/index.md
+        - Rate 194 Residential (Default): wiki/utilities/psegli/residential-194/index.md
+      - RG&E:
+        - wiki/utilities/rge/index.md
+        - 1-RSS Residential (Default): wiki/utilities/rge/residential-1-rss/index.md
+      - NYSEG:
+        - wiki/utilities/nyseg/index.md
+        - SC1 Residential (Default): wiki/utilities/nyseg/residential-sc1/index.md
+      - National Grid (NY):
+        - wiki/utilities/nimo/index.md
+        - SC1 Residential (Default): wiki/utilities/nimo/residential-sc1/index.md
+      - Orange & Rockland:
+        - wiki/utilities/or/index.md
+        - Rate 1 Residential (Default): wiki/utilities/or/residential-1/index.md
+      - Central Hudson:
+        - wiki/utilities/cenhud/index.md
+        - Rate 1 Residential (Default): wiki/utilities/cenhud/residential-1/index.md
+      - Rhode Island Energy:
+        - wiki/utilities/rie/index.md
+        - A-16 Residential (Default): wiki/utilities/rie/residential-a16/index.md
 
 theme:
   name: material
