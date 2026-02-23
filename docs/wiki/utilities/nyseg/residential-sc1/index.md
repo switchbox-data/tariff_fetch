@@ -83,7 +83,7 @@ Part of NY's decoupling policy: NYSEG's allowed delivery revenue is decoupled fr
 
 #### Make-Whole Energy Charge — $0.00276/kWh
 
-A per-kWh delivery adjustment that true-ups energy-related costs not fully captured in the base energy charge. It recovers specific shortfalls or deferrals approved by the PSC. The rate is fixed in the tariff.
+A small, **fixed** per-kWh delivery charge that supplements the base Energy Charge. Despite the name, this is not a variable true-up — the rate is set in the rate case and remains fixed for the rate-case period. It recovers energy-related delivery costs not fully captured in the base rate, likely a specific cost component the PSC ordered shown separately for transparency. At $0.00276/kWh, it adds ~$1.38/month for a 500 kWh customer. Functionally part of the base delivery rate structure.
 
 #### Residential Agricultural Discount — _Variable_
 
@@ -131,11 +131,11 @@ Riders are add-on tariff components that apply across rate schedules. NYSEG upda
 
 #### Rate Adjustment Mechanism — _Variable_
 
-A delivery adjustment that true-ups actual revenue or costs to PSC-allowed levels. It can be a small surcharge or credit. Value from lookup.
+A periodic delivery-side cost reconciliation (defined in PSC No. 120, Section 25 under the Transition Charge umbrella) that trues up specific cost categories: the market value of utility-owned hydro output, net value of purchased power contracts (NUG and NYPA), NYPA Recharge NY residential discount payments, demand response program costs, and transmission wheeling expenses. These are legacy costs from NY's electricity restructuring that are hard to forecast precisely. The mechanism trues them up monthly: each month's charge is set based on a forecast, and any variance is rolled into the next month's rate. Analogous to ConEd's MAC. Value from lookup.
 
 #### Earnings Adjustment Mechanism — $0.00032/kWh
 
-Another delivery true-up that aligns actual earnings with allowed earnings. This fixed per-kWh rate appears in the tariff; it keeps delivery revenue in line with the commission's decisions.
+A **performance-based incentive** created by the NY PSC under REV (Reforming the Energy Vision). The EAM is **not** a cost recovery mechanism or earnings true-up — it is a bonus paid to the utility for achieving specific policy-outcome targets (e.g., peak reduction, DER utilization, beneficial electrification, energy efficiency). If NYSEG hits its targets, it earns a reward collected from ratepayers at this fixed per-kWh rate (~$0.16/month for a 500 kWh customer); if it doesn't, the EAM would be $0.
 
 #### Dynamic Load Management — _Variable_
 
@@ -151,7 +151,7 @@ Recovers NYSEG's costs for EV charging infrastructure: make-ready conduit and wi
 
 #### Late Payment Charge and Other Waived Fees Surcharge — $0 or _Variable_
 
-Can appear as zero in the tariff when waived fees are not being recovered; may be a small per-kWh amount in some periods. Check the tariff or lookup for current applicability.
+Recovers revenue from late payment charges and other fees that NYSEG **waived or suspended** during the COVID-19 pandemic moratorium and during winter 2022–2023 (when supply prices spiked ~42% and the PSC ordered fee suspensions). The deferred fees are recovered from all ratepayers as a $/kWh surcharge. NYSEG files updated surcharge statements with the PSC semi-annually as the pool of deferred fees is paid down. Can appear as zero when waived fees are fully recovered; check the tariff or lookup for current applicability.
 
 #### Arrears Relief Program — Phase 1 & Phase 2 — $0 or _Variable_
 
@@ -159,7 +159,7 @@ Recovers costs from NYSEG's COVID-era arrears forgiveness and relief programs. P
 
 #### Recovery Charge — $0.009922/kWh
 
-An additional per-kWh recovery charge that true-ups specific costs or revenue shortfalls approved by the PSC. Fixed in the tariff at this rate. All delivery customers pay it.
+A **securitized storm-cost recovery** charge authorized under New York's Utility Corporation Securitization Act (signed August 2024) and PSC Financing Order in Case 24-E-0493 (December 2024). NYSEG issued **$710.6 million in Recovery Bonds** (Series 2025-A) through a Special Purpose Entity to finance accumulated storm damage restoration costs. The bonds are rated Aaa and have three tranches maturing in 2031, 2034, and 2037. The charge is non-bypassable and applies to all NYSEG electric customers. The rate is adjusted **semi-annually**: if actual kWh billed exceeds the forecast, the rate drops; if below, it rises to ensure the bond debt-service schedule is met. At $0.009922/kWh, this is roughly $5/month for a 500 kWh customer — one of the larger riders on the NYSEG bill. The charge runs until the bonds are fully repaid (~2037).
 
 ---
 

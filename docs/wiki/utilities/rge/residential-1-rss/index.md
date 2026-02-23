@@ -75,7 +75,7 @@ The main volumetric delivery rate. It recovers the distribution revenue requirem
 
 #### Make-Whole Energy — $0.00221/kWh
 
-A small per-kWh delivery adjustment that true-ups energy-related costs that are not fully captured in the base energy delivery charge. It is set to recover specific cost shortfalls or deferrals approved by the PSC. The rate is fixed in the tariff but the mechanism may be reconciled periodically.
+A small, **fixed** per-kWh delivery charge that supplements the base Energy Delivery Charge. In the Arcadia tariff data, it is in the same **"Energy Delivery Charge" rate group** as the base rate ($0.08316/kWh) and classified as DISTRIBUTION — Arcadia treats it as a supplemental component of the base delivery charge, not a separate adjustment. The rate is set in the rate case and remains fixed for the rate-case period (unlike variable true-ups like RDM or RAM). At $0.00221/kWh, it adds ~$1.11/month for a 500 kWh customer. Functionally part of the base delivery rate structure.
 
 #### System Benefits Charge (Energy Efficiency) — _Variable_
 
@@ -135,11 +135,11 @@ Riders are add-on tariff components that apply across rate schedules. They are u
 
 #### Rate Adjustment Mechanism — $0.00029/kWh
 
-A delivery adjustment that true-ups actual revenue or costs to the levels allowed by the PSC. It can be a small surcharge or credit depending on whether the utility over- or under-collected. The rate shown here is from the tariff; it may be updated periodically.
+A periodic delivery-side cost reconciliation (defined in PSC No. 120, Section 25 under the Transition Charge umbrella) that trues up specific cost categories: the market value of utility-owned hydro output, net value of purchased power contracts (NUG and NYPA), NYPA Recharge NY residential discount payments, demand response program costs, and transmission wheeling expenses. The mechanism trues them up monthly: each month's charge is set based on a forecast, and any variance is rolled into the next month's rate. At $0.00029/kWh (~$0.15/month for a 500 kWh customer), it is extremely small relative to the base delivery rate. Analogous to ConEd's MAC.
 
 #### Earnings Adjustment Mechanism — $0.000047/kWh
 
-Another delivery true-up that aligns actual earnings with allowed earnings. It is typically a small per-kWh amount. Together with the Rate Adjustment Mechanism, it keeps delivery revenue in line with the commission's decisions.
+A **performance-based incentive** created by the NY PSC under REV (Reforming the Energy Vision). The EAM is **not** a cost recovery mechanism or earnings true-up — it is a bonus paid to the utility for achieving specific policy-outcome targets (e.g., peak reduction, DER utilization, beneficial electrification, energy efficiency). If RG&E hits its targets, it earns a reward collected from ratepayers at this fixed per-kWh rate (~$0.02/month for a 500 kWh customer — among the smallest line items on the bill); if it doesn't, the EAM would be $0.
 
 #### Dynamic Load Management — $0.000084/kWh
 

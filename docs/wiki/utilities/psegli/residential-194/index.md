@@ -85,15 +85,15 @@ Delivery rate for all winter hours outside 3–7 PM weekdays. The lowest of the 
 
 #### Shoreham Property Tax (SPT) Settlement — _Variable, by territory_
 
-Recovers costs tied to the former Shoreham nuclear plant (property taxes, settlements). **Territory matters**: Suffolk County and Outside Suffolk County (Nassau, Rockaways) have different SPT factors. Use the Lookups API with the correct territory. Typically a small per-kWh or percentage component.
+Recovers LIPA's payment of a **$620 million property-tax refund** related to the Shoreham nuclear power plant. Shoreham was built by LILCO (1973–1984) at a cost of $6 billion but operated only briefly in 1986 before being decommissioned in 1989 after Suffolk County determined safe evacuation was impossible. LIPA acquired the plant for $1 in 1992 and won a settlement for excess property-tax assessments. The charge is a **percentage of delivery charges** (~3%), applied for up to 30 years from ~2003 (through ~2033). **Territory matters**: only **Suffolk County** customers pay it; Outside Suffolk County (Nassau, Rockaways) customers see $0. Use the Lookups API with the correct territory.
 
 #### Distributed Energy Resources Cost Recovery — _Variable_
 
-Recovers PSEG-LI's costs for DER programs and grid integration (solar, storage, demand response). The per-kWh rate is updated periodically; use the Lookups API.
+Recovers the net cost LIPA incurs from compensating distributed energy resources — primarily rooftop solar, community solar (CDG), and behind-the-meter storage — under NY's Value of Distributed Energy Resources (VDER) / Value Stack framework. When DER systems export power to the grid, LIPA compensates owners via bill credits; the total credits paid out create a net cost recovered from all ratepayers through this per-kWh surcharge. PSEG-LI's equivalent of ConEd's VDER Cost Recovery charge. Rate is updated periodically; use the Lookups API.
 
 #### New York State Assessment — _Variable_
 
-State-level assessment that utilities pass through to customers. Rate is obtained via lookup. Covers state regulatory and policy costs.
+PSEG-LI's name for the **NY State Surcharge** under Public Service Law §18-a. This is a statewide assessment on utilities that funds the Department of Public Service and other state regulatory costs; utilities pass it through to customers as a percentage of charges. Rate is obtained via lookup.
 
 #### Revenue Decoupling Mechanism — _Variable_
 
@@ -101,15 +101,15 @@ Part of New York's decoupling policy: PSEG-LI's allowed delivery revenue is deco
 
 #### Securitization Offset Charge — _Variable_
 
-Supply-side charge related to securitization of certain legacy or transition costs. Pass-through to customers; value from lookup.
+A **credit** that removes old, higher debt-service costs previously embedded in LIPA's base rates. Before securitization, ratepayers were paying higher interest on LIPA's legacy debt (inherited from LILCO, including Shoreham-related obligations). The Utility Debt Securitization Authority (UDSA) refinanced this debt through lower-cost restructuring bonds; the offset passes the savings through. Value from lookup.
 
 #### Securitization Charge — _Variable_
 
-Another supply-side securitization component. Often netted with the offset; use the Lookups API for the effective rate.
+Collects **debt service** (principal and interest) on the UDSA restructuring bonds — the lower-cost bonds that replaced LIPA's legacy debt. UDSA has issued five series of bonds, generating cumulative NPV savings of ~$699M for Long Island ratepayers. The **net** of the Securitization Charge minus the Securitization Offset represents the actual debt-service burden on ratepayers, which is lower than what they'd pay without refinancing. Both are classified SUPPLY,CONTRACTED. Use the Lookups API for the effective rate.
 
 #### Delivery Service Adjustment — _Variable_
 
-True-up or adjustment to delivery charges (e.g. cost changes, deferrals). Value from lookup. Can be a small surcharge or credit.
+Reconciles three delivery-side financing cost categories against LIPA's budget: (1) **debt service** — actual vs. projected principal and interest on delivery-related debt, (2) **coverage** — adjustments to hit LIPA's Board-mandated debt coverage ratio target, and (3) **other financing costs** — interest rate swaps, letter of credit fees, and remarketing fees. Can be a surcharge (costs exceeded budget) or credit (costs came in below). Analogous to ConEd's MAC. Value from lookup.
 
 ---
 
@@ -125,7 +125,7 @@ If the bill before applying this floor is less than the minimum, the minimum app
 
 #### Increase in Rates and Charges to Recover / Rates for Cities and Incorporated Villages — $1.1404 and $3.5921 (quantity-based)
 
-Recovers payments in lieu of taxes (PILOT) and similar charges for cities and incorporated villages. The tariff includes quantity-based rates (e.g. per-kW or per-kWh components); the exact application (which rate applies to which component) may vary. Use the tariff or Lookups API for your scenario.
+Recovers **Payments in Lieu of Taxes (PILOTs)** that LIPA, as a public authority, makes to municipalities where it owns infrastructure (replacing the property taxes a private utility would pay). LIPA's total PILOT obligation is ~$346–351M/year (~8% of its operating budget); the bulk is embedded in base delivery rates. This separate line item recovers the **incremental** PILOT obligations for customers in cities and incorporated villages on Long Island. The two quantity-based rates ($1.1404 and $3.5921) are **fixed per-customer charges** (not volumetric). Customers outside qualifying cities/villages don't pay this surcharge.
 
 #### Customer Benefit Contribution — $0.0372/kW of system size (solar)
 

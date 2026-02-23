@@ -69,15 +69,24 @@ Recovers legacy costs from New York's electricity restructuring (stranded costs,
 
 #### Purchased Power Adjustment — _Variable_
 
-A delivery-side adjustment that true-ups the cost of purchased power used for delivery service. Value from lookup.
+Reconciles the non-avoidable, variable energy costs from Central Hudson's **remaining generating facilities** and **mandatory IPP (Independent Power Producer) purchases** under legacy PURPA/restructuring-era contracts. Unlike ConEd (which divested all generation), Central Hudson still owns some generating plants and is obligated to purchase power from certain IPPs at predetermined rates. These costs are "non-avoidable" — customers cannot escape them by switching to an ESCO, which is why the charge is classified as delivery (DISTRIBUTION) rather than supply. The base delivery rates embed a forecast; this adjustment reconciles actuals against that forecast monthly. Value from lookup.
 
 #### Electric Bill Credit — _Variable_
 
-A **credit** (reduction) that can appear on the bill when certain conditions are met (e.g. refunds, over-recovery). When positive it reduces the bill; check the tariff or lookup for applicability.
+A temporary per-kWh credit that returned **$16.351 million** in accumulated regulatory liabilities — money the utility over-collected from customers due to prior rate adjustments. Incorporated into Central Hudson's rate case (Case 24-E-0461), it reduced the requested delivery revenue increase by approximately 32% for the rate year ending June 30, 2025. **Expired June 30, 2025** — for any tariff effective after that date, this value is $0. Value from lookup.
 
 #### Miscellaneous Charges — _Variable_
 
-Covers other distribution-related costs not broken out elsewhere. Value from lookup.
+An **umbrella** that bundles multiple sub-charges into a single $/kWh line item. As of Feb 2025, the aggregate rate is ~$0.00522/kWh. The decomposition (from Central Hudson's published misc charges schedule) includes:
+
+- **Make Whole Factor** ($0.00223/kWh) — regulatory cost reconciliation
+- **Arrears Reduction Surcharge** ($0.00185/kWh) — COVID-era arrears forgiveness recovery
+- **EV Make Ready Program** ($0.00068/kWh) — EV charging infrastructure costs
+- **Miscellaneous Charges II Factor** ($0.00045/kWh) — general delivery cost reconciliation
+- **Energy Storage Program Recovery** ($0.00001/kWh) — battery storage program costs
+- **Clean Heat Deployment Program** ($0.00000/kWh) — heat pump incentive cost recovery (currently $0)
+
+Also covers: Targeted Demand Response Program, Distributed System Implementation Plan (DSIP), Value Stack Compensation (VDER credits), and Commercial System Relief Program costs. Value from lookup.
 
 #### System Benefits Charge — _Variable_
 
@@ -85,11 +94,11 @@ Funds NY clean energy and efficiency programs (e.g. NYSERDA). Set by the PSC; al
 
 #### Earnings Adjustment Mechanism Surcharge — _Variable_
 
-A delivery true-up that aligns actual earnings with PSC-allowed earnings. Value from lookup.
+A **performance-based incentive** created by the NY PSC under REV (Reforming the Energy Vision). The EAM is **not** a cost recovery mechanism or earnings true-up — it is a bonus paid to the utility for achieving specific policy-outcome targets (e.g., peak reduction, DER utilization, beneficial electrification, energy efficiency). If the utility hits its targets, it earns a reward collected from ratepayers as a uniform $/kWh surcharge; if it doesn't, the EAM is $0. Typically a very small per-kWh amount. Value from lookup.
 
 #### Rate Adjustment Mechanism Surcharge — _Variable_
 
-Another delivery adjustment that true-ups revenue or costs to allowed levels. Value from lookup.
+A periodic delivery-side cost reconciliation that trues up specific cost categories against what was forecasted in the revenue requirement — including purchased power costs, generation costs, and other delivery expenses. Analogous to ConEd's MAC. Value from lookup.
 
 ---
 

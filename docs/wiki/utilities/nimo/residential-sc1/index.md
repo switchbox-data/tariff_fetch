@@ -96,7 +96,12 @@ The main volumetric delivery rate. Recovers the distribution revenue requirement
 
 #### Delivery Charge Adjustment — _Variable, by zone_
 
-A **zone-specific** adjustment to the delivery charge. Each zone (Adirondack, Capital, Central, Frontier, Genesee, Utica) has its own adjustment factor or rate. It can be a surcharge or credit depending on the zone's cost allocation. Use the Lookups API with the correct zone to get the current delivery adjustment for your location.
+In the Arcadia tariff data, this is an **umbrella** (riderId 801) that bundles **two distinct components** for each of National Grid's six zones (12 sub-rates total):
+
+1. **Delivery Charge Adjustment - [Zone]** (chargeClass: DISTRIBUTION): A zone-specific adjustment to the base delivery energy charge ($0.08889/kWh is uniform; this adds zone-level differentiation reflecting differing infrastructure costs).
+2. **Electricity Supply Charge - [Zone]** (chargeClass: SUPPLY,CONTRACTED): The zone-specific **default supply charge** — National Grid's equivalent of ConEd's MSC, recovering wholesale energy costs for customers on default supply.
+
+Use the Lookups API with the correct zone (territoryId) to get both the delivery adjustment and the supply rate for your location.
 
 #### Revenue Decoupling Mechanism — _Variable_
 
@@ -104,7 +109,7 @@ Part of NY's decoupling policy: National Grid's allowed delivery revenue is deco
 
 #### Transmission Revenue Adjustment — _Variable_
 
-True-up for transmission revenue or costs. Pass-through of FERC or state transmission rates. Value from lookup.
+Reconciles National Grid's actual transmission costs with the transmission cost component embedded in retail delivery rates. Unlike distribution costs (set in PSC rate cases), National Grid's transmission costs are governed by a **FERC-approved formula rate** under the NYISO Open Access Transmission Tariff (established in a 2009 Settlement Agreement). This formula updates annually based on actual investment return, depreciation, and property tax on transmission plant. The TRA adjusts residential bills so customers pay the current FERC-formula amount rather than whatever was frozen in the last state rate case. Value from lookup.
 
 #### Legacy Transition Charge — _Variable_
 
@@ -124,11 +129,11 @@ Recovers the cost of demand response and dynamic load management programs. Value
 
 #### Earnings Adjustment Mechanism — _Variable_
 
-A delivery true-up that aligns actual earnings with PSC-allowed earnings. Value from lookup.
+A **performance-based incentive** created by the NY PSC under REV (Reforming the Energy Vision). The EAM is **not** a cost recovery mechanism or earnings true-up — it is a bonus paid to the utility for achieving specific policy-outcome targets (e.g., peak reduction, DER utilization, beneficial electrification, energy efficiency). If the utility hits its targets, it earns a reward collected from ratepayers as a uniform $/kWh surcharge; if it doesn't, the EAM is $0. Typically a very small per-kWh amount. Value from lookup.
 
 #### Rate Adjustment Mechanism — $0.00671/kWh
 
-Another delivery adjustment; this per-kWh rate is fixed in the tariff. True-ups revenue or costs to allowed levels. All delivery customers pay it.
+A periodic delivery-side cost reconciliation that trues up specific cost categories against what was forecasted in the revenue requirement — including purchased power costs, hydro output, NUG contract costs, demand response program costs, and transmission wheeling expenses. Analogous to ConEd's MAC. Fixed in the tariff at this rate; all delivery customers pay it.
 
 #### Electric Vehicle Make Ready Surcharge — $0.00147/kWh
 
@@ -140,7 +145,7 @@ Recovers costs of arrears management and forgiveness programs. Fixed per-kWh rat
 
 #### Net Utility Plant and Depreciation Expense Reconciliation — _Variable_ or $0
 
-Reconciliation of net utility plant and depreciation expense; may be a surcharge or credit. Value from lookup when applicable.
+Trues up the difference between National Grid's **actual capital spending** and the capital budget approved in the rate case. Base rates embed an expected return on (investment return on rate base) and return of (depreciation expense) for planned capital. If the utility spends less than approved, customers receive a credit for the over-collection; if it spends more (with PSC approval), customers are surcharged. Currently near $0, suggesting the forecast and actuals are well-aligned. Value from lookup when applicable.
 
 ---
 

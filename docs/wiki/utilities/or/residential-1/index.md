@@ -93,7 +93,7 @@ Recovers the cost of demand response and dynamic load management programs. Value
 
 #### Delivery Revenue Surcharge — _Variable_
 
-A delivery true-up that aligns actual revenue with allowed revenue. Value from lookup.
+A delivery-side surcharge or credit that corrects when O&R's actual collected delivery revenue differs from the PSC-allowed amount. If the utility under-collected (e.g., milder weather → lower sales), the DRS surcharges customers in the next period; if it over-collected, customers receive a credit. Analogous to ConEd's DRS. Value from lookup.
 
 #### Transition Adjustment for Competitive — _Variable_
 
@@ -107,7 +107,7 @@ These apply only if you take default supply from O&R. If you choose an ESCO, you
 
 #### Energy Cost Adjustment — _Variable_
 
-Pass-through of energy-related supply costs that vary from the base market supply rate. Value from lookup.
+O&R's supply-side cost reconciliation. Trues up the difference between the estimated wholesale energy costs baked into the Market Supply Charge and the actual wholesale costs O&R incurred purchasing power from the NYISO market. If wholesale prices came in higher than estimated, the ECA is a surcharge; if lower, it's a credit. Analogous to ConEd's MSC I Adjustment. Value from lookup.
 
 #### Market Supply Charge — _Variable_
 
@@ -143,7 +143,7 @@ Additional **credits** for qualifying customers under NY's energy affordability 
 
 #### Energy Storage Surcharge — $0.00002/kWh
 
-A small per-kWh charge that recovers costs related to energy storage programs and grid integration. All customers pay it. The rate is fixed in the tariff.
+Recovers O&R's costs for energy storage deployment programs — battery storage incentives, grid integration, and pilot programs (e.g., O&R's residential solar+battery pilot with Sunrun). Part of NY's statewide energy storage mandate. At $0.00002/kWh, this is roughly $0.01/month for a 500 kWh customer — one of the smallest line items on the bill. All customers pay it. The rate is fixed in the tariff.
 
 #### Electric Vehicle Make-Ready Surcharge — $0.00236/kWh
 
