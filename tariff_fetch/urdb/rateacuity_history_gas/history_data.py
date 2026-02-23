@@ -41,6 +41,17 @@ class HistoryData:
             with contextlib.suppress(RowValidationError):
                 yield _row_to_model(row_dict, location_avg_factor, month_column_names)
 
+    def get_unknown_nonempty_columns(self) -> list[str]:
+        df = self._df
+        df_schema = df.schema
+        non_date_columns = {col for col in df_schema if not is_date_column_name(col)}
+        allow_empty_columns = non_date_columns - FixedChargeRow.model_fields.keys()
+        return [
+            c
+            for c in allow_empty_columns
+            if not (df[c].is_null() | (df[c] == "" if df[c].dtype == pl.Utf8 else False)).all()
+        ]
+
     def validate_rows(self) -> list[RowValidationError]:
         result: list[RowValidationError] = []
         month_column_names = _get_month_column_names(self._df)
