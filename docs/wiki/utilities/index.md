@@ -15,12 +15,6 @@ Guides organized by utility company.
 | [Central Hudson](cenhud/index.md)                 | 2033   | Mid-Hudson Valley, NY      | Electricity  |
 | [Rhode Island Energy (RIE)](rie/index.md)         | 507    | Rhode Island               | Electricity  |
 
-## Cross-Utility Comparison
-
-| Page                                                 | Description                                                           |
-| ---------------------------------------------------- | --------------------------------------------------------------------- |
-| [NY default rate comparison](ny-comparison/index.md) | Charge-by-charge comparison of all seven NY default residential rates |
-
 ## Adding New Utilities
 
 To add documentation for a new utility:

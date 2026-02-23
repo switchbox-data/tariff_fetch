@@ -36,8 +36,6 @@ This wiki explains what all of that means so you can actually use the data.
 | [Central Hudson](utilities/cenhud/index.md)             | New York     | Rate 1 (default)   |
 | [Rhode Island Energy](utilities/rie/index.md)           | Rhode Island | A-16 (default)     |
 
-See also [NY default rate comparison](utilities/ny-comparison/index.md) for a cross-utility charge comparison.
-
 ## Structure
 
 ```
@@ -51,8 +49,6 @@ wiki/
 │   │   ├── riders.md
 │   │   ├── supply-charges.md
 │   │   └── variable-rates-api.md
-│   ├── ny-comparison/            # NY default rate comparison
-│   │   └── index.md
 │   ├── psegli/                   # PSEG Long Island
 │   │   ├── index.md
 │   │   └── residential-194/

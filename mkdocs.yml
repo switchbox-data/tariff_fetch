@@ -24,7 +24,6 @@ nav:
     - wiki/index.md
     - Utilities:
       - wiki/utilities/index.md
-      - NY Default Rate Comparison: wiki/utilities/ny-comparison/index.md
       - ConEd:
         - wiki/utilities/coned/index.md
         - Delivery Adjustments: wiki/utilities/coned/delivery-adjustments.md
