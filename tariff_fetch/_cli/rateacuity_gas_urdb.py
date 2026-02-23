@@ -4,7 +4,7 @@ from collections.abc import Collection
 from datetime import date
 from pathlib import Path
 from statistics import mean
-from typing import cast
+from typing import cast, get_args
 
 import questionary
 import tenacity
@@ -17,7 +17,7 @@ from tariff_fetch.urdb.rateacuity_history_gas import (
     build_urdb,
 )
 from tariff_fetch.urdb.rateacuity_history_gas.history_data import HistoryData, PercentageRow, Row
-from tariff_fetch.urdb.schema import URDBRate
+from tariff_fetch.urdb.schema import RateSector, ServiceType, URDBRate
 
 from . import console, prompt_filename
 
@@ -118,6 +118,33 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                         console.print("Percentages will be applied to the final result as is")
                         apply_percentages = Confirm.ask("Apply percentages? (otherwise percentages will be ignored)")
 
+                    label = cast(
+                        str | None, questionary.text("Label", default=_utility_name_to_label(selected_utility)).ask()
+                    )
+                    if label is None:
+                        exit()
+                    sector = cast(
+                        RateSector | None,
+                        questionary.select(
+                            "Sector",
+                            default="Residential",
+                            choices=get_args(RateSector),
+                        ).ask(),
+                    )
+                    if sector is None:
+                        exit()
+
+                    servicetype = cast(
+                        ServiceType | None,
+                        questionary.select(
+                            "Sector",
+                            default="Bundled",
+                            choices=get_args(ServiceType),
+                        ).ask(),
+                    )
+                    if servicetype is None:
+                        exit()
+
                     try:
                         urdb = build_urdb(rows, apply_percentages)
                     except ValueError as e:
@@ -125,6 +152,13 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                     else:
                         urdb["utility"] = selected_utility
                         urdb["name"] = tariff
+                        urdb["label"] = label
+                        urdb["sector"] = sector
+                        urdb["servicetype"] = servicetype
+                        urdb["demandunits"] = "kW"
+                        urdb["mincharge"] = 0.0
+                        urdb["minchargeunits"] = "$/month"
+                        urdb["country"] = "USA"
                         result.append(urdb)
 
                 scraping_state = (
@@ -137,7 +171,14 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
     if not (filename := prompt_filename(output_folder, suggested_filename, "json")):
         return
     filename.parent.mkdir(exist_ok=True)
-    _ = filename.write_text(json.dumps(result, indent=2))
+    wrapped_result = {"items": result}
+    _ = filename.write_text(json.dumps(wrapped_result, indent=2))
+
+
+def _utility_name_to_label(utility_name: str) -> str:
+    if not utility_name:
+        return ""
+    return "".join(w[0].lower() for w in utility_name.split() if w)
 
 
 def _get_percentage_columns(rows: Collection[Row]) -> list[tuple[str, str | None, float]]:

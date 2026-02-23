@@ -174,6 +174,8 @@ class URDBRate(TypedDict, total=False):
     minchargeunits: MinChargeUnit
     fixedattrs: Attrs
 
+    country: str
+
 
 URDBRateAdapter: TypeAdapter[URDBRate] = TypeAdapter(URDBRate)
 URDBListAdapter: TypeAdapter[list[URDBRate]] = TypeAdapter(Annotated[list[URDBRate], FailFast()])
