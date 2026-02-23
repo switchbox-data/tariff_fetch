@@ -5,8 +5,8 @@ from typing import cast
 
 from tariff_fetch.urdb.schema import EnergyTier, MonthSchedule, URDBRate
 
-from .history_data import ConsumptionRow, FixedChargeRow, PercentageRow, Row
 from .exceptions import EmptyBandsError
+from .history_data import ConsumptionRow, FixedChargeRow, PercentageRow, Row
 
 
 def build_urdb(rows: Collection[Row], include_taxes: bool) -> URDBRate:
