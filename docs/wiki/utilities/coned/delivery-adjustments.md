@@ -21,164 +21,41 @@ All of these adjustments have `variableRateKey` in the JSON—meaning they chang
 
 ---
 
-## Why So Many Adjustments?
+## The Problem Rate Cases Can't Fully Solve
 
-Electric utility regulation creates a fundamental timing problem:
+The point of a rate case is to set rates in advance so that the resulting **revenue** covers **expected costs**. That means the regulator and utility have to guess two things: (1) **costs**—what will it cost to serve customers? (2) **loads**—how many kWh will be sold? Because revenue = rate × load, the rates are set so that (rate × forecast load) equals the **revenue requirement** (the authorized dollar total needed to cover forecasted costs).
 
-1. **Rate cases are infrequent**: ConEd files a rate case every 1-3 years
-2. **Costs change constantly**: Fuel prices, labor, taxes, program costs fluctuate
-3. **Sales volumes vary**: Weather affects how much electricity customers use
-4. **Policy mandates evolve**: NY State adds new clean energy requirements
+Both guesses are uncertain. **Loads** might be higher or lower than expected—a mild summer or a hot one, more efficiency, more electrification—so you may **over- or under-collect** the revenue you set out to collect. Even if you hit the revenue requirement on the nose, you might have **forecasted costs wrong**: actual costs could be above or below what was baked into that revenue requirement, so the money you collect might be too much or too little relative to what costs actually were.
 
-Rather than constantly filing new rate cases (expensive, slow), regulators allow **adjustment mechanisms** that automatically true-up certain costs between rate cases.
+**RDM** (Revenue Decoupling Mechanism) addresses the first problem: it true-ups **revenue** so that, regardless of whether load was higher or lower than forecast, the utility eventually collects the revenue requirement. **MAC** (Monthly Adjustment Clause) addresses part of the second: a defined basket of costs that are volatile and hard to predict is true-upped **monthly** so that those costs are fully recovered (or refunded when over-collected) without waiting for the next rate case. The sections below explain how each works.
 
 ---
 
 ## The Adjustment Mechanisms
 
-### 1. Monthly Adjustment Clause (MAC)
+### 1. Revenue Decoupling Mechanism (RDM) Adjustment
 
-#### What Problem It Solves
+Assume for the moment that the **costs** in the revenue requirement were forecast correctly. The rates are still set using an **expected** amount of load (kWh per year). Revenue = rate × actual load, so if actual load is lower than forecast, you **under-collect** the revenue requirement; if actual load is higher, you **over-collect**. At the end of the rate year, there is a deficit or surplus relative to the dollar target the PSC authorized.
 
-The MAC is an **umbrella mechanism** that captures cost changes the PSC has pre-approved for pass-through. It's the "catch-all" for costs that vary but shouldn't require a rate case to update.
+**RDM** true-ups that revenue shortfall or surplus. It compares **actual delivery revenue collected** (from base rates and other adjustments in effect) to an **annual delivery revenue target**—the authorized revenue requirement for that rate year. The shortfall or overage is then collected from (or refunded to) customers in the **following** period. ConEd uses a **Revenue Per Customer (RPC)** methodology: a target $ per customer is set; the delivery revenue target for the year = RPC target × actual average number of customers. Actual revenue is compared to that target.
 
-#### What's Included
+The RDM adjustment is a **$/kWh** rate: the dollar variance is spread over **forecasted** kWh for the period when the new rate applies (e.g. the next rate year or the period until the next reconciliation). So next year's bills include an RDM surcharge (if there was a shortfall) or credit (if there was over-collection). Because that true-up is also spread over _forecasted_ kWh, the recovery in that period can be slightly high or low; that residual is picked up in the _next_ RDM reconciliation. Over time, total delivery revenue converges to the revenue requirement.
 
-The MAC typically includes:
+RDM is reconciled **annually** (not monthly like MAC). The lag is typically 12–18 months: this year's RDM rate reflects last year's over- or under-collection.
 
-- Property tax changes
-- Environmental compliance costs
-- Storm damage recovery
-- Pension and benefit cost changes
-- Other PSC-approved cost pass-throughs
+#### RDM and energy efficiency
 
-#### How It Works
+While RDM solves the general problem that sales are hard to forecast and therefore revenue often misses the target, it's often discussed as fixing the **throughput incentive**—the idea that utilities were set against energy efficiency (EE) programs because EE reduces sales and thus revenue. The connection is real, but the story is subtler.
 
-**Step 1: Rate Case Establishes Baseline**
+**Before EE.** Revenue requirement = $100M (numerator), forecast sales = 1,000 GWh (denominator), so rate = $0.10/kWh. If actual sales = 1,000 GWh, the utility collects $100M and is whole.
 
-```
-During rate case, PSC sets base delivery rates assuming:
-- Property taxes: $X million/year
-- Storm costs: $Y million/year
-- Pension costs: $Z million/year
-```
+**Add an EE program.** The commission adds the EE program to the revenue requirement: new numerator = $103M ($100M + $3M program). If the **denominator is left at 1,000 GWh** and the rate is updated to $0.103/kWh, but EE actually reduces sales to 950 GWh, the utility collects 950 × $0.103 = $97.85M. Shortfall = $5.15M. So the utility is worse off for having run EE—it both spent $3M on the program and came up short on total revenue. That's the disincentive.
 
-**Step 2: Actual Costs Differ**
+**In principle, no shortfall.** The commission could instead set the **denominator** to the post-EE forecast (e.g. 950 GWh) and the rate to $103M / 950 = $0.1084/kWh. Then when sales = 950 GWh, the utility collects $103M. No shortfall. That approach—recovering revenue "lost" due to EE by building the expected sales impact into the rate (or by a separate lost-revenue adjustment)—is called a **Lost Revenue Adjustment Mechanism (LRAM)**. So in principle there is no structural problem: you can make the utility whole by adjusting for the EE-driven sales drop.
 
-```
-Year 1 Reality:
-- Property taxes: $X + $5 million (taxes went up)
-- Storm costs: $Y + $20 million (bad hurricane season)
-- Pension costs: $Z - $2 million (good investment returns)
-```
+**In practice, LRAM ran into real problems.** States tried LRAM-style mechanisms in the 1980s and early 1990s. The experience was contentious: LRAM required **estimating** how much of the sales change was due to EE (evaluation, measurement, and verification—EM&V), which is disputed and costly. Recovery was usually **asymmetric**—utilities could recover when sales fell (EE) but often kept surplus when sales rose—so the throughput incentive wasn't fully removed. (In principle, truing to a revenue target would imply surcharge when below target and refund when above; LRAM was instead framed and implemented as "recover lost revenue from EE," so it had only the recovery leg and no matching refund when sales rose.) With infrequent rate cases, "lost revenue" from multiple years **pancaked**, so the bill impact was large and politically toxic. Lost-revenue recovery sometimes approached the total amount spent on efficiency. Many states abandoned the approach.
 
-**Step 3: MAC Adjustment Calculated**
-
-```
-Net variance = +$5M + $20M - $2M = +$23 million under-recovery
-
-MAC Rate = $23 million / Expected annual kWh sales
-         = $23 million / 40 billion kWh
-         = $0.000575/kWh
-```
-
-**Step 4: Applied to Bills**
-The MAC rate is updated (typically monthly or quarterly) and applied to all kWh consumed.
-
-#### Time Lag
-
-- **Lag**: 1-3 months
-- **Why**: ConEd needs to compile actual costs, file with PSC, get approval
-- **Pattern**: You're paying for cost variances from ~2-3 months ago
-
-#### Variable Rate Key
-
-```json
-"variableRateKey": "monthlyAdjustmentClauseResidential"
-```
-
----
-
-### 2. Revenue Decoupling Mechanism (RDM) Adjustment
-
-#### What Problem It Solves
-
-Traditional utility regulation created a perverse incentive: utilities made more money when customers used more electricity. This discouraged utilities from promoting energy efficiency.
-
-**Revenue decoupling** breaks this link by guaranteeing the utility a fixed revenue amount regardless of sales volume.
-
-#### The Core Concept
-
-```
-Traditional Model:
-- Revenue = Rate × Sales Volume
-- If customers conserve, utility loses money
-- Utility has incentive to encourage consumption
-
-Decoupled Model:
-- Revenue = PSC-authorized amount (fixed)
-- If customers conserve, rates adjust upward to hit target
-- If customers use more, rates adjust downward
-- Utility is indifferent to sales volume
-```
-
-#### How It Works
-
-**Step 1: Rate Case Sets Target Revenue**
-
-```
-PSC authorizes ConEd to collect $2.5 billion/year in delivery revenue
-Based on expected sales of 40 billion kWh
-Implied rate: $0.0625/kWh
-```
-
-**Step 2: Actual Sales Differ**
-
-```
-Year 1: Mild summer → customers use only 38 billion kWh
-At $0.0625/kWh, ConEd collects only $2.375 billion
-Shortfall: $125 million
-```
-
-**Step 3: RDM Adjustment Calculated**
-
-```
-RDM Adjustment = Shortfall / Expected Future Sales
-               = $125 million / 40 billion kWh
-               = $0.003125/kWh surcharge
-```
-
-**Step 4: Applied to Future Bills**
-Next year's bills include the RDM surcharge to make ConEd whole.
-
-#### The Flip Side
-
-```
-Year 2: Hot summer → customers use 43 billion kWh
-At $0.0625/kWh, ConEd collects $2.6875 billion
-Over-collection: $187.5 million
-
-RDM Adjustment = -$187.5 million / 40 billion kWh
-               = -$0.0047/kWh CREDIT
-```
-
-Customers get money back when they use more than expected!
-
-#### Time Lag
-
-- **Lag**: 12-18 months typically
-- **Why**: RDM is usually reconciled annually after a full year of data
-- **Pattern**: This year's RDM reflects last year's over/under-collection
-
-#### Why This Matters for Clean Energy
-
-Revenue decoupling is foundational to NY's climate policy. Without it:
-
-- ConEd would fight rooftop solar (reduces sales)
-- ConEd would oppose efficiency programs (reduces sales)
-- ConEd would resist electrification messaging (complicated)
-
-With decoupling, ConEd's revenue is protected regardless of sales trends.
+**Why RDM instead?** RDM's "make revenue match the revenue requirement" achieves the same goal—utilities don't under-recover when sales fall—but in a way that avoids what made LRAM hard. RDM uses **actual total sales**, not an estimate of how much sales changed _because of_ EE, so there's no need to attribute the change to EE (no EM&V fight over cause). The true-up is **symmetric**: if sales are above forecast, the utility refunds; if below, it surcharges. So the throughput incentive is fully removed, and the utility has no reason to oppose EE or chase sales. Adjustments are **periodic** (e.g. annual), so they don't pancake over many years the way LRAM did when rate cases were years apart. In short, RDM makes the utility indifferent to sales volume without requiring anyone to agree on or measure the share of the sales change due to EE, and without the one-sided recovery and political blowback that LRAM produced.
 
 #### Variable Rate Key
 
@@ -188,81 +65,65 @@ With decoupling, ConEd's revenue is protected regardless of sales trends.
 
 ---
 
-### 3. Delivery Revenue Surcharge
+### 2. Monthly Adjustment Clause (MAC)
 
-#### What Problem It Solves
+So RDM ensures the utility collects the **revenue requirement** regardless of load. But what if the **costs** that were baked into that revenue requirement were wrong? Some of the costs the utility actually incurs are volatile and hard to predict—property taxes, storm damage, pension and benefit costs, environmental compliance, and similar items. If those turn out higher or lower than forecast, the revenue requirement (and thus the revenue you collect with RDM in place) is no longer aligned with actual costs for that basket.
 
-This is a **supplemental revenue adjustment** that handles specific revenue shortfalls or policy-driven rate changes outside the normal MAC and RDM mechanisms.
+A subset of delivery costs is designated the **MAC basket**. These are PSC-approved, pass-through style costs that are true-upped **every month** (not every year) so that they are fully recovered—or any over-collection is refunded—without waiting for the next rate case. The MAC basket typically includes property tax changes, storm-related costs, pension/OPEB, environmental compliance, and other volatile pass-throughs. Because they're hard to predict, the PSC pre-approves this reconciliation mechanism.
 
-#### Common Uses
+#### What about non-MAC costs that are wrong?
 
-- Implementing PSC-ordered rate changes mid-period
-- Recovering costs from specific events (major storms, infrastructure failures)
-- Adjusting for regulatory lag when costs change faster than rate cases
+Other costs in the revenue requirement (labor, wires, depreciation, non-MAC O&M, etc.) are **not** true-upped continuously like the MAC basket. If actual non-MAC costs differ from what was in the revenue requirement, the utility may under- or over-recover those costs even though RDM has made total **revenue** match the revenue requirement. Those variances are typically handled through **deferral accounts**: under-recoveries are booked as regulatory assets (to be recovered later), over-recoveries as regulatory liabilities (to be credited back later). The balances are then **amortized or reconciled in the next rate case**—the next rate case sets a new revenue requirement that can include amortization of those deferrals. So the utility (or customers) are made whole over the rate-case cycle, not every month or year.
 
-#### How It Works
+#### How MAC works (mechanics)
 
-Similar to MAC, but used for more specific, identifiable cost categories that the PSC wants tracked separately.
+ConEd's tariff applies the MAC as a single line item; the underlying **Statement of Adjustment Factor - MAC** (filed with the PSC) has three components: **MAC Reconciliation**, **Uncollectible-bill Expense**, and **Transition Adjustment**. Uncollectible Bill Expense is described in the next section; Transition Adjustment and Reconciliation Rate have their own sections below. This section describes the **MAC** as it appears on the bill—the **MAC Reconciliation** component.
 
-#### Variable Rate Key
+**Base rate and MAC component.** In the rate case, the PSC sets the delivery revenue requirement (including an allowance for the MAC basket) and expected sales. The **base** $/kWh is a single blended rate set so that (base rate × expected sales) recovers that full requirement. For reconciliation, the portion of the base rate that corresponds to **forecasted** MAC costs is defined explicitly—e.g. (forecasted MAC costs for the year ÷ forecasted kWh for the year) in $/kWh. That slice is the "MAC component" of the base; customers don't see it as a separate line.
 
-```json
-"variableRateKey": "DeliveryRevenueSurchargeSc1"
-```
+**Actual MAC revenue.** In any month, revenue counted as "for MAC" is: **(MAC component of base × actual kWh) + (MAC adjustment rate in effect that month × actual kWh)**.
 
----
+**True-up.** Each period (e.g. prior month), ConEd compares **actual** costs for the MAC basket to **actual MAC revenue** (as defined above). **Variance** = actual costs − actual MAC revenue. If positive, the utility under-collected for MAC; if negative, it over-collected.
 
-### 4. Reconciliation Rate
+**MAC rate (the line item).** That variance (in dollars) is turned into a **$/kWh** rate by spreading it over **forecasted** kWh for the period when the new rate will apply (e.g. next month). So the **MAC rate** you see this month is the true-up for a **prior** period (prior month, per ConEd's description), applied to your current-month usage. Spreading over forecasted (rather than actual) kWh can still cause over- or under-collection of that true-up; any such error is absorbed into the **next** period's reconciliation. The lag is about one month.
 
-#### What Problem It Solves
+**Dual role of MAC.** MAC does two things: (1) **Level**—when the annual forecast for MAC costs (or the load used to set the MAC component) is wrong, MAC true-ups so the utility collects the allowed amount for that basket over time. (2) **Timing**—even when the annual forecast is correct, MAC costs are lumpy (storms, tax payments) while revenue from the base follows load; month-by-month, actual cost and actual collection often don't match. MAC shifts **when** dollars are collected so they align better with **when** costs were incurred. So MAC is not "extra" revenue—it keeps recovery for the MAC basket in line with actual costs and timing.
 
-The Reconciliation Rate handles **true-ups for deferred costs** from NY's electricity restructuring in the late 1990s.
+#### Effect on monthly collection
 
-#### Historical Context
-
-When NY deregulated electricity in 1996-2000:
-
-- Utilities sold off power plants
-- Some sold at losses ("stranded costs")
-- PSC allowed utilities to recover these over time
-- The Reconciliation Rate adjusts for actual vs. expected recovery
-
-#### Why It Still Exists
-
-Even decades later, there are ongoing reconciliations for:
-
-- Legacy power purchase contracts
-- Deferred regulatory assets
-- Long-term debt from restructuring
-
-#### Time Lag
-
-- **Lag**: Annual
-- **Pattern**: Reconciles prior year's deferred cost recovery
+Your delivery charge each month includes **(base + MAC) × kWh**. When the **prior** period had **under**-recovery, the current MAC rate is **positive** → you collect more this month. When the prior period had **over**-recovery, the MAC rate is **negative** (a credit). Over a full year, if the annual cost and load forecasts for the MAC basket were perfect, the **sum** of MAC collections would be close to zero—you'd just be shifting which months contribute more or less, so the utility's cash flow better matches when it actually incurred the costs.
 
 #### Variable Rate Key
 
 ```json
-"variableRateKey": "macAdjustmentReconciliation2252"
+"variableRateKey": "monthlyAdjustmentClauseResidential"
 ```
 
 ---
 
-### 5. Transition Adjustment
+### 3. Uncollectible Bill Expense
 
-#### What Problem It Solves
+When some customers don't pay their bills, the utility doesn't absorb the shortfall—**paying customers** are made whole through rates. Regulators allow this by treating expected unpaid bills as a **cost** (uncollectible or bad-debt expense) and adding it to the **revenue requirement**. Base rates are then set to collect that expected shortfall in advance. So the mechanism is an accounting choice: unpaid bills are framed as a "cost" so the utility can raise rates on everyone else to cover the amount it expects not to collect.
 
-Another legacy of deregulation. The Transition Adjustment handles costs related to the **transition** from regulated monopoly to competitive markets.
+Actual bad debt is volatile (economic conditions, disconnection rules, arrears). If **actual** uncollectible expense is higher than the amount baked into rates, the utility under-recovers via base rates; if lower, it over-recovers. The **Uncollectible Bill Expense** line is the **true-up**: it reconciles actual vs. expected uncollectible (and in practice, per PSC filings, late payment charge revenue is often reconciled together with it). When actual > expected, the adjustment is a surcharge; when actual < expected, a credit. In this way it behaves like the other MAC components—a volatile "cost" that is trued up **monthly** instead of waiting for the next rate case.
 
-#### What It Covers
+On ConEd's **Statement of Adjustment Factor - MAC**, Uncollectible Bill Expense is one of the **three columns** (with Transition Adjustment and Reconciliation Rate). So it is a **subcomponent** of that MAC statement. On the bill and in Genability it appears as a **separate** line item with its own variable rate key. Lag is about one month, like the other MAC-statement components.
 
-- Costs of separating generation from distribution
-- Stranded cost recovery adjustments
-- Contract buyouts from the restructuring era
+#### Variable Rate Key
 
-#### Why It's (Usually) Small Now
+```json
+"variableRateKey": "macAdjustmentUncollectibeBillExpense2252"
+```
 
-Most transition costs have been recovered, so this adjustment is typically minimal. It persists for final true-ups and any remaining legacy obligations.
+---
+
+### 4. Transition Adjustment
+
+When New York restructured (generation separated from delivery, retail choice introduced), utilities were left with obligations that were no longer economic in a competitive market: **stranded plants** (e.g., a plant taken out of service but still on the books—regulators let them recover the remaining value through rates), **above-market power contracts** (long-term PPAs at 6¢/kWh while the market fell to 3¢—they kept paying, or bought out the contract for a lump sum and recovered that from ratepayers over time), and **one-time transition costs** (separation, buyouts, settlements). Those amounts were (and in small part still are) recovered from customers on a schedule set in rate cases: so much per year in amortization, plus interest on any balance that built up when the utility under-collected in a prior period.
+
+In the rate case, the commission **forecasts** how much of that recovery will land in each period. In practice, the actual amount can differ: the **schedule** can slip or stretch (same total dollars, different timing); **interest** on any deferral balance depends on that balance and the formula rate, which may not match the forecast; a **remaining contract payment** or a **small settlement** might come in above or below the estimate. The **Transition Adjustment** is the **monthly true-up**: it reconciles what was actually recovered (or what was actually due) for this basket against what was built into rates, so the utility doesn't over- or under-recover. When actual &gt; expected, the adjustment is a surcharge; when actual &lt; expected, a credit.
+
+Structurally it's the same idea as the MAC basket and Uncollectible Bill Expense: the **cost** (here, the allowed recovery of legacy transition/stranded amounts) turned out different than we thought, so we true up instead of waiting for the next rate case. On ConEd's **Statement of Adjustment Factor - MAC**, Transition Adjustment is one of the three columns (with Uncollectible and Reconciliation Rate); on the bill it's a separate line item. Lag is about one month.
 
 #### Variable Rate Key
 
@@ -272,54 +133,53 @@ Most transition costs have been recovered, so this adjustment is typically minim
 
 ---
 
-### 6. Uncollectible Bill Expense
+### 5. Reconciliation Rate
 
-#### What Problem It Solves
+#### What It Is (from the tariff and MAC statement)
 
-Some customers don't pay their bills. ConEd can't collect from them, but still incurred costs to serve them. This adjustment recovers those costs from paying customers.
+The **Reconciliation Rate** is the **third component** of ConEd's **Statement of Adjustment Factor - MAC** (the same monthly statement that has Uncollectible-bill Expense and Transition Adjustment). It appears as a separate line item on the bill with variable rate key `macAdjustmentReconciliation2252`. (The **2252** is ConEd's LSE (load-serving entity) ID, not a tariff schedule number.)
 
-#### How It Works
+So it is **not** the same as the main MAC charge (the cost-basket true-up in section 2): that one uses key `monthlyAdjustmentClauseResidential`. The Reconciliation Rate is a distinct, usually **small** $/kWh component (often a fraction of a cent per kWh, and sometimes negative) that is updated **monthly** along with the other two MAC-statement components.
 
-**Step 1: Rate Case Estimates Bad Debt**
+#### What it reconciles
 
-```
-PSC assumes 1.5% of billed revenue will be uncollectible
-Base rates include recovery for this expected level
-```
+The PSC No. 10 electric tariff (General Rule 26), which is the primary source for such things, does **not** define what the Reconciliation Rate component reconciles. The tariff refers to "delivery charges and adjustments described in General Rule 26" and to the "Adjustment Factor – MAC" but does not name or define the three columns on the Statement of Adjustment Factor - MAC. The exact scope of the Reconciliation Rate (which deferrals or cost categories it true-ups) is set in PSC rate case orders and ConEd's filings that establish that statement; it is not spelled out in the main tariff PDF. We don't really know.
 
-**Step 2: Actual Bad Debt Differs**
+#### Time lag
 
-```
-Year 1: Economic downturn → 2.3% of bills unpaid
-Excess bad debt: 0.8% × $2.5 billion = $20 million
-```
-
-**Step 3: Adjustment Calculated**
-
-```
-Uncollectible Expense Adjustment = $20 million / 40 billion kWh
-                                 = $0.0005/kWh
-```
-
-#### COVID-19 Impact
-
-This adjustment spiked during COVID when:
-
-- Moratoriums prevented disconnections
-- Many customers fell behind on bills
-- Bad debt rates exceeded historical norms
-
-The separate "Arrears Management Program Recovery Surcharge" (a rider) handles some of this, but the Uncollectible Bill Expense adjustment captures ongoing bad debt variances.
-
-#### Time Lag
-
-- **Lag**: 6-12 months
-- **Why**: ConEd needs time to determine which bills are truly uncollectible (not just late)
+- **Lag**: **Monthly** (same as the other MAC-statement components).
+- **Pattern**: The rate is set each month on the Statement of Adjustment Factor - MAC; it reflects a prior-period true-up applied to current billing.
 
 #### Variable Rate Key
 
 ```json
-"variableRateKey": "macAdjustmentUncollectibeBillExpense2252"
+"variableRateKey": "macAdjustmentReconciliation2252"
+```
+
+---
+
+### 6. Delivery Revenue Surcharge
+
+#### What Problem It Solves
+
+The Delivery Revenue Surcharge (DRS) recovers **revenue**—not costs—that the utility would have collected under **newly approved rates** during the period when those rates were **suspended** or delayed. When the PSC extends a rate-case suspension (or the case runs long), the effective date of the new rates is pushed out. During the extra months, the utility still collects under **old** rates, so it under-collects relative to the revenue it would have gotten if the new rates had been in effect. DRS is the mechanism to recover that **suspension-period revenue shortfall** over a defined period, often as a separate line item so the recovery is transparent and deferrals don't build up.
+
+#### Why RDM, MAC, or the next rate case don't handle it
+
+- **RDM** true-ups actual revenue to the **revenue target for the rates currently in effect**. During the suspension extension, the rates in effect are the old ones, so the RDM target is the old revenue requirement. The DRS shortfall is relative to the **new** (approved but not yet effective) revenue requirement—a different target.
+- **MAC** true-ups **costs** in the MAC basket. This shortfall is from not having the new rate level in effect, not from wrong cost forecasts.
+- **Next rate case:** The utility could defer the shortfall and recover it in the next case. ConEd's joint proposals instead use a surcharge over a set period to avoid large deferrals and make the recovery visible.
+
+#### How It Works (with example)
+
+The PSC approves new rates with an assumed effective date (e.g. January 1). The case or suspension is extended, so the new rates don't take effect until later (e.g. July 1). The dollar shortfall = (revenue that would have been collected at the **new** rates from Jan–Jun) − (revenue actually collected at the **old** rates for Jan–Jun). That shortfall is spread over a defined recovery period (e.g. through the following year) as a **$/kWh** surcharge—the DRS. When the recovery period ends, the surcharge goes away (possibly with a final prior-period reconciliation).
+
+**Example.** Suppose the PSC order assumes new electric delivery rates effective January 1, 2024, but the suspension is extended and new rates don't take effect until August 1, 2024. For those seven months, ConEd collects at **old** rates. Had the new rates been in effect, it would have collected an extra $X (the "make whole" amount). The commission authorizes recovery of $X via a Delivery Revenue Surcharge, e.g. as a $/kWh adder on bills from September 2024 through December 2025, so the utility is made whole without rolling the shortfall into the next rate case. The DRS line on your bill is that adder.
+
+#### Variable Rate Key
+
+```json
+"variableRateKey": "DeliveryRevenueSurchargeSc1"
 ```
 
 ---
@@ -437,15 +297,15 @@ YEAR 3: NEXT RATE CASE (OR CONTINUED ADJUSTMENTS)
 
 These aren't completely independent—they're designed to work together:
 
-| Adjustment                 | What It Catches                    | Frequency | Typical Lag  |
-| -------------------------- | ---------------------------------- | --------- | ------------ |
-| MAC                        | Cost changes (taxes, storms, etc.) | Monthly   | 1-3 months   |
-| RDM                        | Sales volume variance              | Annual    | 12-18 months |
-| Delivery Revenue Surcharge | Specific revenue shortfalls        | As needed | Varies       |
-| Reconciliation Rate        | Deferred cost recovery             | Annual    | 12+ months   |
-| Transition Adjustment      | Legacy restructuring costs         | Annual    | 12+ months   |
-| Uncollectible Bill Expense | Bad debt variance                  | Quarterly | 6-12 months  |
-| CES Delivery Surcharge     | Clean energy infrastructure        | Quarterly | 3-6 months   |
+| Adjustment                 | What It Catches                            | Frequency | Typical Lag  |
+| -------------------------- | ------------------------------------------ | --------- | ------------ |
+| MAC                        | Cost changes (taxes, storms, etc.)         | Monthly   | ~1 month     |
+| RDM                        | Sales volume variance                      | Annual    | 12-18 months |
+| Delivery Revenue Surcharge | Specific revenue shortfalls                | As needed | Varies       |
+| Reconciliation Rate        | Third MAC component; scope per PSC filings | Monthly   | ~1 month     |
+| Transition Adjustment      | Legacy restructuring costs                 | Monthly   | ~1 month     |
+| Uncollectible Bill Expense | Bad debt (uncollectible) true-up           | Monthly   | ~1 month     |
+| CES Delivery Surcharge     | Clean energy infrastructure                | Quarterly | 3-6 months   |
 
 ---
 

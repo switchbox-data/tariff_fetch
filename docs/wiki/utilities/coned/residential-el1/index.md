@@ -142,7 +142,7 @@ Recovers the cost of Renewable Energy Credits (RECs), Zero Emission Credits (ZEC
 
 #### System Benefits Charge (SBC) — _Variable_
 
-Funds NY's clean energy programs administered by NYSERDA: energy efficiency rebates, low-income assistance, renewable energy research. Set by the PSC; all customers pay.
+Established by the PSC in 1996 to fund public policy programs not expected to be handled by competitive electricity markets. Administered by NYSERDA, the SBC funds energy efficiency rebates, low-income assistance, renewable energy research, the Clean Energy Fund, and related initiatives. It is governed by its own PSC proceedings (e.g., Cases 14-M-0094, 18-M-0084), not by the utility's rate case. ConEd files a separate "Statement of System Benefits Charge" under PSC No. 10 with its own effective dates, independent of base rate changes. All customers pay; the rate is updated periodically (typically quarterly or when the PSC issues a new order).
 
 ---
 
@@ -150,7 +150,7 @@ Funds NY's clean energy programs administered by NYSERDA: energy efficiency reba
 
 #### New York State Surcharge — _Variable_
 
-A temporary surcharge authorized by the NY PSC. Often used for policy initiatives or one-time cost recovery.
+The PSL §18-a regulatory assessment: a fee the state imposes on all regulated utilities to fund the Department of Public Service (the regulator itself). The utility collects it from customers on a per-kWh basis and remits it to the state. It is not a utility cost in the traditional sense — it's a government-imposed pass-through. The level is set by statute/PSC order; the utility reconciles any variance between what it collects and what it owes. Despite the doc's earlier description as "temporary," this is an ongoing, permanent charge.
 
 ---
 
