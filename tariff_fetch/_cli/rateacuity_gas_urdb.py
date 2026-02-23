@@ -99,6 +99,12 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                         console.print(f" - {error.row}")
                     proceed = Confirm.ask("Proceed?", console=console)
 
+                if proceed and (unknown_non_empty_columns := hd.get_unknown_nonempty_columns()):
+                    console.print("Found following unknown non-empty columns. Their values will be ignored:")
+                    for col in unknown_non_empty_columns:
+                        console.print(f" - {col}")
+                    proceed = Confirm.ask("Proceed?", console=console)
+
                 if proceed:
                     apply_percentages = False
                     rows = list(hd.rows())
@@ -112,10 +118,14 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                         console.print("Percentages will be applied to the final result as is")
                         apply_percentages = Confirm.ask("Apply percentages? (otherwise percentages will be ignored)")
 
-                    urdb = build_urdb(rows, apply_percentages)
-                    urdb["utility"] = selected_utility
-                    urdb["name"] = tariff
-                    result.append(urdb)
+                    try:
+                        urdb = build_urdb(rows, apply_percentages)
+                    except ValueError as e:
+                        console.print(f"Cannot convert to urdb: [red]{e}[/]")
+                    else:
+                        urdb["utility"] = selected_utility
+                        urdb["name"] = tariff
+                        result.append(urdb)
 
                 scraping_state = (
                     scraping_state.back_to_selections()

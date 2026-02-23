@@ -2,6 +2,13 @@ from typing_extensions import final, override
 
 
 @final
+class EmptyBandsError(ValueError):
+    @override
+    def __str__(self) -> str:
+        return "Empty monthly bands"
+
+
+@final
 class IncorrectDataframeSchemaMonths(ValueError):
     @override
     def __str__(self) -> str:

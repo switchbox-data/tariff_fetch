@@ -6,6 +6,7 @@ from typing import cast
 from tariff_fetch.urdb.schema import EnergyTier, MonthSchedule, URDBRate
 
 from .history_data import ConsumptionRow, FixedChargeRow, PercentageRow, Row
+from .exceptions import EmptyBandsError
 
 
 def build_urdb(rows: Collection[Row], include_taxes: bool) -> URDBRate:
@@ -32,6 +33,8 @@ def _build_energy_schedule_raw(rows: Collection[Row], include_taxes: bool) -> UR
         summed_bands = tuple(
             (round(limit) if limit != inf else inf, round(max(0, value), 6)) for limit, value in summed_bands
         )
+        if not summed_bands:
+            raise EmptyBandsError()
         # join bands
         summed_bands = [
             *(this for this, next_ in itertools.pairwise(summed_bands) if this[1] != next_[1] and this[0] != 0),
