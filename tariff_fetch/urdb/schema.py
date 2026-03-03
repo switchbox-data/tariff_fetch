@@ -29,7 +29,7 @@ URDBItemType = Literal["Utility_Rates"]  # shown in docs examples :contentRefere
 
 
 # --- fixed-shape schedules (12 months x 24 hours) ---
-Int24 = tuple[
+Int24_ = tuple[
     int,
     int,
     int,
@@ -55,9 +55,13 @@ Int24 = tuple[
     int,
     int,
 ]
-MonthSchedule = tuple[Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24]
-Float12 = tuple[float, float, float, float, float, float, float, float, float, float, float, float]
-FlatDemandMonths = tuple[int, int, int, int, int, int, int, int, int, int, int, int]
+Int24 = tuple[int, ...]
+# MonthSchedule = tuple[Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24]
+MonthSchedule = tuple[Int24, ...]
+# Float12 = tuple[float, float, float, float, float, float, float, float, float, float, float, float]
+Float12 = tuple[float, ...]
+# FlatDemandMonths = tuple[int, int, int, int, int, int, int, int, int, int, int, int]
+FlatDemandMonths = tuple[int, ...]
 
 
 # --- tiers (NO None allowed) ---

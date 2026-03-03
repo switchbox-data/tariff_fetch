@@ -85,6 +85,8 @@ class TariffsParams(TypedDict, total=False):
     populate_properties: bool
     populate_rates: bool
     populate_documents: bool
+    from_date_time: date
+    to_date_time: date
 
 
 class LookupsParams(PagingParams, total=False):

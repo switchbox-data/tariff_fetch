@@ -41,9 +41,9 @@ TariffPropertyPeriod = Literal[
 class TariffPropertyChoice(TypedDict):
     value: str
     "Machine readable option value"
-    displayValue: str
+    display_value: str
     "Human readable value shown to end users"
-    dataValue: str
+    data_value: str
     likelihood: NotRequired[float | None]
 
 
@@ -62,7 +62,7 @@ class TariffPropertyMinimalFields(TypedDict):
 class TariffPropertyStandardFields(TypedDict):
     period: NotRequired[TariffPropertyPeriod]
     operator: str | None
-    propertyValue: NotRequired[str]
+    property_value: NotRequired[str]
     minValue: NotRequired[str | float | int]
     maxValue: NotRequired[str | float | int]
     choices: NotRequired[list[TariffPropertyChoice]]

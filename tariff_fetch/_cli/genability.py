@@ -1,5 +1,5 @@
 import os
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import cast
 
@@ -124,7 +124,8 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]]):
             page = api.tariffs.iter_pages(
                 fields="ext",
                 master_tariff_id=id_,
-                effective_on=date.today(),
+                # effective_on=date.today(),
+                effective_on=date(2025, 6, 1),
                 populate_properties=True,
                 populate_rates=True,
             )

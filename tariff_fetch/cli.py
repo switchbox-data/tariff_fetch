@@ -1,3 +1,5 @@
+import logging
+from datetime import date
 from pathlib import Path
 from typing import Annotated, cast
 
@@ -7,6 +9,7 @@ import typer
 from requests import HTTPError
 from rich.prompt import Prompt
 
+from tariff_fetch._cli.arcadia_urdb import process_genability as process_genability_urdb
 from tariff_fetch._cli.genability import process_genability
 from tariff_fetch._cli.openei import process_openei
 from tariff_fetch._cli.rateacuity import process_rateacuity
@@ -19,6 +22,21 @@ ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
 CORE_EIA861_YEARLY_SALES_HTTPS = (
     "https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/core_eia861__yearly_sales.parquet"
 )
+
+
+def prompt_year() -> int:
+    result = cast(
+        str, questionary.text("Enter year", default=str(date.today().year - 1), validate=_is_valid_year).ask()
+    )
+    return int(result)
+
+
+def _is_valid_year(value: str) -> bool:
+    try:
+        _ = date(int(value), 1, 1)
+    except (TypeError, ValueError):
+        return False
+    return True
 
 
 def prompt_state() -> StateCode:
@@ -137,43 +155,74 @@ def main(
     output_folder: Annotated[
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
+    urdb: bool = False,
 ):
+    logging.basicConfig(level=logging.DEBUG)
     # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
     state_ = state or prompt_state().value
     providers_ = providers or prompt_providers()
     output_folder_ = Path(output_folder)
     utility = prompt_utility(state_)
-    if Provider.GENABILITY in providers_:
-        console.print("Processing [blue]Genability[/]")
-        try:
-            process_genability(utility=utility, output_folder=output_folder_)
-        except HTTPError as e:
-            if e.response.status_code == 401:
+
+    if urdb:
+        year = prompt_year()
+        if Provider.GENABILITY in providers_:
+            console.print("Processing [blue]Genability[/]")
+            try:
+                process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
+            except HTTPError as e:
+                if e.response.status_code == 401:
+                    console.print("Authorization failed")
+                    console.print(
+                        "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
+                    )
+                else:
+                    raise e from None
+        if Provider.OPENEI in providers_:
+            console.print("Processing [blue]OpenEI[/]")
+            try:
+                process_openei(utility, output_folder_)
+            except HTTPError as e:
+                if e.response.status_code == 403:
+                    console.print("Authorization failed")
+                    console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
+                else:
+                    raise e from None
+        if Provider.RATEACUITY in providers_:
+            console.print("Cannot convert RateAcuity data to URDB")
+
+    else:
+        if Provider.GENABILITY in providers_:
+            console.print("Processing [blue]Genability[/]")
+            try:
+                process_genability(utility=utility, output_folder=output_folder_)
+            except HTTPError as e:
+                if e.response.status_code == 401:
+                    console.print("Authorization failed")
+                    console.print(
+                        "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
+                    )
+                else:
+                    raise e from None
+        if Provider.OPENEI in providers_:
+            console.print("Processing [blue]OpenEI[/]")
+            try:
+                process_openei(utility, output_folder_)
+            except HTTPError as e:
+                if e.response.status_code == 403:
+                    console.print("Authorization failed")
+                    console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
+                else:
+                    raise e from None
+        if Provider.RATEACUITY in providers_:
+            console.print("Processing [blue]RateAcuity[/]")
+            try:
+                process_rateacuity(output_folder_, state_, utility)
+            except AuthorizationError:
                 console.print("Authorization failed")
                 console.print(
-                    "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
+                    "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
                 )
-            else:
-                raise e from None
-    if Provider.OPENEI in providers_:
-        console.print("Processing [blue]OpenEI[/]")
-        try:
-            process_openei(utility, output_folder_)
-        except HTTPError as e:
-            if e.response.status_code == 403:
-                console.print("Authorization failed")
-                console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
-            else:
-                raise e from None
-    if Provider.RATEACUITY in providers_:
-        console.print("Processing [blue]RateAcuity[/]")
-        try:
-            process_rateacuity(output_folder_, state_, utility)
-        except AuthorizationError:
-            console.print("Authorization failed")
-            console.print(
-                "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
-            )
 
 
 def main_cli():
