@@ -9,6 +9,7 @@ from tariff_fetch.urdb.schema import URDBRate
 
 from .energyschedule import build_energy_schedule
 from .fixedcharge import build_fixed_charge
+from .metadata import build_metadata
 from .scenario import Scenario
 
 
@@ -28,7 +29,13 @@ def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario) -> URDBRate:
         fixed_charge = build_fixed_charge(scenario, library)
     except Exception as e:
         fixed_charge = _confirm_proceed(e, "fixed charges")
-    return {**energy_schedule, **fixed_charge}
+
+    try:
+        metadata = build_metadata(scenario, library)
+    except Exception as e:
+        metadata = _confirm_proceed(e, "metadata")
+
+    return {**energy_schedule, **fixed_charge, **metadata}
 
 
 def _confirm_proceed(e: Exception, processing: str) -> URDBRate:
