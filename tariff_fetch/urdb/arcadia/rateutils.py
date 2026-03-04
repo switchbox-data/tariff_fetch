@@ -2,16 +2,14 @@ from collections.abc import Collection, Iterator
 from datetime import date, datetime
 from math import inf
 
-from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.arcadia.schema.common import RateChargeClass, RateUnit
 from tariff_fetch.arcadia.schema.season import SeasonExtended
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExtended
 from tariff_fetch.arcadia.schema.timeofuse import Period, TimeOfUseExtended
-from tariff_fetch.urdb.arcadia.library import Library, TariffLibrary, VariablePropertyLibrary
-from tariff_fetch.urdb.arcadia.shared import lookup_variable_rate
+from tariff_fetch.urdb.arcadia.library import Library
 
-from .exception import RateConversionError, TariffConversionError
+from .exception import RateConversionError
 from .scenario import Scenario
 
 # ================================
@@ -198,8 +196,3 @@ def season_is_datetime_within(
     if start_date < end_date:
         return start_date <= dt < end_date
     return start_date <= dt or dt < end_date
-
-
-# ================================
-# Rate
-# ================================
