@@ -116,7 +116,7 @@ class ConsumptionRow(_Row):
         raw_value = self.month_values[month]
         if raw_value is None:
             return 0
-        result = max(0, raw_value / kwh_multiplier(self.rate_determinant))
+        result = raw_value / kwh_multiplier(self.rate_determinant)
         if self.location:
             result *= self.location_avg_factor
         return result

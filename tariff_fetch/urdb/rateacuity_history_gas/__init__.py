@@ -48,6 +48,8 @@ def _build_energy_schedule_raw(rows: Collection[Row], include_taxes: bool) -> UR
             summed_bands[0],
             *(this for prev, this in itertools.pairwise(summed_bands) if this[0] - prev[0] > 30),
         ]
+        # clamp at >0
+        summed_bands = [(bound, max(0, value)) for bound, value in summed_bands]
         month_bands.append(tuple(summed_bands))
     month_bands_unique = list(set(month_bands))
     energy_weekday_schedule = cast(MonthSchedule, tuple(tuple([month_bands_unique.index(b)] * 24) for b in month_bands))
