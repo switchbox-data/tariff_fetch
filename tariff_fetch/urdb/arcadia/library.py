@@ -1,6 +1,5 @@
 from datetime import date, datetime
 from typing import Literal, final, overload
-from xdrlib import ConversionError
 
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.arcadia.schema.lookup import Lookup
@@ -9,6 +8,7 @@ from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyPrunedDataT
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateExtended
 from tariff_fetch.urdb.arcadia.exception import TariffNotFoundByDate, TariffNotFoundById
 
+from .exception import ConversionError
 from .prompts import (
     prompt_boolean,
     prompt_choice,
