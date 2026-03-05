@@ -1,9 +1,8 @@
 import itertools
 from collections.abc import Collection
 from math import inf
-from typing import cast
 
-from tariff_fetch.urdb.schema import EnergyTier, MonthSchedule, URDBRate
+from tariff_fetch.urdb.schema import EnergyTier, URDBRate
 
 from .exceptions import EmptyBandsError
 from .history_data import ConsumptionRow, FixedChargeRow, PercentageRow, Row
