@@ -13,8 +13,6 @@ from .exception import RateConversionError
 from .library import Library
 from .scenario import Scenario
 
-_LOGGED: set[int] = set()
-
 
 def build_fixed_charge(scenario: Scenario, library: Library) -> URDBRate:
     """Build the URDB fixed-charge fields for a scenario."""
@@ -81,9 +79,6 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
 
     rate_amount = ru.rate_band_get_amount_at_datetime(band, library, dt)
     rate_amount = normalize_fixed_charge_amount(rate_amount, charge_period, dt)
-    if rate["tariff_rate_id"] not in _LOGGED:
-        print(f"Applied fixed charge: {rate['rate_name']} ({rate['tariff_rate_id']}) ({rate_amount})")
-        _LOGGED.add(rate["tariff_rate_id"])
     return rate_amount
 
 
