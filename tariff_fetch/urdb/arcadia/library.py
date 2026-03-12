@@ -267,12 +267,12 @@ class Library:
                     raise ConversionError(f"Value for property {key} is expected to be `float`, not {value_type}")
                 return value
             case "INTEGER":
-                if not isinstance(value, bool):
+                if not isinstance(value, int):
                     raise ConversionError(f"Value for property {key} is expected to be `int`, not {value_type}")
                 return value
 
             case "DEMAND":
-                if not isinstance(value, bool):
+                if not isinstance(value, float):
                     raise ConversionError(f"Value for property {key} is expected to be `float`, not {value_type}")
                 return value
 
