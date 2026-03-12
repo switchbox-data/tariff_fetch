@@ -35,6 +35,7 @@ TariffPropertyPeriod = Literal[
     "OFF_PEAK",
     "CRITICAL_PEAK",
     "SUPER_ON_PEAK",
+    "ALL",  # Undocumented
 ]
 
 

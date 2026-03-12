@@ -2,12 +2,13 @@ from collections.abc import Iterator
 from datetime import datetime, timedelta
 from statistics import mean
 
-from t import Library, Scenario
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateExtended
-from tariff_fetch.urdb.arcadia.exception import RateConversionError
 from tariff_fetch.urdb.schema import URDBRate
 
 from . import rateutils as ru
+from .exception import RateConversionError
+from .library import Library
+from .scenario import Scenario
 
 _LOGGED: set[int] = set()
 
@@ -35,6 +36,10 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
     band_rate_units = {band["rate_unit"] for band in bands}
     if rate["charge_type"] != "FIXED_PRICE":
         return 0
+    if (transaction_type := rate["transaction_type"]) != "BUY":
+        raise RateConversionError(
+            rate, f"Only BUY transaction type is supported for fixed charges (got {transaction_type})"
+        )
     if "COST_PER_UNIT" not in band_rate_units:
         raise RateConversionError(rate, "Fixed price rate bands units should be COST_PER_UNIT")
     if rate["charge_period"] != "MONTHLY":

@@ -23,11 +23,11 @@ _RATE_PRECISION = 6
 
 
 def build_energy_schedule(scenario: Scenario, library: Library) -> URDBRate:
-    weekend_schedule_raw = [
+    weekday_schedule_raw = [
         [get_month_hour_bands(scenario, library, month, hour, is_weekday) for hour in range(24)]
         for month in range(1, 13)
     ]
-    weekday_schedule_raw = [
+    weekend_schedule_raw = [
         [get_month_hour_bands(scenario, library, month, hour, is_weekend) for hour in range(24)]
         for month in range(1, 13)
     ]
@@ -99,6 +99,11 @@ def _get_rate_consumption_bands_at_datetime(
 ) -> ConsumptionBandSet | None:
     if rate.get("charge_type") != "CONSUMPTION_BASED":
         return None
+    if (transaction_type := rate["transaction_type"]) not in {"BUY", "NET", "BUY_IMPORT"}:
+        raise RateConversionError(
+            rate,
+            f"Only BUY, BUY_IMPORT, and NET transactions are supported for consumption rates (got {transaction_type})",
+        )
     if set(rate.get("charge_class", [])) - _ALLOWED_CHARGE_CLASSES:
         raise RateConversionError(rate, "Incorrect charge class for consumption-based rate")
     if rate["charge_period"] != "MONTHLY":
@@ -121,6 +126,13 @@ def _get_percentage_rates_at_datetime(
 
     result: PercentageModifiers = []
     for rate in rates:
+        if (transaction_type := rate["transaction_type"]) not in {"BUY", "NET", "BUY_IMPORT"}:
+            raise RateConversionError(
+                rate,
+                f"Only BUY, BUY_IMPORT, and NET transactions are supported for percentage rates (got {transaction_type})",
+            )
+        if rate["charge_period"] != "MONTHLY":
+            raise RateConversionError(rate, "Incorrect charge period for percentage-based rate")
         if not (bands := ru.rate_filter_bands(rate, scenario, library)):
             raise RateConversionError(rate, "No bands for percentage rate")
 

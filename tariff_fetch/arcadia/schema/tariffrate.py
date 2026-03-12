@@ -129,6 +129,10 @@ class TariffRateStandardFields(TypedDict):
     """
     rate_bands: list[TariffRateBand]
 
+    # These are fields with unknown purpose
+    edge_predominance: NotRequired[str]
+    proration_rules: NotRequired[list[str]]
+
 
 class TariffRateExtendedFields(TypedDict):
     rider_tariff_id: NotRequired[int]

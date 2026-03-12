@@ -68,6 +68,8 @@ class TariffLibrary:
                 fields="ext",
                 search=str(tariff_id),
                 search_on=["tariffId"],
+                starts_with=True,
+                ends_with=True,
                 populate_properties=True,
                 populate_rates=True,
             )

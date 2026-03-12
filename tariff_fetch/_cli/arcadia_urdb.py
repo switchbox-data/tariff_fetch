@@ -2,11 +2,10 @@ import json
 import os
 from datetime import date
 from pathlib import Path
-from typing import cast, get_args
+from typing import cast
 
 import questionary
 from dotenv import load_dotenv
-from pydantic import TypeAdapter
 
 # from tariff_fetch.genability.lse import get_lses_page
 # from tariff_fetch.genability.tariffs import CustomerClass, TariffType, tariffs_paginate

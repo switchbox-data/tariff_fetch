@@ -17,7 +17,7 @@ TariffChargeType = Literal[
     "MAXIMUM",
     "TAX",
 ]
-TariffChargePeriod = Literal["MONTHLY", "DAILY", "QUARTERLY", "ANNUALLY", "HOURLY"]
+TariffChargePeriod = Literal["MONTHLY", "DAILY", "QUARTERLY", "ANNUALLY", "HOURLY", "ONE_TIME"]
 
 RateChargeClass = Literal[
     "SUPPLY",
@@ -29,8 +29,9 @@ RateChargeClass = Literal[
     "AFTER_TAX",
     "OTHER",
     "NON_BYPASSABLE",
+    "NET_EXCESS",
 ]
-RateTransactionType = Literal["BUY", "SELL", "NET", "BUY_IMPORT", "SELL_IMPORT"]
+RateTransactionType = Literal["BUY", "SELL", "NET", "BUY_IMPORT", "SELL_IMPORT", "SELL_EXPORT"]
 RateUnit = Literal["COST_PER_UNIT", "PERCENTAGE"]
 
 TerritoryUsageType = Literal["SERVICE", "TARIFF", "CLIMATE_ZONE", "UTILITY_CLIMATE_ZONE"]
@@ -38,5 +39,7 @@ TerritoryItemType = Literal["STATE", "COUNTY", "CITY", "ZIPCODE"]
 
 SeasonPredominance = Literal["PREDOMINANT", "SUBSERVIENT"]
 
-TimeOfUseType = Literal["SUPER_OFF_PEAK", "OFF_PEAK", "PARTIAL_PEAK", "ON_PEAK", "SUPER_ON_PEAK", "CRITICAL_PEAK"]
+TimeOfUseType = Literal[
+    "SUPER_OFF_PEAK", "OFF_PEAK", "PARTIAL_PEAK", "ON_PEAK", "SUPER_ON_PEAK", "CRITICAL_PEAK", "ALL"
+]
 TimeOfUsePrivacy = Literal["PUBLIC", "PRIVATE"]
