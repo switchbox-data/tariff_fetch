@@ -1,6 +1,5 @@
 """Build URDB-style output from Arcadia tariff data for a conversion scenario."""
 
-from dataclasses import dataclass
 from typing import cast
 
 import questionary

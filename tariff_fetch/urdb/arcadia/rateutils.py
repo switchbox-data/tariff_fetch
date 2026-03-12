@@ -13,6 +13,7 @@ from tariff_fetch.urdb.arcadia.library import Library
 
 from .exception import ConversionError, RateConversionError
 from .scenario import Scenario
+from .shared import as_naive_datetime
 
 # ================================
 # Tariff
@@ -74,6 +75,11 @@ def rate_is_applied_to_charge_classes(rate: TariffRateExtended, charge_classes: 
 def rate_is_applied_to_datetime(rate: TariffRateExtended, dt: datetime) -> bool:
     """Return whether a rate is active at the given datetime."""
 
+    dt_naive = as_naive_datetime(dt)
+    if (from_dt := rate.get("from_date_time")) is not None and dt_naive < as_naive_datetime(from_dt):
+        return False
+    if (to_dt := rate.get("to_date_time")) is not None and dt_naive >= as_naive_datetime(to_dt):
+        return False
     if (season := rate.get("season")) and not season_is_datetime_within(season, dt):
         return False
     if (tou := rate.get("time_of_use")) and not time_of_use_is_datetime_within(tou, dt):
@@ -121,7 +127,7 @@ def rate_filter_bands(rate: TariffRateExtended, _scenario: Scenario, library: Li
                     if applicability_value not in library.get_property(applicability_key, "CHOICE"):
                         continue
                 case "STRING":
-                    if applicability_value != library.get_property(applicability_value, "STRING"):
+                    if applicability_value != library.get_property(applicability_key, "STRING"):
                         continue
                 case "BOOLEAN":
                     match applicability_value:

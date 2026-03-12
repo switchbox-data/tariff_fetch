@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from types import SimpleNamespace
 
 import pytest
@@ -75,6 +75,59 @@ def test_time_of_use_is_datetime_within_applies_embedded_season():
     assert ru.time_of_use_is_datetime_within(tou, datetime(2025, 7, 10, 15, 30)) is True  # type: ignore[arg-type]
     assert ru.time_of_use_is_datetime_within(tou, datetime(2025, 10, 10, 15, 30)) is False  # type: ignore[arg-type]
     assert ru.time_of_use_is_datetime_within(tou, datetime(2025, 7, 10, 12, 30)) is False  # type: ignore[arg-type]
+
+
+def test_rate_is_applied_to_datetime_respects_rate_level_effective_window():
+    rate = {
+        "from_date_time": datetime(2025, 3, 1, 0, 0),
+        "to_date_time": datetime(2025, 6, 1, 0, 0),
+    }
+
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 2, 28, 23, 59)) is False  # type: ignore[arg-type]
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 3, 1, 0, 0)) is True  # type: ignore[arg-type]
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 5, 31, 23, 59)) is True  # type: ignore[arg-type]
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 6, 1, 0, 0)) is False  # type: ignore[arg-type]
+
+
+def test_rate_is_applied_to_datetime_combines_effective_window_with_season_and_tou():
+    rate = {
+        "from_date_time": datetime(2025, 6, 1, 0, 0),
+        "to_date_time": datetime(2025, 9, 1, 0, 0),
+        "season": {
+            "season_from_month": 6,
+            "season_from_day": 1,
+            "season_to_month": 9,
+            "season_to_day": 1,
+        },
+        "time_of_use": {
+            "tou_periods": [
+                {
+                    "from_day_of_week": 0,
+                    "to_day_of_week": 6,
+                    "from_hour": 14,
+                    "to_hour": 18,
+                    "from_minute": 0,
+                    "to_minute": 59,
+                }
+            ]
+        },
+    }
+
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 7, 10, 15, 30)) is True  # type: ignore[arg-type]
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 5, 31, 15, 30)) is False  # type: ignore[arg-type]
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 7, 10, 12, 30)) is False  # type: ignore[arg-type]
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 9, 1, 0, 0)) is False  # type: ignore[arg-type]
+
+
+def test_rate_is_applied_to_datetime_handles_offset_aware_rate_window():
+    rate = {
+        "from_date_time": datetime(2025, 3, 1, 0, 0, tzinfo=timezone.utc),
+        "to_date_time": datetime(2025, 6, 1, 0, 0, tzinfo=timezone.utc),
+    }
+
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 2, 28, 23, 59)) is False  # type: ignore[arg-type]
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 3, 1, 0, 0)) is True  # type: ignore[arg-type]
+    assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 6, 1, 0, 0)) is False  # type: ignore[arg-type]
 
 
 def test_time_of_use_is_datetime_within_rejects_calendar_id():

@@ -22,6 +22,7 @@ from .prompts import (
     prompt_integer,
     prompt_string,
 )
+from .shared import as_naive_datetime
 
 PropertyValue = str | list[str] | bool | date | float | int
 _DEFAULT_DEBUG_ROOT = Path("./outputs/arcadia_library")
@@ -188,7 +189,9 @@ class VariablePropertyLibrary:
             self.debug_store.save_lookups(key, dt.year, lookups)
 
         for row in lookups:
-            if row["from_date_time"] <= dt <= (row["to_date_time"] or datetime.max):
+            if as_naive_datetime(row["from_date_time"]) <= as_naive_datetime(dt) <= as_naive_datetime(
+                row["to_date_time"] or datetime.max
+            ):
                 if (value := row["actual_value"]) is not None:
                     return value
                 if (value := row["best_value"]) is not None:

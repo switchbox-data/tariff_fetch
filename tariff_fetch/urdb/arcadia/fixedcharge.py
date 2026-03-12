@@ -59,7 +59,7 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
         raise RateConversionError(rate, "Fixed price rate bands units should be COST_PER_UNIT")
     if (charge_period := rate["charge_period"]) not in {"MONTHLY", "DAILY"}:
         raise RateConversionError(rate, f"Fixed charges should be monthly or daily (got {charge_period})")
-    if len(band_rate_units) > 1:
+    if len(bands) > 1:
         raise RateConversionError(rate, "More than one applicable band for percentage rate")
     band = bands[0]
     if band["has_consumption_limit"]:

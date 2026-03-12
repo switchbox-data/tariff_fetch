@@ -93,6 +93,16 @@ Some Arcadia tariffs include percentage-based adjustments. These can be included
 
 This makes it easier to compare a cleaner base energy schedule against a schedule that includes percentage adders.
 
+Percentage handling should be understood as an approximation. The converter treats supported percentage rates as linear modifiers on matching energy charges. That is often reasonable for simple tariffs, but it is not the same as reproducing Arcadia's full bill-calculation logic in every case.
+
+The approximation is most trustworthy when:
+
+- the percentage rate is a straightforward adder or surcharge
+- the affected charges are ordinary energy charges
+- the intended percentage base lines up well with the selected charge classes
+
+It is less trustworthy when the percentage is really meant to apply to a bill subtotal with exclusions, ordering rules, caps, floors, taxes, or other bill-level logic.
+
 ## Debug output
 
 For troubleshooting, the converter saves fetched Arcadia data under `outputs/arcadia_library/` by default.

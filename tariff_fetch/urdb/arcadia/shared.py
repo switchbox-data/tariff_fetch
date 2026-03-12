@@ -9,6 +9,12 @@ from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from .types import DayPredicate
 
 
+def as_naive_datetime(dt: datetime) -> datetime:
+    """Drop timezone metadata so Arcadia timestamps compare as local wall-clock datetimes."""
+
+    return dt.replace(tzinfo=None)
+
+
 def iter_sampled_datetimes(
     year: int,
     month: int,
@@ -56,7 +62,11 @@ def lookup_variable_rate(
 
     lookups = lookup_property_timeseries(api, key, dt.year)
     for row in lookups:
-        if row["from_date_time"] <= dt <= (row["to_date_time"] or datetime.max):
+        if (
+            as_naive_datetime(row["from_date_time"])
+            <= as_naive_datetime(dt)
+            <= as_naive_datetime(row["to_date_time"] or datetime.max)
+        ):
             if (value := row["actual_value"]) is not None:
                 return value
             if (value := row["best_value"]) is not None:
