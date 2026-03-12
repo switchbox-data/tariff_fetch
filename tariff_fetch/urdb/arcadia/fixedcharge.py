@@ -1,3 +1,4 @@
+import calendar
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 from statistics import mean
@@ -44,8 +45,8 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
         )
     if "COST_PER_UNIT" not in band_rate_units:
         raise RateConversionError(rate, "Fixed price rate bands units should be COST_PER_UNIT")
-    if (charge_period := rate["charge_period"]) != "MONTHLY":
-        raise RateConversionError(rate, f"Fixed charges should be monthly (got {charge_period})")
+    if (charge_period := rate["charge_period"]) not in {"MONTHLY", "DAILY"}:
+        raise RateConversionError(rate, f"Fixed charges should be monthly or daily (got {charge_period})")
     if len(band_rate_units) > 1:
         raise RateConversionError(rate, "More than one applicable band for percentage rate")
     band = bands[0]
@@ -67,10 +68,19 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
         raise RateConversionError(rate, "Fixed rate bands cannot have applicability_formula")
 
     rate_amount = ru.rate_band_get_amount_at_datetime(band, library, dt)
+    rate_amount = normalize_fixed_charge_amount(rate_amount, charge_period, dt)
     if rate["tariff_rate_id"] not in _LOGGED:
         print(f"Applied fixed charge: {rate['rate_name']} ({rate['tariff_rate_id']}) ({rate_amount})")
         _LOGGED.add(rate["tariff_rate_id"])
     return rate_amount
+
+
+def normalize_fixed_charge_amount(rate_amount: float, charge_period: str, dt: datetime) -> float:
+    if charge_period == "MONTHLY":
+        return rate_amount
+    if charge_period == "DAILY":
+        return rate_amount * calendar.monthrange(dt.year, dt.month)[1]
+    raise ValueError(f"Unsupported fixed charge period: {charge_period}")
 
 
 def _iter_year(year: int, delta: timedelta) -> Iterator[datetime]:
