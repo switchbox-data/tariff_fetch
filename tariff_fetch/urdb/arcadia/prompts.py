@@ -1,3 +1,5 @@
+"""Interactive prompts for Arcadia conversion scenario and property inputs."""
+
 from datetime import date
 from typing import cast, get_args
 
@@ -33,6 +35,8 @@ from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyStandard
 
 
 def prompt_charge_classes() -> set[RateChargeClass] | None:
+    """Prompt for the Arcadia charge classes to include in conversion."""
+
     choices = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
     result_raw = cast(
         list[RateChargeClass] | None,
@@ -54,6 +58,8 @@ def prompt_charge_classes() -> set[RateChargeClass] | None:
 
 
 def prompt_string(tariff_property: TariffPropertyStandard) -> str | None:
+    """Prompt for a string-valued Arcadia tariff property."""
+
     default_value = tariff_property.get("property_value") if tariff_property["is_default"] else None
     return cast(
         str | None,
@@ -65,6 +71,8 @@ def prompt_string(tariff_property: TariffPropertyStandard) -> str | None:
 
 
 def prompt_choice(tariff_property: TariffPropertyStandard) -> list[str] | None:
+    """Prompt for a multi-select Arcadia CHOICE property."""
+
     if tariff_property["is_default"]:
         default_value_raw = tariff_property.get("property_value")
         default_value = {item.strip() for item in (default_value_raw or "").split(",")}
@@ -87,6 +95,8 @@ def prompt_choice(tariff_property: TariffPropertyStandard) -> list[str] | None:
 
 
 def prompt_boolean(tariff_property: TariffPropertyStandard) -> bool | None:
+    """Prompt for a boolean Arcadia tariff property."""
+
     default_value = tariff_property.get("property_value") if tariff_property["is_default"] else None
     default_value = True if default_value == "true" else (False if default_value == "false" else None)
     result = cast(
@@ -99,10 +109,14 @@ def prompt_boolean(tariff_property: TariffPropertyStandard) -> bool | None:
 
 
 def prompt_date(tariff_property: TariffPropertyStandard) -> date | None:  # pyright: ignore[reportUnusedParameter]
+    """Placeholder for date property prompting, which is not implemented yet."""
+
     raise NotImplementedError()
 
 
 def prompt_decimal(tariff_property: TariffPropertyStandard) -> float | None:
+    """Prompt for a decimal-valued Arcadia tariff property."""
+
     default_value = tariff_property.get("property_value") if tariff_property["is_default"] else None
     default_value = float(default_value) if default_value else None
 
@@ -120,6 +134,8 @@ def prompt_decimal(tariff_property: TariffPropertyStandard) -> float | None:
 
 
 def prompt_integer(tariff_property: TariffPropertyStandard) -> float | None:
+    """Prompt for an integer-valued Arcadia tariff property."""
+
     default_value = tariff_property.get("property_value") if tariff_property["is_default"] else None
     default_value = int(default_value) if default_value else None
 
@@ -137,10 +153,14 @@ def prompt_integer(tariff_property: TariffPropertyStandard) -> float | None:
 
 
 def prompt_demand(tariff_property: TariffPropertyStandard) -> float | None:
+    """Prompt for a demand-valued Arcadia tariff property."""
+
     return prompt_decimal(tariff_property)
 
 
 def _is_float(value: str) -> bool:
+    """Return whether a string can be parsed as a float."""
+
     try:
         _ = float(value)
     except ValueError:
@@ -149,6 +169,8 @@ def _is_float(value: str) -> bool:
 
 
 def _is_int(value: str) -> bool:
+    """Return whether a string can be parsed as an integer."""
+
     try:
         _ = int(value)
     except ValueError:
@@ -157,6 +179,8 @@ def _is_int(value: str) -> bool:
 
 
 def _get_property_msg(tariff_property: TariffPropertyStandard) -> str:
+    """Build a prompt label from an Arcadia property's display name and description."""
+
     title = tariff_property["display_name"]
     description = tariff_property["description"]
     return f"{title} ({description})"

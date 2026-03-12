@@ -1,3 +1,5 @@
+"""Shared Arcadia tariff filtering and time applicability helpers."""
+
 from collections.abc import Collection, Iterator
 from datetime import date, datetime
 from math import inf
@@ -9,7 +11,7 @@ from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExt
 from tariff_fetch.arcadia.schema.timeofuse import Period, TimeOfUseExtended
 from tariff_fetch.urdb.arcadia.library import Library
 
-from .exception import RateConversionError
+from .exception import ConversionError, RateConversionError
 from .scenario import Scenario
 
 # ================================
@@ -23,6 +25,8 @@ def tariff_iter_rates_for_dt(
     library: Library,
     dt: datetime,
 ) -> Iterator[TariffRateExtended]:
+    """Yield all rate entries that apply for a scenario at a given datetime."""
+
     rates = tariff.get("rates", [])
     for rate in rates:
         if not rate_is_applied_to_scenario(rate, scenario, library):
@@ -46,6 +50,8 @@ def rate_is_applied_to_scenario(
     scenario: Scenario,
     library: Library,
 ) -> bool:
+    """Return whether a rate matches scenario-level filters such as territory and charge class."""
+
     if not rate_is_applied_to_charge_classes(rate, scenario.charge_classes):
         return False
     if (territory := rate.get("territory")) is not None:
@@ -58,12 +64,16 @@ def rate_is_applied_to_scenario(
 
 
 def rate_is_applied_to_charge_classes(rate: TariffRateExtended, charge_classes: Collection[RateChargeClass]) -> bool:
+    """Return whether a rate overlaps the requested Arcadia charge classes."""
+
     if (rate_charge_classes := rate.get("charge_class")) is None:
         return True
     return not set(rate_charge_classes).isdisjoint(charge_classes)
 
 
 def rate_is_applied_to_datetime(rate: TariffRateExtended, dt: datetime) -> bool:
+    """Return whether a rate is active at the given datetime."""
+
     if (season := rate.get("season")) and not season_is_datetime_within(season, dt):
         return False
     if (tou := rate.get("time_of_use")) and not time_of_use_is_datetime_within(tou, dt):
@@ -72,6 +82,10 @@ def rate_is_applied_to_datetime(rate: TariffRateExtended, dt: datetime) -> bool:
 
 
 def rate_filter_bands(rate: TariffRateExtended, _scenario: Scenario, library: Library) -> list[TariffRateBand]:
+    """Return the supported rate bands whose applicability matches the current inputs."""
+
+    if rate.get("variable_limit_key") is not None:
+        raise RateConversionError(rate, "Rates with variable_limit_key are not supported")
     result: list[TariffRateBand] = []
     for band in rate.get("rate_bands"):
         if band.get("has_demand_limit"):
@@ -128,6 +142,8 @@ def rate_filter_bands(rate: TariffRateExtended, _scenario: Scenario, library: Li
 
 
 def rate_get_band_units(rate: TariffRateExtended) -> set[RateUnit]:
+    """Return the set of rate-unit values used by a rate's bands."""
+
     return {b["rate_unit"] for b in rate.get("rate_bands", [])}
 
 
@@ -135,12 +151,18 @@ def rate_get_band_units(rate: TariffRateExtended) -> set[RateUnit]:
 # Rate Band
 # ================================
 def band_consumption_upper_limit(band: TariffRateBand) -> float:
+    """Return a band's upper consumption limit, defaulting to infinity."""
+
     return band.get("consumption_upper_limit") or inf
 
 
 def rate_band_get_amount_at_datetime(band: TariffRateBand, library: Library, dt: datetime) -> float:
+    """Resolve the signed monetary amount for one rate band at a given datetime."""
+
     rate_id = band["tariff_rate_id"]
     rate = library.tariffs.get_rate(rate_id)
+    if rate.get("variable_factor_key") is not None:
+        raise RateConversionError(rate, "Rates with variable_factor_key are not supported")
     mp = -1 if band["is_credit"] else 1
     if (variable_rate_key := rate.get("variable_rate_key")) is None:
         return band["rate_amount"] * mp
@@ -156,6 +178,10 @@ def time_of_use_is_datetime_within(
     tou: TimeOfUseExtended,
     dt: datetime,
 ) -> bool:
+    """Return whether a datetime falls within a supported Arcadia TOU definition."""
+
+    if tou.get("calendar_id") is not None:
+        raise ConversionError("TOU calendar_id is not supported")
     season = tou.get("season")
     if season and not season_is_datetime_within(season, dt):
         return False
@@ -172,6 +198,10 @@ def period_is_datetime_within(
     period: Period,
     dt: datetime,
 ) -> bool:
+    """Return whether a datetime falls within a TOU period's weekday and time bounds."""
+
+    if period.get("calendar_id") is not None:
+        raise ConversionError("TOU period calendar_id is not supported")
     return (
         period["from_day_of_week"] <= dt.weekday() <= period["to_day_of_week"]
         and period["from_hour"] <= dt.hour <= period["to_hour"]
@@ -188,6 +218,8 @@ def season_is_datetime_within(
     season: SeasonExtended,
     dt: datetime | date,
 ) -> bool:
+    """Return whether a date or datetime falls within a seasonal date window."""
+
     dt = dt.date() if isinstance(dt, datetime) else dt
     start_month, end_month = season["season_from_month"], season["season_to_month"]
     start_day, end_day = season["season_from_day"], season["season_to_day"]

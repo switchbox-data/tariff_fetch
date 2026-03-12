@@ -1,3 +1,5 @@
+"""Build URDB-style output from Arcadia tariff data for a conversion scenario."""
+
 from dataclasses import dataclass
 from typing import cast
 
@@ -13,12 +15,9 @@ from .metadata import build_metadata
 from .scenario import Scenario
 
 
-@dataclass(frozen=True)
-class URDBChunk:
-    fixed_charge: float
-
-
 def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario) -> URDBRate:
+    """Build a URDB record by combining energy, fixed-charge, and metadata chunks."""
+
     library = Library(api)
     try:
         energy_schedule = build_energy_schedule(scenario, library)
@@ -39,6 +38,8 @@ def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario) -> URDBRate:
 
 
 def _confirm_proceed(e: Exception, processing: str) -> URDBRate:
+    """Ask whether to continue after a chunk-level conversion failure."""
+
     response = cast(
         bool | None,
         questionary.confirm(f"Error while converting: {processing}: {e}. Continue or print traceback and exit?").ask(),

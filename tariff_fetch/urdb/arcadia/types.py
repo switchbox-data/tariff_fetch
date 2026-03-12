@@ -1,3 +1,5 @@
+"""Shared type aliases used by the Arcadia-to-URDB converter."""
+
 from collections.abc import Callable
 from datetime import datetime
 

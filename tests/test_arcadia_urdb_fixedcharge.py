@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 
+from tariff_fetch.urdb.arcadia.exception import RateConversionError
 from tariff_fetch.urdb.arcadia.fixedcharge import get_rate_fixed_charge_at_dt, normalize_fixed_charge_amount
 from tests.arcadia_urdb_fixtures import make_band, make_fixed_rate
 
@@ -49,3 +50,15 @@ def test_get_rate_fixed_charge_converts_daily_to_monthly(monkeypatch):
 def test_normalize_fixed_charge_amount_rejects_unsupported_period():
     with pytest.raises(ValueError, match="Unsupported fixed charge period"):
         normalize_fixed_charge_amount(1.0, "YEARLY", datetime(2025, 1, 1, 0, 30))
+
+
+def test_get_rate_fixed_charge_rejects_quantity_key():
+    rate = make_fixed_rate(quantity_key="billingMeter")
+
+    with pytest.raises(RateConversionError, match="quantity_key"):
+        get_rate_fixed_charge_at_dt(
+            scenario=None,  # pyright: ignore[reportArgumentType]
+            library=None,  # pyright: ignore[reportArgumentType]
+            rate=rate,  # pyright: ignore[reportArgumentType]
+            dt=datetime(2025, 1, 1, 0, 30),
+        )

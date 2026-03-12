@@ -1,3 +1,5 @@
+"""Converter-specific exception types for Arcadia to URDB translation."""
+
 from datetime import date
 from typing import final
 
@@ -7,11 +9,13 @@ from tariff_fetch.arcadia.schema.tariffrate import TariffRateExtended
 
 
 class ConversionError(Exception):
-    pass
+    """Base exception for Arcadia-to-URDB conversion failures."""
 
 
 @final
 class TariffConversionError(ConversionError):
+    """Conversion error scoped to a master Arcadia tariff."""
+
     def __init__(self, master_tariff_id: int, msg: str) -> None:
         self.master_tariff_id = master_tariff_id
         self.msg = msg
@@ -20,6 +24,8 @@ class TariffConversionError(ConversionError):
 
 @final
 class RateConversionError(ConversionError):
+    """Conversion error scoped to a specific Arcadia tariff rate."""
+
     def __init__(self, rate: TariffRateExtended, msg: str) -> None:
         self.rate = rate
         self.msg = msg
@@ -27,11 +33,13 @@ class RateConversionError(ConversionError):
 
 
 class TariffNotFoundError(ConversionError):
-    pass
+    """Base exception for tariff lookup misses."""
 
 
 @final
 class TariffNotFoundById(ConversionError):
+    """Raised when a tariff version cannot be found by Arcadia tariff id."""
+
     def __init__(self, tariff_id: int) -> None:
         self.tariff_id = tariff_id
         super().__init__()
@@ -43,6 +51,8 @@ class TariffNotFoundById(ConversionError):
 
 @final
 class TariffNotFoundByDate(ConversionError):
+    """Raised when no tariff version is effective for a requested date."""
+
     def __init__(self, master_tariff_id: int, dt: date) -> None:
         self.master_tariff_id = master_tariff_id
         self.dt = dt

@@ -1,3 +1,5 @@
+"""Convert Arcadia fixed-price charges into a single URDB fixed charge."""
+
 import calendar
 from collections.abc import Iterator
 from datetime import datetime, timedelta
@@ -15,6 +17,8 @@ _LOGGED: set[int] = set()
 
 
 def build_fixed_charge(scenario: Scenario, library: Library) -> URDBRate:
+    """Build the URDB fixed-charge fields for a scenario."""
+
     return {
         "fixedchargefirstmeter": get_fixed_charge_value(scenario, library),
         "fixedchargeunits": "$/month",
@@ -22,10 +26,14 @@ def build_fixed_charge(scenario: Scenario, library: Library) -> URDBRate:
 
 
 def get_fixed_charge_value(scenario: Scenario, library: Library) -> float:
+    """Average the sampled fixed charge across the target year."""
+
     return mean(get_fixed_charge_at_dt(scenario, library, dt) for dt in _iter_year(scenario.year, timedelta(hours=12)))
 
 
 def get_fixed_charge_at_dt(scenario: Scenario, library: Library, dt: datetime) -> float:
+    """Sum all applicable fixed-price rates at one sampled instant."""
+
     master_tariff_id = scenario.master_tariff_id
     tariff = library.tariffs.get_tariff_at_date(master_tariff_id, dt.date())
     rates = ru.tariff_iter_rates_for_dt(tariff, scenario, library, dt)
@@ -33,9 +41,13 @@ def get_fixed_charge_at_dt(scenario: Scenario, library: Library, dt: datetime) -
 
 
 def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: TariffRateExtended, dt: datetime) -> float:
+    """Convert one applicable Arcadia rate into a fixed-charge amount at one instant."""
+
     bands = ru.rate_filter_bands(rate, scenario, library)
     if rate["charge_type"] != "FIXED_PRICE":
         return 0
+    if rate.get("quantity_key") is not None:
+        raise RateConversionError(rate, "Rates with quantity_key are not supported for fixed charge conversion")
     if not bands:
         return 0
     band_rate_units = {band["rate_unit"] for band in bands}
@@ -76,6 +88,8 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
 
 
 def normalize_fixed_charge_amount(rate_amount: float, charge_period: str, dt: datetime) -> float:
+    """Normalize a supported fixed charge into monthly units."""
+
     if charge_period == "MONTHLY":
         return rate_amount
     if charge_period == "DAILY":
@@ -84,6 +98,8 @@ def normalize_fixed_charge_amount(rate_amount: float, charge_period: str, dt: da
 
 
 def _iter_year(year: int, delta: timedelta) -> Iterator[datetime]:
+    """Yield evenly spaced sample datetimes across a calendar year."""
+
     dt = datetime(year, 1, 1, 0, 30, 0)
     max_dt = datetime(year + 1, 1, 1, 0, 0, 0)
     while dt < max_dt:

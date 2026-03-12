@@ -77,6 +77,16 @@ def test_rate_filter_bands_rejects_unsupported_operator():
         ru.rate_filter_bands(rate, Scenario(1, 2025, False), library)  # type: ignore[arg-type]
 
 
+def test_rate_filter_bands_rejects_variable_limit_key():
+    rate = {
+        "variable_limit_key": "demandMultiplierTiers",
+        "rate_bands": [make_band()],
+    }
+
+    with pytest.raises(RateConversionError, match="variable_limit_key"):
+        ru.rate_filter_bands(rate, Scenario(1, 2025, False), StubLibrary())  # type: ignore[arg-type]
+
+
 def test_rate_is_applied_to_scenario_filters_territory():
     rate = {
         "charge_class": ["SUPPLY"],
@@ -138,3 +148,28 @@ def test_get_raw_bands_at_datetime_skips_percentage_when_disabled(monkeypatch):
     )
 
     assert result == [(inf, 10.0)]
+
+
+def test_rate_band_get_amount_at_datetime_rejects_variable_factor_key():
+    band = make_band(tariff_rate_id=7, rate_amount=5.0)
+    rate = make_consumption_rate(tariff_rate_id=7, variable_factor_key="billingPeriodProrationFactor")
+    library = SimpleNamespace(tariffs=SimpleNamespace(get_rate=lambda rate_id: rate))
+
+    with pytest.raises(RateConversionError, match="variable_factor_key"):
+        ru.rate_band_get_amount_at_datetime(
+            band,  # type: ignore[arg-type]
+            library,  # type: ignore[arg-type]
+            datetime(2025, 1, 1, 0, 30),
+        )
+
+
+def test_get_rate_consumption_bands_rejects_quantity_key():
+    rate = make_consumption_rate(quantity_key="billingMeter")
+
+    with pytest.raises(RateConversionError, match="quantity_key"):
+        es.get_rate_consumption_bands_at_datetime(
+            rate=rate,  # type: ignore[arg-type]
+            scenario=None,  # pyright: ignore[reportArgumentType]
+            library=None,  # pyright: ignore[reportArgumentType]
+            dt=datetime(2025, 1, 1, 0, 30),
+        )

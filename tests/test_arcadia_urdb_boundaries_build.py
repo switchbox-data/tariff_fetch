@@ -1,9 +1,12 @@
 from datetime import date, datetime
 from types import SimpleNamespace
 
+import pytest
+
 from tariff_fetch.urdb.arcadia import build as build_mod
 from tariff_fetch.urdb.arcadia import metadata as metadata_mod
 from tariff_fetch.urdb.arcadia import rateutils as ru
+from tariff_fetch.urdb.arcadia.exception import ConversionError
 from tariff_fetch.urdb.arcadia.scenario import Scenario
 
 
@@ -72,6 +75,31 @@ def test_time_of_use_is_datetime_within_applies_embedded_season():
     assert ru.time_of_use_is_datetime_within(tou, datetime(2025, 7, 10, 15, 30)) is True  # type: ignore[arg-type]
     assert ru.time_of_use_is_datetime_within(tou, datetime(2025, 10, 10, 15, 30)) is False  # type: ignore[arg-type]
     assert ru.time_of_use_is_datetime_within(tou, datetime(2025, 7, 10, 12, 30)) is False  # type: ignore[arg-type]
+
+
+def test_time_of_use_is_datetime_within_rejects_calendar_id():
+    tou = {
+        "calendar_id": 10,
+        "tou_periods": [],
+    }
+
+    with pytest.raises(ConversionError, match="calendar_id"):
+        ru.time_of_use_is_datetime_within(tou, datetime(2025, 7, 10, 15, 30))  # type: ignore[arg-type]
+
+
+def test_period_is_datetime_within_rejects_calendar_id():
+    period = {
+        "from_day_of_week": 0,
+        "to_day_of_week": 6,
+        "from_hour": 0,
+        "to_hour": 23,
+        "from_minute": 0,
+        "to_minute": 59,
+        "calendar_id": 10,
+    }
+
+    with pytest.raises(ConversionError, match="calendar_id"):
+        ru.period_is_datetime_within(period, datetime(2025, 7, 10, 15, 30))  # type: ignore[arg-type]
 
 
 def test_build_urdb_merges_converter_chunks(monkeypatch):

@@ -1,3 +1,5 @@
+"""Convert Arcadia energy rates into URDB schedule and tier structures."""
+
 import itertools
 from collections.abc import Collection
 from datetime import datetime
@@ -23,6 +25,8 @@ _RATE_PRECISION = 6
 
 
 def build_energy_schedule(scenario: Scenario, library: Library) -> URDBRate:
+    """Build the URDB energy schedule and rate structure for one scenario year."""
+
     weekday_schedule_raw = [
         [get_month_hour_bands(scenario, library, month, hour, is_weekday) for hour in range(24)]
         for month in range(1, 13)
@@ -63,7 +67,8 @@ def get_month_hour_bands(
     hour: int,
     day_filter: DayPredicate,
 ) -> ConsumptionBandSet:
-    """Get raw consumption bands for specific month/hour"""
+    """Average the sampled energy bands for one month, hour, and day type."""
+
     bands = [
         get_raw_bands_at_datetime(scenario, library, dt)
         for dt in iter_sampled_datetimes(scenario.year, month, hour, day_filter)
@@ -72,7 +77,8 @@ def get_month_hour_bands(
 
 
 def get_raw_bands_at_datetime(scenario: Scenario, library: Library, dt: datetime) -> ConsumptionBandSet:
-    """Get raw tariff consumption-based bands at datetime dt"""
+    """Return the combined consumption bands that apply at one instant."""
+
     tariff = library.tariffs.get_tariff_at_date(scenario.master_tariff_id, dt)
     rates = list(ru.tariff_iter_rates_for_dt(tariff, scenario, library, dt))
     percentage_modifiers = get_percentage_rates_at_datetime(rates, scenario, library, dt)
@@ -97,8 +103,12 @@ def get_rate_consumption_bands_at_datetime(
     library: Library,
     dt: datetime,
 ) -> ConsumptionBandSet | None:
+    """Convert one applicable consumption rate into URDB-style piecewise bands."""
+
     if rate.get("charge_type") != "CONSUMPTION_BASED":
         return None
+    if rate.get("quantity_key") is not None:
+        raise RateConversionError(rate, "Rates with quantity_key are not supported for consumption conversion")
     if (transaction_type := rate["transaction_type"]) not in {"BUY", "NET", "BUY_IMPORT"}:
         raise RateConversionError(
             rate,
@@ -122,10 +132,14 @@ def get_rate_consumption_bands_at_datetime(
 def get_percentage_rates_at_datetime(
     rates: Collection[TariffRateExtended], scenario: Scenario, library: Library, dt: datetime
 ) -> PercentageModifiers:
+    """Collect supported percentage-based modifiers that apply at one instant."""
+
     rates = [rate for rate in rates if ru.rate_get_band_units(rate) == {"PERCENTAGE"}]
 
     result: PercentageModifiers = []
     for rate in rates:
+        if rate.get("quantity_key") is not None:
+            raise RateConversionError(rate, "Rates with quantity_key are not supported for percentage conversion")
         if (transaction_type := rate["transaction_type"]) not in {"BUY", "NET", "BUY_IMPORT"}:
             raise RateConversionError(
                 rate,
@@ -152,6 +166,8 @@ def get_percentage_rates_at_datetime(
 
 
 def sum_piecewise_bands(inputs: Collection[ConsumptionBandSet]) -> ConsumptionBandSet:
+    """Sum multiple piecewise band sets over their combined breakpoints."""
+
     if not inputs:
         return []
 
@@ -170,6 +186,8 @@ def sum_piecewise_bands(inputs: Collection[ConsumptionBandSet]) -> ConsumptionBa
 
 
 def average_aligned_bands(inputs: list[ConsumptionBandSet]) -> ConsumptionBandSet:
+    """Average multiple band sets after aligning them to common tier limits."""
+
     if not inputs:
         return []
 
@@ -196,6 +214,8 @@ def average_aligned_bands(inputs: list[ConsumptionBandSet]) -> ConsumptionBandSe
 
 
 def _energy_band_to_tier(band: ConsumptionBand) -> EnergyTier:
+    """Convert one internal band tuple into a URDB energy tier entry."""
+
     if band[0] == inf:
         return {"rate": band[1], "unit": "kWh"}
     return {"rate": band[1], "max": band[0], "unit": "kWh"}

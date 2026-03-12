@@ -1,3 +1,5 @@
+"""Small shared helpers for Arcadia schedule sampling and date classification."""
+
 import calendar
 from datetime import date, datetime
 from functools import lru_cache
@@ -13,6 +15,8 @@ def iter_sampled_datetimes(
     hour: int,
     day_filter: DayPredicate,
 ):
+    """Yield representative datetimes for all matching days in a month/hour bucket."""
+
     _, days = calendar.monthrange(year, month)
 
     for day in range(1, days + 1):
@@ -32,10 +36,14 @@ def sample_datetime(year: int, month: int, day: int, hour: int) -> datetime:
 
 
 def is_weekday(dt: datetime) -> bool:
+    """Return whether a datetime falls on a weekday."""
+
     return dt.weekday() < 5
 
 
 def is_weekend(dt: datetime) -> bool:
+    """Return whether a datetime falls on a weekend."""
+
     return dt.weekday() >= 5
 
 
@@ -44,6 +52,8 @@ def lookup_variable_rate(
     key: str,
     dt: datetime,
 ) -> float:
+    """Look up one variable Arcadia rate value at a specific datetime."""
+
     lookups = lookup_property_timeseries(api, key, dt.year)
     for row in lookups:
         if row["from_date_time"] <= dt <= (row["to_date_time"] or datetime.max):
@@ -59,6 +69,8 @@ def lookup_variable_rate(
 
 @lru_cache(maxsize=256)
 def lookup_property_timeseries(api: ArcadiaSignalAPI, key: str, year: int):
+    """Fetch and cache one year of variable lookup rows for a property key."""
+
     return list(
         api.properties.lookups.iter_pages(
             key,
