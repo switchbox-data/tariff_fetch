@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # from tariff_fetch.genability.lse import get_lses_page
 # from tariff_fetch.genability.tariffs import CustomerClass, TariffType, tariffs_paginate
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
-from tariff_fetch.arcadia.schema.common import CustomerClass, RateChargeClass, TariffType
+from tariff_fetch.arcadia.schema.common import CustomerClass, TariffType
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
 from tariff_fetch.urdb.arcadia.build import build_urdb
 from tariff_fetch.urdb.arcadia.prompts import prompt_charge_classes

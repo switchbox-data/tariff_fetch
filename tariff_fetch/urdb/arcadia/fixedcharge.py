@@ -33,17 +33,19 @@ def get_fixed_charge_at_dt(scenario: Scenario, library: Library, dt: datetime) -
 
 def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: TariffRateExtended, dt: datetime) -> float:
     bands = ru.rate_filter_bands(rate, scenario, library)
-    band_rate_units = {band["rate_unit"] for band in bands}
     if rate["charge_type"] != "FIXED_PRICE":
         return 0
+    if not bands:
+        return 0
+    band_rate_units = {band["rate_unit"] for band in bands}
     if (transaction_type := rate["transaction_type"]) != "BUY":
         raise RateConversionError(
             rate, f"Only BUY transaction type is supported for fixed charges (got {transaction_type})"
         )
     if "COST_PER_UNIT" not in band_rate_units:
         raise RateConversionError(rate, "Fixed price rate bands units should be COST_PER_UNIT")
-    if rate["charge_period"] != "MONTHLY":
-        raise RateConversionError(rate, "Fixed charges should be monthly")
+    if (charge_period := rate["charge_period"]) != "MONTHLY":
+        raise RateConversionError(rate, f"Fixed charges should be monthly (got {charge_period})")
     if len(band_rate_units) > 1:
         raise RateConversionError(rate, "More than one applicable band for percentage rate")
     band = bands[0]

@@ -6,7 +6,6 @@ import questionary
 from tariff_fetch.arcadia.schema.common import RateChargeClass
 from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyStandard
 
-
 # def prompt_scenario(master_tariff_id: int, year: int, apply_percentages: bool) -> Scenario | None:
 #    result_charge_classes = prompt_charge_classes()
 #    if result_charge_classes is None:
@@ -99,7 +98,7 @@ def prompt_boolean(tariff_property: TariffPropertyStandard) -> bool | None:
     return result
 
 
-def prompt_date(tariff_property: TariffPropertyStandard) -> date | None:
+def prompt_date(tariff_property: TariffPropertyStandard) -> date | None:  # pyright: ignore[reportUnusedParameter]
     raise NotImplementedError()
 
 

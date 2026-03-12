@@ -1,4 +1,6 @@
+import json
 from datetime import date, datetime
+from pathlib import Path
 from typing import Literal, final, overload
 
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
@@ -20,12 +22,48 @@ from .prompts import (
 )
 
 PropertyValue = str | list[str] | bool | date | float | int
+_DEFAULT_DEBUG_ROOT = Path("./outputs/arcadia_library")
+
+
+def _json_default(value: object) -> str:
+    if isinstance(value, datetime | date):
+        return value.isoformat()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
+@final
+class LibraryDebugStore:
+    def __init__(self, root: Path = _DEFAULT_DEBUG_ROOT) -> None:
+        self.root = root
+        self.tariffs_dir = root / "tariffs"
+        self.lookups_dir = root / "lookups"
+        self.properties_dir = root / "properties"
+
+    def save_tariff(self, tariff: TariffExtended) -> None:
+        effective_date = tariff["effective_date"].isoformat()
+        tariff_id = tariff["tariff_id"]
+        master_tariff_id = tariff["master_tariff_id"]
+        path = self.tariffs_dir / f"master-{master_tariff_id}_tariff-{tariff_id}_effective-{effective_date}.json"
+        self._write_json(path, tariff)
+
+    def save_lookups(self, key: str, year: int, lookups: list[Lookup]) -> None:
+        path = self.lookups_dir / f"{key}_{year}.json"
+        self._write_json(path, lookups)
+
+    def save_property_value(self, key: str, value: PropertyValue) -> None:
+        path = self.properties_dir / f"{key}.json"
+        self._write_json(path, {"key": key, "value": value})
+
+    def _write_json(self, path: Path, payload: object) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        _ = path.write_text(json.dumps(payload, indent=2, default=_json_default))
 
 
 @final
 class TariffLibrary:
-    def __init__(self, api: ArcadiaSignalAPI) -> None:
+    def __init__(self, api: ArcadiaSignalAPI, debug_store: LibraryDebugStore) -> None:
         self.api = api
+        self.debug_store = debug_store
         self.tariffs: list[TariffExtended] = []
 
     def get_tariff_at_date(self, master_tariff_id: int, dt: date) -> TariffExtended:
@@ -33,14 +71,14 @@ class TariffLibrary:
         if (found := self._find_tariff_at_date(master_tariff_id, dt)) is not None:
             return found
         tariff = self._fetch_tariff_at_date(master_tariff_id, dt)
-        self.tariffs.append(tariff)
+        self._remember(tariff)
         return tariff
 
     def get_tariff(self, tariff_id: int) -> TariffExtended:
         if (found := self._find_tariff(tariff_id)) is not None:
             return found
         tariff = self._fetch_tariff(tariff_id)
-        self.tariffs.append(tariff)
+        self._remember(tariff)
         return tariff
 
     def get_rate(self, rate_id: int) -> TariffRateExtended:
@@ -61,6 +99,10 @@ class TariffLibrary:
             if _is_tariff_effective_on(tariff, dt):
                 return tariff
         return None
+
+    def _remember(self, tariff: TariffExtended) -> None:
+        self.tariffs.append(tariff)
+        self.debug_store.save_tariff(tariff)
 
     def _fetch_tariff(self, tariff_id: int) -> TariffExtended:
         tariffs = list(
@@ -96,14 +138,16 @@ class TariffLibrary:
 
 @final
 class VariablePropertyLibrary:
-    def __init__(self, api: ArcadiaSignalAPI):
+    def __init__(self, api: ArcadiaSignalAPI, debug_store: LibraryDebugStore):
         self.api = api
+        self.debug_store = debug_store
         self.property_timeseries: dict[tuple[str, int], list[Lookup]] = {}
 
     def lookup(self, key: str, dt: datetime) -> float:
         if (lookups := self.property_timeseries.get((key, dt.year))) is None:
             lookups = self._lookup_property_timeseries(key, dt.year)
             self.property_timeseries[(key, dt.year)] = lookups
+            self.debug_store.save_lookups(key, dt.year, lookups)
 
         for row in lookups:
             if row["from_date_time"] <= dt <= (row["to_date_time"] or datetime.max):
@@ -128,10 +172,16 @@ class VariablePropertyLibrary:
 
 @final
 class Library:
-    def __init__(self, api: ArcadiaSignalAPI, properties: dict[str, PropertyValue] | None = None):
+    def __init__(
+        self,
+        api: ArcadiaSignalAPI,
+        properties: dict[str, PropertyValue] | None = None,
+        debug_root: Path = _DEFAULT_DEBUG_ROOT,
+    ):
         self.api = api
-        self.tariffs = TariffLibrary(api)
-        self.variables = VariablePropertyLibrary(api)
+        self.debug_store = LibraryDebugStore(debug_root)
+        self.tariffs = TariffLibrary(api, self.debug_store)
+        self.variables = VariablePropertyLibrary(api, self.debug_store)
         self._properies: dict[str, PropertyValue] = properties or {}
 
     def has_property(self, key: str) -> bool:
@@ -169,6 +219,7 @@ class Library:
         if result is None:
             raise ConversionError("Property not set")
         self._properies[key] = result
+        self.debug_store.save_property_value(key, result)
         return result
 
     @overload

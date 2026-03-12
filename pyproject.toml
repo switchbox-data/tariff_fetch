@@ -76,5 +76,26 @@ ignore = ["E501", "SIM103"]
 "tests/*" = ["S101"]
 
 [tool.basedpyright]
-include = ["tariff_fetch"]
+include = ["tariff_fetch", "tests"]
 pythonVersion = "3.11"
+venvPath = "."
+venv = ".venv"
+
+[[tool.basedpyright.executionEnvironments]]
+root = "tests"
+extraPaths = [".."]
+reportUnknownVariableType = "none"
+reportUnknownMemberType = "none"
+reportUnknownParameterType = "none"
+reportUnknownLambdaType = "none"
+reportUnknownArgumentType = "none"
+reportArgumentType = "none"
+reportMissingParameterType = "none"
+reportMissingTypeArgument = "none"
+reportMissingTypeStubs = "none"
+reportUnusedParameter = "none"
+reportUnusedImport = "none"
+reportUnusedCallResult = "none"
+reportUnannotatedClassAttribute = "none"
+reportUnnecessaryTypeIgnoreComment = "none"
+reportPrivateUsage = "none"

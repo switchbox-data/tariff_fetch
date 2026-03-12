@@ -1,8 +1,8 @@
 from datetime import date
 from typing import final
+
 from typing_extensions import override
 
-from tariff_fetch.arcadia.schema.tariff import TariffExtended
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateExtended
 
 

@@ -75,10 +75,10 @@ def get_raw_bands_at_datetime(scenario: Scenario, library: Library, dt: datetime
     """Get raw tariff consumption-based bands at datetime dt"""
     tariff = library.tariffs.get_tariff_at_date(scenario.master_tariff_id, dt)
     rates = list(ru.tariff_iter_rates_for_dt(tariff, scenario, library, dt))
-    percentage_modifiers = _get_percentage_rates_at_datetime(rates, scenario, library, dt)
+    percentage_modifiers = get_percentage_rates_at_datetime(rates, scenario, library, dt)
     piecewise_bands: list[ConsumptionBandSet] = []
     for rate in rates:
-        rate_bands = _get_rate_consumption_bands_at_datetime(rate, scenario, library, dt)
+        rate_bands = get_rate_consumption_bands_at_datetime(rate, scenario, library, dt)
         if rate_bands is None:
             continue
         # Apply percentage modifiers
@@ -88,10 +88,10 @@ def get_raw_bands_at_datetime(scenario: Scenario, library: Library, dt: datetime
             rate_bands = [(limit, value * charge_multiplier) for limit, value in rate_bands]
         piecewise_bands.append(rate_bands)
 
-    return _sum_piecewise_bands(piecewise_bands)
+    return sum_piecewise_bands(piecewise_bands)
 
 
-def _get_rate_consumption_bands_at_datetime(
+def get_rate_consumption_bands_at_datetime(
     rate: TariffRateExtended,
     scenario: Scenario,
     library: Library,
@@ -119,7 +119,7 @@ def _get_rate_consumption_bands_at_datetime(
     ]
 
 
-def _get_percentage_rates_at_datetime(
+def get_percentage_rates_at_datetime(
     rates: Collection[TariffRateExtended], scenario: Scenario, library: Library, dt: datetime
 ) -> PercentageModifiers:
     rates = [rate for rate in rates if ru.rate_get_band_units(rate) == {"PERCENTAGE"}]
@@ -151,7 +151,7 @@ def _get_percentage_rates_at_datetime(
     return result
 
 
-def _sum_piecewise_bands(inputs: Collection[ConsumptionBandSet]) -> ConsumptionBandSet:
+def sum_piecewise_bands(inputs: Collection[ConsumptionBandSet]) -> ConsumptionBandSet:
     if not inputs:
         return []
 

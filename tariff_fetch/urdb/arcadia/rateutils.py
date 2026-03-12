@@ -71,7 +71,7 @@ def rate_is_applied_to_datetime(rate: TariffRateExtended, dt: datetime) -> bool:
     return True
 
 
-def rate_filter_bands(rate: TariffRateExtended, scenario: Scenario, library: Library) -> list[TariffRateBand]:
+def rate_filter_bands(rate: TariffRateExtended, _scenario: Scenario, library: Library) -> list[TariffRateBand]:
     result: list[TariffRateBand] = []
     for band in rate.get("rate_bands"):
         if band.get("has_demand_limit"):
