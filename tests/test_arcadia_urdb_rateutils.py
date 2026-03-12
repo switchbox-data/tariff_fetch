@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import datetime
 from math import inf
 from types import SimpleNamespace
@@ -9,40 +8,15 @@ from tariff_fetch.urdb.arcadia import energyschedule as es
 from tariff_fetch.urdb.arcadia import rateutils as ru
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
 from tariff_fetch.urdb.arcadia.scenario import Scenario
-
-
-@dataclass
-class _StubTariffLibrary:
-    properties: dict[str, dict]  # pyright: ignore[reportMissingTypeArgument]
-
-    def get_property(self, key: str):
-        return self.properties[key]
-
-
-class _StubLibrary:
-    def __init__(
-        self, *, properties: dict[str, object] | None = None, tariff_properties: dict[str, dict] | None = None
-    ):
-        self._properties = properties or {}
-        self.tariffs = _StubTariffLibrary(tariff_properties or {})
-
-    def get_property(self, key: str, data_type: str):
-        return self._properties[key]
-
-    def get_choice_property_as_ints(self, key: str) -> list[int]:
-        values = self._properties[key]
-        assert isinstance(values, list)
-        return [int(value) for value in values]
+from tests.arcadia_urdb_fixtures import StubLibrary, make_band, make_consumption_rate, make_percentage_rate
 
 
 def test_rate_filter_bands_excludes_non_matching_choice_band():
     rate = {
-        "rate_bands": [
-            {"applicability_value": "B", "rate_unit": "COST_PER_UNIT"},
-        ],
+        "rate_bands": [make_band(applicability_value="B")],
         "applicability_key": "serviceVoltage",
     }
-    library = _StubLibrary(
+    library = StubLibrary(
         properties={"serviceVoltage": ["A"]},
         tariff_properties={
             "serviceVoltage": {
@@ -60,12 +34,12 @@ def test_rate_filter_bands_excludes_non_matching_choice_band():
 
 
 def test_rate_filter_bands_includes_matching_boolean_band():
-    band = {"applicability_value": "true", "rate_unit": "COST_PER_UNIT"}
+    band = make_band(applicability_value="true")
     rate = {
         "rate_bands": [band],
         "applicability_key": "isSolar",
     }
-    library = _StubLibrary(
+    library = StubLibrary(
         properties={"isSolar": True},
         tariff_properties={
             "isSolar": {
@@ -84,10 +58,10 @@ def test_rate_filter_bands_includes_matching_boolean_band():
 
 def test_rate_filter_bands_rejects_unsupported_operator():
     rate = {
-        "rate_bands": [{"applicability_value": "A", "rate_unit": "COST_PER_UNIT"}],
+        "rate_bands": [make_band(applicability_value="A")],
         "applicability_key": "serviceVoltage",
     }
-    library = _StubLibrary(
+    library = StubLibrary(
         properties={"serviceVoltage": ["A"]},
         tariff_properties={
             "serviceVoltage": {
@@ -109,7 +83,7 @@ def test_rate_is_applied_to_scenario_filters_territory():
         "territory": {"territory_id": 2},
     }
     scenario = Scenario(1, 2025, False, {"SUPPLY"})
-    library = _StubLibrary(properties={"territoryId": ["1"]})
+    library = StubLibrary(properties={"territoryId": ["1"]})
 
     result = ru.rate_is_applied_to_scenario(rate, scenario, library)  # type: ignore[arg-type]
 
@@ -117,35 +91,10 @@ def test_rate_is_applied_to_scenario_filters_territory():
 
 
 def test_get_raw_bands_at_datetime_applies_matching_percentage(monkeypatch):
-    consumption_rate = {
-        "charge_type": "CONSUMPTION_BASED",
-        "transaction_type": "BUY",
-        "charge_class": ["SUPPLY"],
-        "charge_period": "MONTHLY",
-        "rate_bands": [
-            {
-                "tariff_rate_id": 1,
-                "rate_unit": "COST_PER_UNIT",
-                "rate_amount": 10.0,
-                "is_credit": False,
-                "consumption_upper_limit": inf,
-            }
-        ],
-    }
-    percentage_rate = {
-        "charge_type": "FIXED_PRICE",
-        "transaction_type": "BUY",
-        "charge_class": ["SUPPLY"],
-        "charge_period": "MONTHLY",
-        "rate_bands": [
-            {
-                "tariff_rate_id": 2,
-                "rate_unit": "PERCENTAGE",
-                "rate_amount": 10.0,
-                "is_credit": False,
-            }
-        ],
-    }
+    consumption_rate = make_consumption_rate(rate_bands=[make_band(rate_amount=10.0, consumption_upper_limit=inf)])
+    percentage_rate = make_percentage_rate(
+        rate_bands=[make_band(tariff_rate_id=2, rate_unit="PERCENTAGE", rate_amount=10.0)]
+    )
     library = SimpleNamespace(
         tariffs=SimpleNamespace(get_tariff_at_date=lambda master_tariff_id, dt: {"rates": []}),
         variables=None,
@@ -167,35 +116,10 @@ def test_get_raw_bands_at_datetime_applies_matching_percentage(monkeypatch):
 
 
 def test_get_raw_bands_at_datetime_skips_percentage_when_disabled(monkeypatch):
-    consumption_rate = {
-        "charge_type": "CONSUMPTION_BASED",
-        "transaction_type": "BUY",
-        "charge_class": ["SUPPLY"],
-        "charge_period": "MONTHLY",
-        "rate_bands": [
-            {
-                "tariff_rate_id": 1,
-                "rate_unit": "COST_PER_UNIT",
-                "rate_amount": 10.0,
-                "is_credit": False,
-                "consumption_upper_limit": inf,
-            }
-        ],
-    }
-    percentage_rate = {
-        "charge_type": "FIXED_PRICE",
-        "transaction_type": "BUY",
-        "charge_class": ["SUPPLY"],
-        "charge_period": "MONTHLY",
-        "rate_bands": [
-            {
-                "tariff_rate_id": 2,
-                "rate_unit": "PERCENTAGE",
-                "rate_amount": 10.0,
-                "is_credit": False,
-            }
-        ],
-    }
+    consumption_rate = make_consumption_rate(rate_bands=[make_band(rate_amount=10.0, consumption_upper_limit=inf)])
+    percentage_rate = make_percentage_rate(
+        rate_bands=[make_band(tariff_rate_id=2, rate_unit="PERCENTAGE", rate_amount=10.0)]
+    )
     library = SimpleNamespace(
         tariffs=SimpleNamespace(get_tariff_at_date=lambda master_tariff_id, dt: {"rates": []}),
         variables=None,

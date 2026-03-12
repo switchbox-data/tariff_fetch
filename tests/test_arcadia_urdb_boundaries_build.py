@@ -78,9 +78,21 @@ def test_build_urdb_merges_converter_chunks(monkeypatch):
     scenario = Scenario(123, 2025, apply_percentages=True, charge_classes={"SUPPLY"})
 
     monkeypatch.setattr(build_mod, "Library", lambda api: SimpleNamespace())
-    monkeypatch.setattr(build_mod, "build_energy_schedule", lambda scenario, library: {"energyratestructure": [[{"rate": 1.0, "unit": "kWh"}]]})
-    monkeypatch.setattr(build_mod, "build_fixed_charge", lambda scenario, library: {"fixedchargefirstmeter": 12.0, "fixedchargeunits": "$/month"})
-    monkeypatch.setattr(build_mod, "build_metadata", lambda scenario, library: {"label": "UTIL", "utility": "Utility", "name": "Tariff", "country": "USA"})
+    monkeypatch.setattr(
+        build_mod,
+        "build_energy_schedule",
+        lambda scenario, library: {"energyratestructure": [[{"rate": 1.0, "unit": "kWh"}]]},
+    )
+    monkeypatch.setattr(
+        build_mod,
+        "build_fixed_charge",
+        lambda scenario, library: {"fixedchargefirstmeter": 12.0, "fixedchargeunits": "$/month"},
+    )
+    monkeypatch.setattr(
+        build_mod,
+        "build_metadata",
+        lambda scenario, library: {"label": "UTIL", "utility": "Utility", "name": "Tariff", "country": "USA"},
+    )
 
     result = build_mod.build_urdb(api=object(), scenario=scenario)  # type: ignore[arg-type]
 

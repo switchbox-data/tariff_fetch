@@ -6,6 +6,7 @@ from tariff_fetch.urdb.arcadia import energyschedule as es
 from tariff_fetch.urdb.arcadia import fixedcharge as fc
 from tariff_fetch.urdb.arcadia import metadata as metadata_mod
 from tariff_fetch.urdb.arcadia.scenario import Scenario
+from tests.arcadia_urdb_fixtures import make_band, make_fixed_rate, make_library_with_tariff
 
 
 def test_golden_flat_energy_schedule(monkeypatch):
@@ -37,29 +38,8 @@ def test_golden_tiered_energy_schedule(monkeypatch):
 
 
 def test_golden_fixed_charge_build(monkeypatch):
-    tariff = {"rates": []}
-    fixed_rate = {
-        "charge_type": "FIXED_PRICE",
-        "transaction_type": "BUY",
-        "charge_period": "MONTHLY",
-        "tariff_rate_id": 1,
-        "rate_name": "Customer Charge",
-        "rate_bands": [
-            {
-                "tariff_rate_id": 1,
-                "rate_unit": "COST_PER_UNIT",
-                "rate_amount": 12.5,
-                "is_credit": False,
-                "has_consumption_limit": False,
-                "has_demand_limit": False,
-                "has_property_limit": False,
-            }
-        ],
-    }
-    library = SimpleNamespace(
-        tariffs=SimpleNamespace(get_tariff_at_date=lambda master_tariff_id, dt: tariff, get_rate=lambda rate_id: fixed_rate),
-        variables=None,
-    )
+    fixed_rate = make_fixed_rate(rate_bands=[make_band(rate_amount=12.5)])
+    library = make_library_with_tariff(fixed_rate)
 
     monkeypatch.setattr(fc.ru, "tariff_iter_rates_for_dt", lambda tariff, scenario, library, dt: [fixed_rate])
     monkeypatch.setattr(fc.ru, "rate_filter_bands", lambda rate, scenario, library: list(rate["rate_bands"]))
@@ -74,29 +54,8 @@ def test_golden_fixed_charge_build(monkeypatch):
 
 
 def test_golden_daily_fixed_charge_build(monkeypatch):
-    tariff = {"rates": []}
-    fixed_rate = {
-        "charge_type": "FIXED_PRICE",
-        "transaction_type": "BUY",
-        "charge_period": "DAILY",
-        "tariff_rate_id": 1,
-        "rate_name": "Customer Charge",
-        "rate_bands": [
-            {
-                "tariff_rate_id": 1,
-                "rate_unit": "COST_PER_UNIT",
-                "rate_amount": 1.0,
-                "is_credit": False,
-                "has_consumption_limit": False,
-                "has_demand_limit": False,
-                "has_property_limit": False,
-            }
-        ],
-    }
-    library = SimpleNamespace(
-        tariffs=SimpleNamespace(get_tariff_at_date=lambda master_tariff_id, dt: tariff, get_rate=lambda rate_id: fixed_rate),
-        variables=None,
-    )
+    fixed_rate = make_fixed_rate(charge_period="DAILY", rate_bands=[make_band(rate_amount=1.0)])
+    library = make_library_with_tariff(fixed_rate)
 
     monkeypatch.setattr(fc.ru, "tariff_iter_rates_for_dt", lambda tariff, scenario, library, dt: [fixed_rate])
     monkeypatch.setattr(fc.ru, "rate_filter_bands", lambda rate, scenario, library: list(rate["rate_bands"]))

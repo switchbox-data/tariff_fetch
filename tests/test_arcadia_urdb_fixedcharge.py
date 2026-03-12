@@ -3,16 +3,11 @@ from datetime import datetime
 import pytest
 
 from tariff_fetch.urdb.arcadia.fixedcharge import get_rate_fixed_charge_at_dt, normalize_fixed_charge_amount
+from tests.arcadia_urdb_fixtures import make_band, make_fixed_rate
 
 
 def test_get_rate_fixed_charge_returns_zero_when_no_bands_apply(monkeypatch):
-    rate = {
-        "charge_type": "FIXED_PRICE",
-        "transaction_type": "BUY",
-        "charge_period": "MONTHLY",
-        "tariff_rate_id": 1,
-        "rate_name": "Customer Charge",
-    }
+    rate = make_fixed_rate(rate_bands=[])
 
     monkeypatch.setattr(
         "tariff_fetch.urdb.arcadia.fixedcharge.ru.rate_filter_bands",
@@ -30,22 +25,7 @@ def test_get_rate_fixed_charge_returns_zero_when_no_bands_apply(monkeypatch):
 
 
 def test_get_rate_fixed_charge_converts_daily_to_monthly(monkeypatch):
-    rate = {
-        "charge_type": "FIXED_PRICE",
-        "transaction_type": "BUY",
-        "charge_period": "DAILY",
-        "tariff_rate_id": 1,
-        "rate_name": "Customer Charge",
-        "rate_bands": [
-            {
-                "rate_unit": "COST_PER_UNIT",
-                "rate_amount": 2.0,
-                "has_consumption_limit": False,
-                "has_demand_limit": False,
-                "has_property_limit": False,
-            }
-        ],
-    }
+    rate = make_fixed_rate(charge_period="DAILY", rate_bands=[make_band(rate_amount=2.0)])
 
     monkeypatch.setattr(
         "tariff_fetch.urdb.arcadia.fixedcharge.ru.rate_filter_bands",
