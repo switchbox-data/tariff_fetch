@@ -167,6 +167,8 @@ def rate_band_get_amount_at_datetime(band: TariffRateBand, library: Library, dt:
 
     rate_id = band["tariff_rate_id"]
     rate = library.tariffs.get_rate(rate_id)
+    if rate.get("variable_rate_sub_key") is not None:
+        raise RateConversionError(rate, "Rates with variable_rate_sub_key are not supported")
     if rate.get("variable_factor_key") is not None:
         raise RateConversionError(rate, "Rates with variable_factor_key are not supported")
     mp = -1 if band["is_credit"] else 1

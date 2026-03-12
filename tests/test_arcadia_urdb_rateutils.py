@@ -163,6 +163,19 @@ def test_rate_band_get_amount_at_datetime_rejects_variable_factor_key():
         )
 
 
+def test_rate_band_get_amount_at_datetime_rejects_variable_rate_sub_key():
+    band = make_band(tariff_rate_id=8, rate_amount=5.0)
+    rate = make_consumption_rate(tariff_rate_id=8, variable_rate_sub_key="zoneA")
+    library = SimpleNamespace(tariffs=SimpleNamespace(get_rate=lambda rate_id: rate))
+
+    with pytest.raises(RateConversionError, match="variable_rate_sub_key"):
+        ru.rate_band_get_amount_at_datetime(
+            band,  # type: ignore[arg-type]
+            library,  # type: ignore[arg-type]
+            datetime(2025, 1, 1, 0, 30),
+        )
+
+
 def test_get_rate_consumption_bands_rejects_quantity_key():
     rate = make_consumption_rate(quantity_key="billingMeter")
 
