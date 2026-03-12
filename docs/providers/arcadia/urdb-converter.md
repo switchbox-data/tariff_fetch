@@ -69,7 +69,6 @@ Examples include:
 - rates whose tier limits come from a variable lookup
 - rates whose value must be multiplied by an additional variable factor
 - rates that depend on a quantity such as number of meters
-- calendar-driven time-of-use overrides such as holiday or event calendars
 - demand-based rate bands
 - property-limited bands and formula-driven band logic
 
@@ -114,6 +113,22 @@ This includes:
 - prompted property values
 
 This folder is useful when checking why a tariff converted a certain way or why the converter stopped on a particular feature.
+
+## Warnings and skipped items
+
+Some Arcadia features are not converted exactly, but also do not stop the whole conversion.
+
+Current examples:
+
+- inaccessible rider tariffs that Arcadia returns as unauthorized
+- time-of-use calendars attached through `calendar_id`
+
+When this happens, the converter records a warning for the conversion run.
+
+- inaccessible riders are skipped rather than retried forever
+- TOU calendar ids are ignored, and the converter falls back to the ordinary TOU period definitions
+
+These warnings are meant to make the approximation visible without turning every such case into a hard failure.
 
 ## Partial conversions
 

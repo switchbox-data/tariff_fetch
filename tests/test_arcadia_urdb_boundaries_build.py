@@ -6,7 +6,6 @@ import pytest
 from tariff_fetch.urdb.arcadia import build as build_mod
 from tariff_fetch.urdb.arcadia import metadata as metadata_mod
 from tariff_fetch.urdb.arcadia import rateutils as ru
-from tariff_fetch.urdb.arcadia.exception import ConversionError
 from tariff_fetch.urdb.arcadia.scenario import Scenario
 
 
@@ -130,17 +129,25 @@ def test_rate_is_applied_to_datetime_handles_offset_aware_rate_window():
     assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 6, 1, 0, 0)) is False  # type: ignore[arg-type]
 
 
-def test_time_of_use_is_datetime_within_rejects_calendar_id():
+def test_time_of_use_is_datetime_within_ignores_calendar_id():
     tou = {
         "calendar_id": 10,
-        "tou_periods": [],
+        "tou_periods": [
+            {
+                "from_day_of_week": 0,
+                "to_day_of_week": 6,
+                "from_hour": 0,
+                "to_hour": 23,
+                "from_minute": 0,
+                "to_minute": 59,
+            }
+        ],
     }
 
-    with pytest.raises(ConversionError, match="calendar_id"):
-        ru.time_of_use_is_datetime_within(tou, datetime(2025, 7, 10, 15, 30))  # type: ignore[arg-type]
+    assert ru.time_of_use_is_datetime_within(tou, datetime(2025, 7, 10, 15, 30)) is True  # type: ignore[arg-type]
 
 
-def test_period_is_datetime_within_rejects_calendar_id():
+def test_period_is_datetime_within_ignores_calendar_id():
     period = {
         "from_day_of_week": 0,
         "to_day_of_week": 6,
@@ -151,8 +158,58 @@ def test_period_is_datetime_within_rejects_calendar_id():
         "calendar_id": 10,
     }
 
-    with pytest.raises(ConversionError, match="calendar_id"):
-        ru.period_is_datetime_within(period, datetime(2025, 7, 10, 15, 30))  # type: ignore[arg-type]
+    assert ru.period_is_datetime_within(period, datetime(2025, 7, 10, 15, 30)) is True  # type: ignore[arg-type]
+
+
+def test_tariff_iter_rates_for_dt_records_ignored_calendar_issues_once():
+    rate = {
+        "tariff_rate_id": 10,
+        "rate_name": "TOU Charge",
+        "charge_class": ["SUPPLY"],
+        "rate_bands": [{"rate_unit": "COST_PER_UNIT"}],
+        "time_of_use": {
+            "calendar_id": 10,
+            "tou_periods": [
+                {
+                    "tou_period_id": 33,
+                    "from_day_of_week": 0,
+                    "to_day_of_week": 6,
+                    "from_hour": 0,
+                    "to_hour": 23,
+                    "from_minute": 0,
+                    "to_minute": 59,
+                    "calendar_id": 11,
+                }
+            ],
+        },
+    }
+    messages: list[tuple[tuple[object, ...], str]] = []
+    library = SimpleNamespace(
+        record_issue=lambda key, message: messages.append((key, message)),
+        get_choice_property_as_ints=lambda key: [1],
+    )
+    tariff = {"rates": [rate]}
+    scenario = Scenario(1, 2025, False, {"SUPPLY"})
+
+    _ = list(
+        ru.tariff_iter_rates_for_dt(
+            tariff,  # type: ignore[arg-type]
+            scenario,
+            library,  # type: ignore[arg-type]
+            datetime(2025, 7, 10, 15, 30),
+        )
+    )
+
+    assert messages == [
+        (
+            ("ignored_tou_calendar", 10, 10),
+            "Ignoring TOU calendar_id 10 for rate 10 (TOU Charge)",
+        ),
+        (
+            ("ignored_tou_period_calendar", 10, 33, 11),
+            "Ignoring TOU period calendar_id 11 for rate 10 (TOU Charge)",
+        ),
+    ]
 
 
 def test_build_urdb_merges_converter_chunks(monkeypatch):

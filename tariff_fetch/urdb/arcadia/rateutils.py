@@ -11,7 +11,7 @@ from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExt
 from tariff_fetch.arcadia.schema.timeofuse import Period, TimeOfUseExtended
 from tariff_fetch.urdb.arcadia.library import Library
 
-from .exception import ConversionError, RateConversionError, TariffAccessDenied
+from .exception import RateConversionError, TariffAccessDenied
 from .scenario import Scenario
 from .shared import as_naive_datetime
 
@@ -32,6 +32,7 @@ def tariff_iter_rates_for_dt(
     for rate in rates:
         if not rate_is_applied_to_scenario(rate, scenario, library):
             continue
+        _record_calendar_issues(rate, library)
         if not rate_is_applied_to_datetime(rate, dt):
             continue
         if rate["rate_bands"]:
@@ -197,8 +198,6 @@ def time_of_use_is_datetime_within(
 ) -> bool:
     """Return whether a datetime falls within a supported Arcadia TOU definition."""
 
-    if tou.get("calendar_id") is not None:
-        raise ConversionError("TOU calendar_id is not supported")
     season = tou.get("season")
     if season and not season_is_datetime_within(season, dt):
         return False
@@ -217,13 +216,31 @@ def period_is_datetime_within(
 ) -> bool:
     """Return whether a datetime falls within a TOU period's weekday and time bounds."""
 
-    if period.get("calendar_id") is not None:
-        raise ConversionError("TOU period calendar_id is not supported")
     return (
         period["from_day_of_week"] <= dt.weekday() <= period["to_day_of_week"]
         and period["from_hour"] <= dt.hour <= period["to_hour"]
         and period["from_minute"] <= dt.minute <= period["to_minute"]
     )
+
+
+def _record_calendar_issues(rate: TariffRateExtended, library: Library) -> None:
+    """Record ignored TOU calendar usage once per conversion run."""
+
+    if (tou := rate.get("time_of_use")) is None:
+        return
+    if (calendar_id := tou.get("calendar_id")) is not None:
+        library.record_issue(
+            ("ignored_tou_calendar", rate["tariff_rate_id"], calendar_id),
+            f"Ignoring TOU calendar_id {calendar_id} for rate {rate['tariff_rate_id']} ({rate['rate_name']})",
+        )
+    for period in tou.get("tou_periods", []):
+        if (calendar_id := period.get("calendar_id")) is None:
+            continue
+        period_id = period.get("tou_period_id", "unknown")
+        library.record_issue(
+            ("ignored_tou_period_calendar", rate["tariff_rate_id"], period_id, calendar_id),
+            f"Ignoring TOU period calendar_id {calendar_id} for rate {rate['tariff_rate_id']} ({rate['rate_name']})",
+        )
 
 
 # ================================
