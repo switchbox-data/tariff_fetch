@@ -37,7 +37,7 @@ class TariffNotFoundError(ConversionError):
 
 
 @final
-class TariffNotFoundById(ConversionError):
+class TariffNotFoundById(TariffNotFoundError):
     """Raised when a tariff version cannot be found by Arcadia tariff id."""
 
     def __init__(self, tariff_id: int) -> None:
@@ -50,7 +50,7 @@ class TariffNotFoundById(ConversionError):
 
 
 @final
-class TariffNotFoundByDate(ConversionError):
+class TariffNotFoundByDate(TariffNotFoundError):
     """Raised when no tariff version is effective for a requested date."""
 
     def __init__(self, master_tariff_id: int, dt: date) -> None:
