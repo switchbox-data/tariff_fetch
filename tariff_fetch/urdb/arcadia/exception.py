@@ -37,6 +37,19 @@ class TariffNotFoundError(ConversionError):
 
 
 @final
+class TariffAccessDenied(ConversionError):
+    """Raised when Arcadia denies access to a tariff id."""
+
+    def __init__(self, tariff_id: int) -> None:
+        self.tariff_id = tariff_id
+        super().__init__()
+
+    @override
+    def __str__(self) -> str:
+        return f"Access denied for tariff id={self.tariff_id}"
+
+
+@final
 class TariffNotFoundById(TariffNotFoundError):
     """Raised when a tariff version cannot be found by Arcadia tariff id."""
 

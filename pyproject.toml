@@ -1,6 +1,6 @@
 [project]
 name = "tariff_fetch"
-version = "0.4.7"
+version = "0.4.8"
 description = "A CLI tool and a python library to simplify downloading electric and gas utility tariff data."
 authors = [{ name = "Switchbox", email = "hello@switch.box" }]
 readme = "README.md"
@@ -39,6 +39,7 @@ Documentation = "https://switchbox-data.github.io/tariff_fetch/"
 [project.scripts]
 tariff-fetch = "tariff_fetch.cli:main_cli"
 tariff-fetch-gas = "tariff_fetch.cli_gas:main_cli"
+tariff-fetch-arcadia-urdb = "tariff_fetch.cli_arcadia_urdb:main_cli"
 
 [dependency-groups]
 dev = [

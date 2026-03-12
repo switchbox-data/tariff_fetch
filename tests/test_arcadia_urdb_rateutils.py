@@ -3,12 +3,14 @@ from math import inf
 from types import SimpleNamespace
 
 import pytest
-
+from requests import HTTPError, Response
 from tariff_fetch.urdb.arcadia import energyschedule as es
 from tariff_fetch.urdb.arcadia import rateutils as ru
+from tariff_fetch.urdb.arcadia.exception import TariffAccessDenied
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
+from tariff_fetch.urdb.arcadia.library import LibraryDebugStore, TariffLibrary
 from tariff_fetch.urdb.arcadia.scenario import Scenario
-from tests.arcadia_urdb_fixtures import StubLibrary, make_band, make_consumption_rate, make_percentage_rate
+from tests.arcadia_urdb_fixtures import StubLibrary, make_band, make_consumption_rate, make_percentage_rate, make_rate
 
 
 def test_rate_filter_bands_excludes_non_matching_choice_band():
@@ -176,6 +178,51 @@ def test_rate_band_get_amount_at_datetime_rejects_variable_rate_sub_key():
         )
 
 
+def test_rate_band_get_amount_at_datetime_applies_calculation_factor_to_fixed_amount():
+    band = make_band(tariff_rate_id=10, rate_amount=5.0, calculation_factor=1.5)
+    rate = make_consumption_rate(tariff_rate_id=10)
+    library = SimpleNamespace(tariffs=SimpleNamespace(get_rate=lambda rate_id: rate))
+
+    result = ru.rate_band_get_amount_at_datetime(
+        band,  # type: ignore[arg-type]
+        library,  # type: ignore[arg-type]
+        datetime(2025, 1, 1, 0, 30),
+    )
+
+    assert result == 7.5
+
+
+def test_rate_band_get_amount_at_datetime_applies_calculation_factor_to_credit_band():
+    band = make_band(tariff_rate_id=11, rate_amount=5.0, calculation_factor=1.5, is_credit=True)
+    rate = make_consumption_rate(tariff_rate_id=11)
+    library = SimpleNamespace(tariffs=SimpleNamespace(get_rate=lambda rate_id: rate))
+
+    result = ru.rate_band_get_amount_at_datetime(
+        band,  # type: ignore[arg-type]
+        library,  # type: ignore[arg-type]
+        datetime(2025, 1, 1, 0, 30),
+    )
+
+    assert result == -7.5
+
+
+def test_rate_band_get_amount_at_datetime_applies_calculation_factor_to_variable_rate():
+    band = make_band(tariff_rate_id=12, calculation_factor=2.0)
+    rate = make_consumption_rate(tariff_rate_id=12, variable_rate_key="monthlySupply")
+    library = SimpleNamespace(
+        tariffs=SimpleNamespace(get_rate=lambda rate_id: rate),
+        variables=SimpleNamespace(lookup=lambda key, dt: 3.5),
+    )
+
+    result = ru.rate_band_get_amount_at_datetime(
+        band,  # type: ignore[arg-type]
+        library,  # type: ignore[arg-type]
+        datetime(2025, 1, 1, 0, 30),
+    )
+
+    assert result == 7.0
+
+
 def test_get_rate_consumption_bands_rejects_quantity_key():
     rate = make_consumption_rate(quantity_key="billingMeter")
 
@@ -186,3 +233,55 @@ def test_get_rate_consumption_bands_rejects_quantity_key():
             library=None,  # pyright: ignore[reportArgumentType]
             dt=datetime(2025, 1, 1, 0, 30),
         )
+
+
+def test_tariff_iter_rates_for_dt_skips_inaccessible_rider_and_records_issue():
+    rate = make_rate(tariff_rate_id=9, rate_name="Rider Placeholder", rate_bands=[], rider_id=77)
+    tariff = {"rates": [rate]}
+    issues: list[tuple[tuple[object, ...], str]] = []
+
+    def get_tariff(tariff_id: int):
+        raise TariffAccessDenied(tariff_id)
+
+    library = SimpleNamespace(
+        tariffs=SimpleNamespace(get_tariff=get_tariff),
+        record_issue=lambda key, message: issues.append((key, message)),
+    )
+
+    result = list(
+        ru.tariff_iter_rates_for_dt(
+            tariff,  # type: ignore[arg-type]
+            Scenario(1, 2025, False, {"SUPPLY"}),
+            library,  # type: ignore[arg-type]
+            datetime(2025, 1, 1, 0, 30),
+        )
+    )
+
+    assert result == []
+    assert issues == [
+        (
+            ("inaccessible_rider", 9, 77),
+            "Skipping inaccessible rider 77 attached to rate 9 (Rider Placeholder)",
+        )
+    ]
+
+
+def test_tariff_library_caches_access_denied_tariff_ids():
+    calls: list[int] = []
+
+    class DummyTariffsAPI:
+        def iter_pages(self, **kwargs):
+            calls.append(int(kwargs["search"]))
+            response = Response()
+            response.status_code = 403
+            raise HTTPError(response=response)
+
+    api = SimpleNamespace(tariffs=DummyTariffsAPI())
+    library = TariffLibrary(api, LibraryDebugStore())  # type: ignore[arg-type]
+
+    with pytest.raises(TariffAccessDenied):
+        library.get_tariff(77)
+    with pytest.raises(TariffAccessDenied):
+        library.get_tariff(77)
+
+    assert calls == [77]

@@ -5,12 +5,13 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Literal, final, overload
 
+from requests import HTTPError
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.arcadia.schema.lookup import Lookup
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
 from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyPrunedDataType, TariffPropertyStandard
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateExtended
-from tariff_fetch.urdb.arcadia.exception import TariffNotFoundByDate, TariffNotFoundById
+from tariff_fetch.urdb.arcadia.exception import TariffAccessDenied, TariffNotFoundByDate, TariffNotFoundById
 
 from .exception import ConversionError
 from .prompts import (
@@ -82,6 +83,7 @@ class TariffLibrary:
         self.api = api
         self.debug_store = debug_store
         self.tariffs: list[TariffExtended] = []
+        self._access_denied_tariff_ids: set[int] = set()
 
     def get_tariff_at_date(self, master_tariff_id: int, dt: date) -> TariffExtended:
         """Return the tariff version effective for a master tariff on a given date."""
@@ -98,6 +100,8 @@ class TariffLibrary:
 
         if (found := self._find_tariff(tariff_id)) is not None:
             return found
+        if tariff_id in self._access_denied_tariff_ids:
+            raise TariffAccessDenied(tariff_id)
         tariff = self._fetch_tariff(tariff_id)
         self._remember(tariff)
         return tariff
@@ -138,17 +142,23 @@ class TariffLibrary:
     def _fetch_tariff(self, tariff_id: int) -> TariffExtended:
         """Fetch one tariff version from Arcadia by tariff id."""
 
-        tariffs = list(
-            self.api.tariffs.iter_pages(
-                fields="ext",
-                search=str(tariff_id),
-                search_on=["tariffId"],
-                starts_with=True,
-                ends_with=True,
-                populate_properties=True,
-                populate_rates=True,
+        try:
+            tariffs = list(
+                self.api.tariffs.iter_pages(
+                    fields="ext",
+                    search=str(tariff_id),
+                    search_on=["tariffId"],
+                    starts_with=True,
+                    ends_with=True,
+                    populate_properties=True,
+                    populate_rates=True,
+                )
             )
-        )
+        except HTTPError as e:
+            if e.response is not None and e.response.status_code == 403:
+                self._access_denied_tariff_ids.add(tariff_id)
+                raise TariffAccessDenied(tariff_id) from e
+            raise
         if len(tariffs) > 1:
             raise RuntimeError(f"More than one tariff found for id={tariff_id}")
         if not tariffs:
@@ -228,11 +238,22 @@ class Library:
         self.tariffs = TariffLibrary(api, self.debug_store)
         self.variables = VariablePropertyLibrary(api, self.debug_store)
         self._properies: dict[str, PropertyValue] = properties or {}
+        self._issues: dict[tuple[object, ...], str] = {}
 
     def has_property(self, key: str) -> bool:
         """Return whether a property value has already been supplied or cached."""
 
         return key in self._properies
+
+    def record_issue(self, key: tuple[object, ...], message: str) -> None:
+        """Record a deduplicated conversion issue for this conversion run."""
+
+        _ = self._issues.setdefault(key, message)
+
+    def iter_issues(self) -> list[str]:
+        """Return the unique conversion issues recorded during this conversion run."""
+
+        return list(self._issues.values())
 
     def get_choice_property_as_ints(self, key: str) -> list[int]:
         """Return a CHOICE property as integer ids."""

@@ -1,5 +1,6 @@
 """Build URDB-style output from Arcadia tariff data for a conversion scenario."""
 
+import logging
 from typing import cast
 
 import questionary
@@ -12,6 +13,8 @@ from .energyschedule import build_energy_schedule
 from .fixedcharge import build_fixed_charge
 from .metadata import build_metadata
 from .scenario import Scenario
+
+logger = logging.getLogger(__name__)
 
 
 def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario) -> URDBRate:
@@ -32,6 +35,10 @@ def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario) -> URDBRate:
         metadata = build_metadata(scenario, library)
     except Exception as e:
         metadata = _confirm_proceed(e, "metadata")
+
+    if hasattr(library, "iter_issues"):
+        for issue in library.iter_issues():
+            logger.warning(issue)
 
     return {**energy_schedule, **fixed_charge, **metadata}
 

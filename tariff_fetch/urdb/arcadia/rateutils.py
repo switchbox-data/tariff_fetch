@@ -11,7 +11,7 @@ from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExt
 from tariff_fetch.arcadia.schema.timeofuse import Period, TimeOfUseExtended
 from tariff_fetch.urdb.arcadia.library import Library
 
-from .exception import ConversionError, RateConversionError
+from .exception import ConversionError, RateConversionError, TariffAccessDenied
 from .scenario import Scenario
 from .shared import as_naive_datetime
 
@@ -37,7 +37,14 @@ def tariff_iter_rates_for_dt(
         if rate["rate_bands"]:
             yield rate
         elif rider_id := rate.get("rider_id"):
-            rider_tariff = library.tariffs.get_tariff(rider_id)
+            try:
+                rider_tariff = library.tariffs.get_tariff(rider_id)
+            except TariffAccessDenied:
+                library.record_issue(
+                    ("inaccessible_rider", rate["tariff_rate_id"], rider_id),
+                    f"Skipping inaccessible rider {rider_id} attached to rate {rate['tariff_rate_id']} ({rate['rate_name']})",
+                )
+                continue
             yield from tariff_iter_rates_for_dt(rider_tariff, scenario, library, dt)
 
 
@@ -104,8 +111,6 @@ def rate_filter_bands(rate: TariffRateExtended, _scenario: Scenario, library: Li
             raise RateConversionError(rate, "Bands with property limits are not supported")
         if band.get("prev_upper_limit"):
             raise RateConversionError(rate, "Bands with property prev_upper_limit are not supported")
-        if band.get("calculation_factor"):
-            raise RateConversionError(rate, "Bands with property calculation_factor are not supported")
         if band.get("applicability_formula"):
             raise RateConversionError(rate, "Bands with property applicability_formula are not supported")
         if (applicability_value := band.get("applicability_value")) is not None:
@@ -173,8 +178,12 @@ def rate_band_get_amount_at_datetime(band: TariffRateBand, library: Library, dt:
         raise RateConversionError(rate, "Rates with variable_factor_key are not supported")
     mp = -1 if band["is_credit"] else 1
     if (variable_rate_key := rate.get("variable_rate_key")) is None:
-        return band["rate_amount"] * mp
-    return library.variables.lookup(variable_rate_key, dt) * mp
+        raw_result = band["rate_amount"] * mp
+    else:
+        raw_result = library.variables.lookup(variable_rate_key, dt) * mp
+
+    calculation_factor = band.get("calculation_factor", 1.0)
+    return raw_result * calculation_factor
 
 
 # ================================

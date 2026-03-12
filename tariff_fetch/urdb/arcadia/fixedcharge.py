@@ -72,8 +72,6 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
         raise RateConversionError(rate, "Fixed rate bands cannot have has_property_limit==true")
     if band.get("property_upper_limit") is not None:
         raise RateConversionError(rate, "Fixed rate bands cannot have property_upper_limit")
-    if band.get("calculation_factor") is not None:
-        raise RateConversionError(rate, "Fixed rate bands cannot have calculation_factor")
     if band.get("applicability_formula") is not None:
         raise RateConversionError(rate, "Fixed rate bands cannot have applicability_formula")
 
