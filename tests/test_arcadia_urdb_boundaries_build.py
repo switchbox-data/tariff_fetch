@@ -35,20 +35,114 @@ def test_season_is_datetime_within_handles_wraparound_year():
     assert ru.season_is_datetime_within(season, date(2025, 5, 1)) is False  # type: ignore[arg-type]
 
 
-def test_period_is_datetime_within_respects_inclusive_boundaries():
+def test_period_is_datetime_within_respects_exclusive_to_portion():
     period = {
         "from_day_of_week": 0,
-        "to_day_of_week": 4,
-        "from_hour": 9,
-        "to_hour": 17,
+        "to_day_of_week": 0,
+        "from_hour": 0,
+        "to_hour": 0,
+        "from_minute": 0,
+        "to_minute": 0,
+    }
+    # Monday 00:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 0, 0)) is True
+    # Monday 12:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 12, 0)) is True
+    # Monday 23:59
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 23, 59)) is True
+    # Tuesday 00:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 3, 0, 0)) is False
+    # Tuesday 06:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 3, 12, 0)) is False
+
+
+def test_period_is_datetime_within_excludes_exact_to_boundary_for_non_wrapping_window():
+    period = {
+        "from_day_of_week": 0,
+        "to_day_of_week": 0,
+        "from_hour": 14,
+        "to_hour": 18,
         "from_minute": 0,
         "to_minute": 59,
     }
 
-    assert ru.period_is_datetime_within(period, datetime(2025, 1, 6, 9, 0)) is True  # type: ignore[arg-type]
-    assert ru.period_is_datetime_within(period, datetime(2025, 1, 10, 17, 59)) is True  # type: ignore[arg-type]
-    assert ru.period_is_datetime_within(period, datetime(2025, 1, 11, 12, 0)) is False  # type: ignore[arg-type]
-    assert ru.period_is_datetime_within(period, datetime(2025, 1, 6, 8, 59)) is False  # type: ignore[arg-type]
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 18, 58)) is True
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 18, 59)) is False
+
+
+def test_period_is_datetime_within_respects_day_isolation():
+    period = {
+        "from_day_of_week": 0,
+        "to_day_of_week": 2,
+        "from_hour": 17,
+        "to_hour": 8,
+        "from_minute": 0,
+        "to_minute": 0,
+    }
+    # Monday, 00:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 0, 0)) is True
+    # Monday, 06:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 6, 0)) is True
+    # Monday, 09:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 9, 0)) is False
+    # Monday, 16:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 16, 0)) is False
+    # Monday, 17:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 17, 0)) is True
+    # Monday, 23:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 23, 0)) is True
+    # Tuesday, 00:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 3, 0, 0)) is True
+    # Tuesday, 06:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 3, 6, 0)) is True
+    # Tuesday, 09:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 3, 9, 0)) is False
+    # Tuesday, 16:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 3, 16, 0)) is False
+    # Tuesday, 17:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 3, 17, 0)) is True
+    # Tuesday, 23:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 3, 23, 0)) is True
+    # Wednesday, 00:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 4, 0, 0)) is True
+    # Wednesday, 06:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 4, 6, 0)) is True
+    # Wednesday, 09:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 4, 9, 0)) is False
+    # Wednesday, 16:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 4, 16, 0)) is False
+    # Wednesday, 17:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 4, 17, 0)) is True
+    # Wednesday, 23:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 4, 23, 0)) is True
+    # Thursday, 00:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 5, 0, 0)) is False
+    # Thursday, 06:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 5, 6, 0)) is False
+    # Thursday, 09:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 5, 9, 0)) is False
+    # Thursday, 16:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 5, 16, 0)) is False
+    # Thursday, 17:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 5, 17, 0)) is False
+    # Thursday, 23:00
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 5, 23, 0)) is False
+
+
+def test_period_is_datetime_within_excludes_exact_to_boundary_for_wrapping_window():
+    period = {
+        "from_day_of_week": 0,
+        "to_day_of_week": 2,
+        "from_hour": 17,
+        "to_hour": 8,
+        "from_minute": 0,
+        "to_minute": 0,
+    }
+
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 7, 59)) is True
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 2, 8, 0)) is False
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 4, 7, 59)) is True
+    assert ru.period_is_datetime_within(period, datetime(2025, 6, 4, 8, 0)) is False
 
 
 def test_time_of_use_is_datetime_within_applies_embedded_season():

@@ -216,11 +216,24 @@ def period_is_datetime_within(
 ) -> bool:
     """Return whether a datetime falls within a TOU period's weekday and time bounds."""
 
-    return (
-        period["from_day_of_week"] <= dt.weekday() <= period["to_day_of_week"]
-        and period["from_hour"] <= dt.hour <= period["to_hour"]
-        and period["from_minute"] <= dt.minute <= period["to_minute"]
-    )
+    current_day = dt.weekday()
+    start_day, end_day = period["from_day_of_week"], period["to_day_of_week"]
+
+    if start_day <= end_day:
+        if not (start_day <= current_day <= end_day):
+            return False
+    elif not (start_day <= current_day or current_day <= end_day):
+        return False
+
+    current_time = dt.hour * 60 + dt.minute
+    start_time = period["from_hour"] * 60 + period["from_minute"]
+    end_time = period["to_hour"] * 60 + period["to_minute"]
+
+    if start_time == end_time:
+        return True
+    if start_time < end_time:
+        return start_time <= current_time < end_time
+    return current_time >= start_time or current_time < end_time
 
 
 def _record_calendar_issues(rate: TariffRateExtended, library: Library) -> None:
