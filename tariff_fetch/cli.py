@@ -49,17 +49,6 @@ def prompt_state() -> StateCode:
     return StateCode(choice.lower())
 
 
-def prompt_providers() -> list[Provider]:
-    return cast(
-        list[Provider],
-        questionary.checkbox(
-            message="Select providers",
-            choices=[questionary.Choice(title=_.value, value=_) for _ in Provider],
-            validate=lambda x: True if x else "Select at least one provider",
-        ).ask(),
-    )
-
-
 def prompt_utility(state: str) -> Utility:
     with console.status("Fetching utilities..."):
         yearly_sales_df = (
@@ -151,7 +140,7 @@ def main(
     state: Annotated[
         StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
     ] = None,
-    providers: Annotated[list[Provider] | None, typer.Option("--providers", "-p", case_sensitive=False)] = None,
+    provider: Annotated[Provider | None, typer.Option("--provider", "-p", case_sensitive=False)] = None,
     output_folder: Annotated[
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
@@ -160,16 +149,19 @@ def main(
     logging.basicConfig(level=logging.DEBUG)
     # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
     state_ = state or prompt_state().value
-    providers_ = providers or prompt_providers()
+    provider = provider or prompt_provider()
     output_folder_ = Path(output_folder)
     utility = prompt_utility(state_)
 
-    if urdb:
-        year = prompt_year()
-        if Provider.GENABILITY in providers_:
+    match provider:
+        case Provider.GENABILITY:
             console.print("Processing [blue]Genability[/]")
             try:
-                process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
+                if urdb:
+                    year = prompt_year()
+                    process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
+                else:
+                    process_genability(utility=utility, output_folder=output_folder_)
             except HTTPError as e:
                 if e.response.status_code == 401:
                     console.print("Authorization failed")
@@ -177,8 +169,8 @@ def main(
                         "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
                     )
                 else:
-                    raise e from None
-        if Provider.OPENEI in providers_:
+                    raise
+        case Provider.OPENEI:
             console.print("Processing [blue]OpenEI[/]")
             try:
                 process_openei(utility, output_folder_)
@@ -187,34 +179,10 @@ def main(
                     console.print("Authorization failed")
                     console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
                 else:
-                    raise e from None
-        if Provider.RATEACUITY in providers_:
-            console.print("Cannot convert RateAcuity data to URDB")
-
-    else:
-        if Provider.GENABILITY in providers_:
-            console.print("Processing [blue]Genability[/]")
-            try:
-                process_genability(utility=utility, output_folder=output_folder_)
-            except HTTPError as e:
-                if e.response.status_code == 401:
-                    console.print("Authorization failed")
-                    console.print(
-                        "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
-                    )
-                else:
-                    raise e from None
-        if Provider.OPENEI in providers_:
-            console.print("Processing [blue]OpenEI[/]")
-            try:
-                process_openei(utility, output_folder_)
-            except HTTPError as e:
-                if e.response.status_code == 403:
-                    console.print("Authorization failed")
-                    console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
-                else:
-                    raise e from None
-        if Provider.RATEACUITY in providers_:
+                    raise
+        case Provider.RATEACUITY:
+            if urdb:
+                console.print("Cannot convert RateAcuity data to URDB")
             console.print("Processing [blue]RateAcuity[/]")
             try:
                 process_rateacuity(output_folder_, state_, utility)
@@ -227,6 +195,16 @@ def main(
 
 def main_cli():
     typer.run(main)
+
+
+def prompt_provider() -> Provider:
+    return cast(
+        Provider,
+        questionary.select(
+            message="Select provider",
+            choices=[questionary.Choice(title=_.value, value=_) for _ in Provider],
+        ).ask(),
+    )
 
 
 if __name__ == "__main__":
