@@ -18,6 +18,11 @@ from tariff_fetch.rateacuity.base import AuthorizationError
 from ._cli import console
 from ._cli.types import Provider, StateCode, Utility
 
+app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+)
+
 ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
 CORE_EIA861_YEARLY_SALES_HTTPS = (
     "https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/core_eia861__yearly_sales.parquet"
@@ -136,7 +141,38 @@ def prompt_utility(state: str) -> Utility:
     return result
 
 
-def main(
+@app.command("urdb")
+def main_urdb(
+    state: Annotated[
+        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
+    ] = None,
+    output_folder: Annotated[
+        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
+    ] = "./outputs",
+    year: Annotated[int | None, typer.Option("--year", "-y")] = None,
+):
+    logging.basicConfig(level=logging.DEBUG)
+    # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
+    state_ = state or prompt_state().value
+    output_folder_ = Path(output_folder)
+    utility = prompt_utility(state_)
+    year = prompt_year()
+
+    console.print("Processing [blue]Genability[/]")
+    try:
+        process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
+    except HTTPError as e:
+        if e.response.status_code == 401:
+            console.print("Authorization failed")
+            console.print(
+                "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
+            )
+        else:
+            raise
+
+
+@app.command("raw")
+def main_raw(
     state: Annotated[
         StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
     ] = None,
@@ -144,7 +180,6 @@ def main(
     output_folder: Annotated[
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
-    urdb: bool = False,
 ):
     logging.basicConfig(level=logging.DEBUG)
     # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
@@ -157,11 +192,7 @@ def main(
         case Provider.GENABILITY:
             console.print("Processing [blue]Genability[/]")
             try:
-                if urdb:
-                    year = prompt_year()
-                    process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
-                else:
-                    process_genability(utility=utility, output_folder=output_folder_)
+                process_genability(utility=utility, output_folder=output_folder_)
             except HTTPError as e:
                 if e.response.status_code == 401:
                     console.print("Authorization failed")
@@ -181,8 +212,6 @@ def main(
                 else:
                     raise
         case Provider.RATEACUITY:
-            if urdb:
-                console.print("Cannot convert RateAcuity data to URDB")
             console.print("Processing [blue]RateAcuity[/]")
             try:
                 process_rateacuity(output_folder_, state_, utility)
@@ -194,7 +223,7 @@ def main(
 
 
 def main_cli():
-    typer.run(main)
+    app()
 
 
 def prompt_provider() -> Provider:
