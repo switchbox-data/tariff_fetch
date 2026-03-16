@@ -1,7 +1,7 @@
 from datetime import date
-from typing import Literal, Required, TypedDict, get_args
+from typing import Literal, Required, get_args
 
-from typing_extensions import TypeIs
+from typing_extensions import TypedDict, TypeIs
 
 BandDeterminant = Literal["ccf", "therms", "cubic feet"]
 ConsumptionRateDeterminant = Literal["per ccf", "per therm"]

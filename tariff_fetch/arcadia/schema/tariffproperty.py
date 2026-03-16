@@ -1,6 +1,7 @@
-from typing import Literal, NotRequired, TypedDict
+from typing import Literal, NotRequired
 
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 TariffPropertyFormulaType = Literal["FORMULA"]
 

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Literal, final, overload
 
 from requests import HTTPError
+
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.arcadia.schema.lookup import Lookup
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
@@ -199,8 +200,10 @@ class VariablePropertyLibrary:
             self.debug_store.save_lookups(key, dt.year, lookups)
 
         for row in lookups:
-            if as_naive_datetime(row["from_date_time"]) <= as_naive_datetime(dt) <= as_naive_datetime(
-                row["to_date_time"] or datetime.max
+            if (
+                as_naive_datetime(row["from_date_time"])
+                <= as_naive_datetime(dt)
+                <= as_naive_datetime(row["to_date_time"] or datetime.max)
             ):
                 if (value := row["actual_value"]) is not None:
                     return value

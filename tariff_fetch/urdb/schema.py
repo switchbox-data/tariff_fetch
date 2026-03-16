@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Annotated, Any, Literal, Required, TypedDict
+from typing import Annotated, Any, Literal, Required
 
 from pydantic import FailFast, TypeAdapter
+from typing_extensions import TypedDict
 
 # --- enums per URDB v7 docs ---
 RateSector = Literal["Residential", "Commercial", "Industrial", "Lighting"]

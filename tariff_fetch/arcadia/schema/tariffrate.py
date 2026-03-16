@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Annotated, NotRequired, TypedDict
+from typing import Annotated, NotRequired
 
 from pydantic import BeforeValidator
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 from .common import RateChargeClass, RateTransactionType, RateUnit, TariffChargePeriod, TariffChargeType
 from .season import SeasonExtended, SeasonStandard

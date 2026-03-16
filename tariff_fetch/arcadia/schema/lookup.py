@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import NotRequired, TypedDict
+from typing import NotRequired
 
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 
 class Lookup(TypedDict):

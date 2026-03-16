@@ -1,7 +1,5 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from types import SimpleNamespace
-
-import pytest
 
 from tariff_fetch.urdb.arcadia import build as build_mod
 from tariff_fetch.urdb.arcadia import metadata as metadata_mod
@@ -214,8 +212,8 @@ def test_rate_is_applied_to_datetime_combines_effective_window_with_season_and_t
 
 def test_rate_is_applied_to_datetime_handles_offset_aware_rate_window():
     rate = {
-        "from_date_time": datetime(2025, 3, 1, 0, 0, tzinfo=timezone.utc),
-        "to_date_time": datetime(2025, 6, 1, 0, 0, tzinfo=timezone.utc),
+        "from_date_time": datetime(2025, 3, 1, 0, 0, tzinfo=UTC),
+        "to_date_time": datetime(2025, 6, 1, 0, 0, tzinfo=UTC),
     }
 
     assert ru.rate_is_applied_to_datetime(rate, datetime(2025, 2, 28, 23, 59)) is False  # type: ignore[arg-type]

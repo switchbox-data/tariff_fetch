@@ -1,7 +1,8 @@
-from typing import Annotated, TypedDict
+from typing import Annotated
 
 from pydantic import Field
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 from .common import TimeOfUsePrivacy, TimeOfUseType
 from .season import SeasonExtended, SeasonStandard

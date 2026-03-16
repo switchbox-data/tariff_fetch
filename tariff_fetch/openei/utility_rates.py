@@ -4,9 +4,9 @@ import json
 import os
 from collections.abc import Iterator, Sequence
 from pathlib import Path
-from typing import Any, Literal, TypeAlias, TypedDict, cast
+from typing import Any, Literal, TypeAlias, cast
 
-from typing_extensions import Unpack
+from typing_extensions import TypedDict, Unpack
 
 from .base import api_request_json  # pyright: ignore[reportUnknownVariableType]
 
@@ -330,7 +330,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     if rates_for_utility is None:
         parser.error("ratesforutility must be set")
 
-    effective_on_date = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+    effective_on_date = int(datetime.datetime.now(datetime.UTC).timestamp())
     records = list(
         iter_utility_rates(
             api_key=api_key,

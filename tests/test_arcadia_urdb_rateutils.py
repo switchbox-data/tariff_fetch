@@ -4,10 +4,10 @@ from types import SimpleNamespace
 
 import pytest
 from requests import HTTPError, Response
+
 from tariff_fetch.urdb.arcadia import energyschedule as es
 from tariff_fetch.urdb.arcadia import rateutils as ru
-from tariff_fetch.urdb.arcadia.exception import TariffAccessDenied
-from tariff_fetch.urdb.arcadia.exception import RateConversionError
+from tariff_fetch.urdb.arcadia.exception import RateConversionError, TariffAccessDenied
 from tariff_fetch.urdb.arcadia.library import LibraryDebugStore, TariffLibrary
 from tariff_fetch.urdb.arcadia.scenario import Scenario
 from tests.arcadia_urdb_fixtures import StubLibrary, make_band, make_consumption_rate, make_percentage_rate, make_rate
