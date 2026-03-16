@@ -1,6 +1,6 @@
 [project]
 name = "tariff_fetch"
-version = "0.4.9"
+version = "0.4.10"
 description = "A CLI tool and a python library to simplify downloading electric and gas utility tariff data."
 authors = [{ name = "Switchbox", email = "hello@switch.box" }]
 readme = "README.md"

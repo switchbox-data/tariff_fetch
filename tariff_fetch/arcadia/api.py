@@ -2,6 +2,7 @@ import os
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import date
+from json import JSONDecodeError
 from typing import Annotated, Any, Generic, Literal, Self, TypeVar, Unpack, overload
 from urllib.parse import urljoin
 
@@ -148,7 +149,12 @@ class ArcadiaSignalAPI:
             params=params,  # pyright: ignore[reportUnknownArgumentType]
             auth=HTTPBasicAuth(self.auth.app_id, self.auth.app_key),
         )
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            if (message := _extract_arcadia_error_message(response)) is not None:
+                raise requests.HTTPError(message, response=response, request=response.request) from e
+            raise
         return response.json()  # pyright: ignore[reportAny]
 
     def _request_typed(
@@ -293,3 +299,27 @@ class ArcadiaLookupsAPI(ArcadiaPropertiesAPI):
             if size <= 0:
                 return
             page_start += size
+
+
+def _extract_arcadia_error_message(response: requests.Response) -> str | None:
+    try:
+        payload = response.json()  # pyright: ignore[reportAny]
+    except (JSONDecodeError, ValueError):
+        return None
+
+    if not isinstance(payload, dict):
+        return None
+
+    results = payload.get("results")  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
+    if not isinstance(results, list):
+        return None
+
+    messages = [  # pyright: ignore[reportUnknownVariableType]
+        item["message"]
+        for item in results  # pyright: ignore[reportUnknownVariableType]
+        if isinstance(item, dict) and isinstance(item.get("message"), str) and item["message"].strip()  # pyright: ignore[reportUnknownMemberType]
+    ]
+    if not messages:
+        return None
+
+    return "; ".join(messages)  # pyright: ignore[reportUnknownArgumentType]
