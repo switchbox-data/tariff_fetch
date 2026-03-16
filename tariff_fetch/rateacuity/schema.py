@@ -1,9 +1,10 @@
 import re
 from datetime import date
-from typing import Annotated, Any, Generic, Literal, NamedTuple, TypedDict, TypeVar
+from typing import Annotated, Any, Generic, Literal, NamedTuple, TypeVar
 
 from pydantic import BeforeValidator, Field
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 USStateCode = Literal[
     "AL",

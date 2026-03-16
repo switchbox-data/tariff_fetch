@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import date
 from pathlib import Path
@@ -5,16 +6,83 @@ from typing import cast
 
 import questionary
 from dotenv import load_dotenv
-from pydantic import TypeAdapter
 
 # from tariff_fetch.genability.lse import get_lses_page
 # from tariff_fetch.genability.tariffs import CustomerClass, TariffType, tariffs_paginate
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
-from tariff_fetch.arcadia.schema import tariff
 from tariff_fetch.arcadia.schema.common import CustomerClass, TariffType
+from tariff_fetch.arcadia.schema.tariff import TariffExtended
+from tariff_fetch.urdb.arcadia.build import build_urdb
+from tariff_fetch.urdb.arcadia.prompts import prompt_charge_classes
+from tariff_fetch.urdb.arcadia.scenario import Scenario
+from tariff_fetch.urdb.schema import URDBRate
 
 from . import console, prompt_filename
 from .types import Utility
+
+
+def process_genability(utility: Utility, output_folder: Path, year: int):
+    _ = load_dotenv()
+    if not os.getenv("ARCADIA_APP_ID"):
+        console.print("[b]ARCADIA_APP_ID[/] environment variable is not set.")
+    if not os.getenv("ARCADIA_APP_KEY"):
+        console.print("[b]ARCADIA_APP_KEY[/] environment variable is not set.")
+    if not (os.getenv("ARCADIA_APP_ID") and os.getenv("ARCADIA_APP_KEY")):
+        console.print("Cannot use Arcadia API due to missing credentials")
+        _ = console.input("Press enter to proceed...")
+        return
+    api = ArcadiaSignalAPI()
+
+    lse_id = _find_utility_lse_id(api, utility)
+    if lse_id is None:
+        return
+
+    if not (customer_classes := _select_customer_classes()):
+        return
+
+    if not (tariff_types := _select_tariff_types()):
+        return
+
+    if not (tariffs := _select_tariffs(api, lse_id, customer_classes, tariff_types, year)):
+        console.print("[red]No tariffs found[/]")
+        _ = console.input("Press enter to proceed...")
+        return
+
+    api_results = _fetch_tariffs(api, tariffs, year)
+    results: list[URDBRate] = []
+
+    # tariff_ids = {id_ for _, id_ in tariffs}
+
+    apply_percentages = cast(bool | None, questionary.confirm("Apply percentage rates?").ask())
+    if apply_percentages is None:
+        return
+
+    for tariff in api_results:
+        tariff_name = tariff["tariff_name"]
+        console.print(f"Creating scenario for tariff: [blue]{tariff_name}[/]")
+        charge_classes = prompt_charge_classes()
+        if charge_classes is None:
+            continue
+        scenario = Scenario(
+            tariff["master_tariff_id"],
+            year=year,
+            apply_percentages=apply_percentages,
+            charge_classes=charge_classes,
+        )
+        urdb_tariff = build_urdb(api, scenario)
+        urdb_tariff["name"] = _prompt_tariff_name(urdb_tariff.get("name", ""))
+
+        results.append(urdb_tariff)
+        # results.append(build_urdb(tariff, api, scenario))
+
+    suggested_filename = f"arcadia_{utility.name}.urdb.{year}."
+
+    if not (filename := prompt_filename(output_folder, suggested_filename, "json")):
+        return
+
+    filename.parent.mkdir(exist_ok=True)
+    _ = filename.write_text(json.dumps({"items": results}, indent=2))
+    console.print(f"Wrote [blue]{len(results)}[/] records to {filename}")
 
 
 def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
@@ -54,13 +122,13 @@ def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
 
 
 def _select_tariffs(
-    api: ArcadiaSignalAPI, lse_id: int, customer_classes: list[CustomerClass], tariff_types: list[TariffType]
+    api: ArcadiaSignalAPI, lse_id: int, customer_classes: list[CustomerClass], tariff_types: list[TariffType], year: int
 ) -> list[tuple[str, int]]:
     with console.status("Fetching tariffs..."):
         tariffs = list(
             api.tariffs.iter_pages(
                 lse_id=lse_id,
-                effective_on=date.today(),
+                effective_on=date(year, 6, 1),
                 customer_classes=customer_classes,
                 tariff_types=tariff_types,
             )
@@ -116,16 +184,15 @@ def _select_tariff_types() -> list[TariffType]:
     )
 
 
-def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]]):
-    result: list[tariff.TariffExtended] = []
+def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], year: int):
+    result: list[TariffExtended] = []
     with console.status("Fetching tariffs..."):
         for name, id_ in tariffs:
             console.print(f"Tariff id: {name}")
             page = api.tariffs.iter_pages(
                 fields="ext",
                 master_tariff_id=id_,
-                # effective_on=date.today(),
-                effective_on=date(2025, 6, 1),
+                effective_on=date(year, 12, 1),
                 populate_properties=True,
                 populate_rates=True,
             )
@@ -133,39 +200,8 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]]):
     return result
 
 
-def process_genability(utility: Utility, output_folder: Path):
-    _ = load_dotenv()
-    if not os.getenv("ARCADIA_APP_ID"):
-        console.print("[b]ARCADIA_APP_ID[/] environment variable is not set.")
-    if not os.getenv("ARCADIA_APP_KEY"):
-        console.print("[b]ARCADIA_APP_KEY[/] environment variable is not set.")
-    if not (os.getenv("ARCADIA_APP_ID") and os.getenv("ARCADIA_APP_KEY")):
-        console.print("Cannot use Arcadia API due to missing credentials")
-        _ = console.input("Press enter to proceed...")
-        return
-    api = ArcadiaSignalAPI()
-
-    lse_id = _find_utility_lse_id(api, utility)
-    if lse_id is None:
-        return
-
-    if not (customer_classes := _select_customer_classes()):
-        return
-
-    if not (tariff_types := _select_tariff_types()):
-        return
-
-    if not (tariffs := _select_tariffs(api, lse_id, customer_classes, tariff_types)):
-        console.print("[red]No tariffs found[/]")
-        _ = console.input("Press enter to proceed...")
-        return
-
-    results = _fetch_tariffs(api, tariffs)
-    suggested_filename = f"arcadia_{utility.name}"
-
-    if not (filename := prompt_filename(output_folder, suggested_filename, "json")):
-        return
-
-    filename.parent.mkdir(exist_ok=True)
-    _ = filename.write_bytes(TypeAdapter(list[tariff.TariffExtended]).dump_json(results, indent=2))
-    console.print(f"Wrote [blue]{len(results)}[/] records to {filename}")
+def _prompt_tariff_name(default: str) -> str:
+    result = cast(str | None, questionary.text("Tariff name", default=default).ask())
+    if result is None:
+        exit()
+    return result

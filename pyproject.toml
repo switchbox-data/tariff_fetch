@@ -1,6 +1,6 @@
 [project]
 name = "tariff_fetch"
-version = "0.1.1"
+version = "0.4.9"
 description = "A CLI tool and a python library to simplify downloading electric and gas utility tariff data."
 authors = [{ name = "Switchbox", email = "hello@switch.box" }]
 readme = "README.md"
@@ -39,6 +39,7 @@ Documentation = "https://switchbox-data.github.io/tariff_fetch/"
 [project.scripts]
 tariff-fetch = "tariff_fetch.cli:main_cli"
 tariff-fetch-gas = "tariff_fetch.cli_gas:main_cli"
+tariff-fetch-arcadia-urdb = "tariff_fetch.cli_arcadia_urdb:main_cli"
 
 [dependency-groups]
 dev = [
@@ -64,17 +65,40 @@ testpaths = ["tests"]
 addopts = ["-q"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 120
 fix = true
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "B", "I", "UP", "SIM", "C4", "RUF"]
-ignore = ["E501"]
+ignore = ["E501", "SIM103"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
 
 [tool.basedpyright]
-include = ["tariff_fetch"]
+include = ["tariff_fetch", "tests"]
 pythonVersion = "3.11"
+venvPath = "."
+venv = ".venv"
+
+[[tool.basedpyright.executionEnvironments]]
+root = "tests"
+extraPaths = [".."]
+reportUnknownVariableType = "none"
+reportUnknownMemberType = "none"
+reportUnknownParameterType = "none"
+reportUnknownLambdaType = "none"
+reportUnknownArgumentType = "none"
+reportArgumentType = "none"
+reportAny = "none"
+reportExplicitAny = "none"
+reportMissingParameterType = "none"
+reportMissingTypeArgument = "none"
+reportMissingTypeStubs = "none"
+reportUnusedParameter = "none"
+reportUnusedImport = "none"
+reportUnusedCallResult = "none"
+reportUnannotatedClassAttribute = "none"
+reportUnnecessaryTypeIgnoreComment = "none"
+reportPrivateUsage = "none"

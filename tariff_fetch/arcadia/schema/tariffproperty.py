@@ -1,6 +1,7 @@
-from typing import Literal, NotRequired, TypedDict
+from typing import Literal, NotRequired
 
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 TariffPropertyFormulaType = Literal["FORMULA"]
 
@@ -35,15 +36,16 @@ TariffPropertyPeriod = Literal[
     "OFF_PEAK",
     "CRITICAL_PEAK",
     "SUPER_ON_PEAK",
+    "ALL",  # Undocumented
 ]
 
 
 class TariffPropertyChoice(TypedDict):
     value: str
     "Machine readable option value"
-    displayValue: str
+    display_value: str
     "Human readable value shown to end users"
-    dataValue: str
+    data_value: str
     likelihood: NotRequired[float | None]
 
 
@@ -62,7 +64,7 @@ class TariffPropertyMinimalFields(TypedDict):
 class TariffPropertyStandardFields(TypedDict):
     period: NotRequired[TariffPropertyPeriod]
     operator: str | None
-    propertyValue: NotRequired[str]
+    property_value: NotRequired[str]
     minValue: NotRequired[str | float | int]
     maxValue: NotRequired[str | float | int]
     choices: NotRequired[list[TariffPropertyChoice]]

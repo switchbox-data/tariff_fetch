@@ -1,7 +1,8 @@
-from typing import Annotated, NotRequired, TypedDict
+from typing import Annotated, NotRequired
 
 from pydantic import Field
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 from .common import SeasonPredominance
 

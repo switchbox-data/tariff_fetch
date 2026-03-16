@@ -1,7 +1,8 @@
-from typing import Annotated, Literal, TypedDict
+from typing import Annotated, Literal
 
 from pydantic import BeforeValidator
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 from .validators import comma_separated_str
 

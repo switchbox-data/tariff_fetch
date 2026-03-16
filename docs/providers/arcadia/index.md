@@ -15,6 +15,7 @@ Arcadia's Signal Tariffs API (formerly Genability) provides comprehensive US uti
 
 The Signal API uses a custom JSON objects to represent tariffs, with a complex hierarchical structure.
 
+- **[Arcadia to URDB converter](urdb-converter.md)**
 - **[Short guide to the Tariff JSON](tariff-json-structure.md)**
 - [Official API docs on Tariff JSON](https://docs.arcadia.com/v2022-12-21-Signal/reference/tariff)
 

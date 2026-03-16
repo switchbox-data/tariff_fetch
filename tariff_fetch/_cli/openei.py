@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal, cast
 
@@ -47,7 +47,7 @@ def _get_tariffs(
     with console.status("Fetching rates..."):
         iterator = iter_utility_rates(
             api_key,
-            effective_on_date=datetime.now(timezone.utc),
+            effective_on_date=datetime.now(UTC),
             sector=sector,
             detail=detail,
             eia=eia_id,

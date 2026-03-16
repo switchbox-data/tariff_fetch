@@ -2,13 +2,14 @@ import os
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Annotated, Any, Generic, Literal, Self, TypedDict, TypeVar, Unpack, overload
+from typing import Annotated, Any, Generic, Literal, Self, TypeVar, Unpack, overload
 from urllib.parse import urljoin
 
 import requests
 from pydantic import ConfigDict, PlainSerializer, TypeAdapter
 from pydantic.alias_generators import to_camel
 from requests.auth import HTTPBasicAuth
+from typing_extensions import TypedDict
 
 from .schema.common import CustomerClass, TariffType
 from .schema.lookup import Lookup
@@ -85,6 +86,8 @@ class TariffsParams(TypedDict, total=False):
     populate_properties: bool
     populate_rates: bool
     populate_documents: bool
+    from_date_time: date
+    to_date_time: date
 
 
 class LookupsParams(PagingParams, total=False):

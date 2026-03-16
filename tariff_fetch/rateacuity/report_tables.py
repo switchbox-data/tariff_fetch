@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import TypedDict, cast
+from typing import cast
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+from typing_extensions import TypedDict
 
 from .schema import Section
 

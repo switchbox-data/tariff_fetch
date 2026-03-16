@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Annotated, NotRequired, TypedDict
+from typing import Annotated, NotRequired
 
 from pydantic import BeforeValidator
 from pydantic.alias_generators import to_camel
+from typing_extensions import TypedDict
 
 from .common import RateChargeClass, RateTransactionType, RateUnit, TariffChargePeriod, TariffChargeType
 from .season import SeasonExtended, SeasonStandard
@@ -128,6 +129,10 @@ class TariffRateStandardFields(TypedDict):
     e.g billingPeriodProrationFactor: property which defines a prorated number of billing days
     """
     rate_bands: list[TariffRateBand]
+
+    # These are fields with unknown purpose
+    edge_predominance: NotRequired[str]
+    proration_rules: NotRequired[list[str]]
 
 
 class TariffRateExtendedFields(TypedDict):

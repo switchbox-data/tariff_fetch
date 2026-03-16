@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Annotated, Any, Literal, Required, TypedDict
+from typing import Annotated, Any, Literal, Required
 
 from pydantic import FailFast, TypeAdapter
+from typing_extensions import TypedDict
 
 # --- enums per URDB v7 docs ---
 RateSector = Literal["Residential", "Commercial", "Industrial", "Lighting"]
@@ -29,7 +30,7 @@ URDBItemType = Literal["Utility_Rates"]  # shown in docs examples :contentRefere
 
 
 # --- fixed-shape schedules (12 months x 24 hours) ---
-Int24 = tuple[
+Int24_ = tuple[
     int,
     int,
     int,
@@ -55,9 +56,13 @@ Int24 = tuple[
     int,
     int,
 ]
-MonthSchedule = tuple[Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24]
-Float12 = tuple[float, float, float, float, float, float, float, float, float, float, float, float]
-FlatDemandMonths = tuple[int, int, int, int, int, int, int, int, int, int, int, int]
+Int24 = tuple[int, ...]
+# MonthSchedule = tuple[Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24, Int24]
+MonthSchedule = tuple[Int24, ...]
+# Float12 = tuple[float, float, float, float, float, float, float, float, float, float, float, float]
+Float12 = tuple[float, ...]
+# FlatDemandMonths = tuple[int, int, int, int, int, int, int, int, int, int, int, int]
+FlatDemandMonths = tuple[int, ...]
 
 
 # --- tiers (NO None allowed) ---

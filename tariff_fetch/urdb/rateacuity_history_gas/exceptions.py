@@ -1,4 +1,6 @@
-from typing_extensions import final, override
+from typing import final
+
+from typing_extensions import override
 
 
 @final

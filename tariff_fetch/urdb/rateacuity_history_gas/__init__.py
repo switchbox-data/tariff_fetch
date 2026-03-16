@@ -1,9 +1,8 @@
 import itertools
 from collections.abc import Collection
 from math import inf
-from typing import cast
 
-from tariff_fetch.urdb.schema import EnergyTier, MonthSchedule, URDBRate
+from tariff_fetch.urdb.schema import EnergyTier, URDBRate
 
 from .exceptions import EmptyBandsError
 from .history_data import ConsumptionRow, FixedChargeRow, PercentageRow, Row
@@ -48,9 +47,11 @@ def _build_energy_schedule_raw(rows: Collection[Row], include_taxes: bool) -> UR
             summed_bands[0],
             *(this for prev, this in itertools.pairwise(summed_bands) if this[0] - prev[0] > 30),
         ]
+        # clamp at >0
+        summed_bands = [(bound, max(0, value)) for bound, value in summed_bands]
         month_bands.append(tuple(summed_bands))
-    month_bands_unique = list(set(month_bands))
-    energy_weekday_schedule = cast(MonthSchedule, tuple(tuple([month_bands_unique.index(b)] * 24) for b in month_bands))
+    month_bands_unique = list(dict.fromkeys(month_bands))
+    energy_weekday_schedule = tuple(tuple([month_bands_unique.index(b)] * 24) for b in month_bands)
     energy_weekend_schedule = energy_weekday_schedule
     energy_rate_structure = [[_band_tuple_to_tier(br) for br in mb if br != (0, 0)] for mb in month_bands_unique]
     return {

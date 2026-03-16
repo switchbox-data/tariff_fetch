@@ -12,6 +12,7 @@ nav:
     - Arcadia (Genability):
       - Overview: providers/arcadia/index.md
       - Access & Credentials: providers/arcadia/access.md
+      - Arcadia to URDB Converter: providers/arcadia/urdb-converter.md
       - Tariff JSON Structure: providers/arcadia/tariff-json-structure.md
     - NREL / OpenEI:
       - Overview: providers/nrel/index.md

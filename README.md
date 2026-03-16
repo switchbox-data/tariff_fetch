@@ -83,6 +83,7 @@ With uv:
 ```bash
 uv run tariff-fetch [OPTIONS]
 uv run tariff-fetch-gas [OPTIONS]
+uv run tariff-fetch-arcadia-urdb MASTER_TARIFF_ID YEAR [OPTIONS]
 ```
 
 With Just:
@@ -116,3 +117,18 @@ uv run tariff-fetch.cli \
 
 The CLI suggests filenames like `outputs/openei_Utility_sector_detail-0_2024-03-18.json` before writing each file so you
 can accept or override them.
+
+## Direct Arcadia to URDB Conversion
+
+For direct conversion of a single Arcadia master tariff to URDB JSON:
+
+```bash
+uv run tariff-fetch-arcadia-urdb 522 2025
+```
+
+Useful options:
+
+- `--output` / `-o`: output file path
+- `--apply-percentages` / `--no-apply-percentages`
+- `--charge-class`: repeat to include multiple charge classes
+- `--force` / `-f`: overwrite an existing output file
