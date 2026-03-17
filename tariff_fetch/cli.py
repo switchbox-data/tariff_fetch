@@ -88,16 +88,7 @@ def main_raw(
     match provider:
         case Provider.GENABILITY:
             console.print("Processing [blue]Genability[/]")
-            try:
-                process_genability(utility=utility, output_folder=output_folder_)
-            except HTTPError as e:
-                if e.response.status_code == 401:
-                    console.print("Authorization failed")
-                    console.print(
-                        "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
-                    )
-                else:
-                    raise
+            process_genability(utility=utility, output_folder=output_folder_)
         case Provider.OPENEI:
             console.print("Processing [blue]OpenEI[/]")
             try:

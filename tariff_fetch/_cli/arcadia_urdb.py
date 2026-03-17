@@ -23,14 +23,6 @@ from .types import Utility
 
 def process_genability(utility: Utility, output_folder: Path, year: int):
     _ = load_dotenv()
-    if not os.getenv("ARCADIA_APP_ID"):
-        console.print("[b]ARCADIA_APP_ID[/] environment variable is not set.")
-    if not os.getenv("ARCADIA_APP_KEY"):
-        console.print("[b]ARCADIA_APP_KEY[/] environment variable is not set.")
-    if not (os.getenv("ARCADIA_APP_ID") and os.getenv("ARCADIA_APP_KEY")):
-        console.print("Cannot use Arcadia API due to missing credentials")
-        _ = console.input("Press enter to proceed...")
-        return
     api = ArcadiaSignalAPI()
 
     lse_id = _find_utility_lse_id(api, utility)
