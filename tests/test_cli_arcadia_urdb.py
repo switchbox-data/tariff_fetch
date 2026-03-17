@@ -7,6 +7,7 @@ import typer
 
 from tariff_fetch import cli_arcadia_urdb as cli
 
+
 def test_cli_arcadia_urdb_fail_fast_passes_non_interactive(monkeypatch, tmp_path: Path):
     monkeypatch.setenv("ARCADIA_APP_ID", "id")
     monkeypatch.setenv("ARCADIA_APP_KEY", "key")
@@ -25,7 +26,9 @@ def test_cli_arcadia_urdb_fail_fast_passes_non_interactive(monkeypatch, tmp_path
     assert captured["interactive_errors"] is False
 
 
-def test_cli_arcadia_urdb_json_errors_include_http_message(monkeypatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]):
+def test_cli_arcadia_urdb_json_errors_include_http_message(
+    monkeypatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+):
     monkeypatch.setenv("ARCADIA_APP_ID", "id")
     monkeypatch.setenv("ARCADIA_APP_KEY", "key")
     monkeypatch.setattr(cli, "ArcadiaSignalAPI", lambda: object())

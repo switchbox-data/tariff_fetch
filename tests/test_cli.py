@@ -5,7 +5,6 @@ from typer.testing import CliRunner
 from tariff_fetch import cli
 from tariff_fetch._cli.types import Utility
 
-
 runner = CliRunner()
 
 
