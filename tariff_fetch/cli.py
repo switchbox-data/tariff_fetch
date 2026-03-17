@@ -187,12 +187,16 @@ def main_gas(
     output_folder: Annotated[
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
     if ctx.invoked_subcommand is not None:
         return
 
     state_ = (state or prompt_state()).value
     output_folder_ = Path(output_folder)
+    log_path = _configure_logging("tariff_fetch_gas", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file)
+    console.print(f"Logging to [blue]{log_path}[/]")
     try:
         process_rateacuity_gas(output_folder_, state_)
     except AuthorizationError:
@@ -211,10 +215,16 @@ def main_gas_urdb(
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
     year: Annotated[int | None, typer.Option("--year", "-y")] = None,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
     state_ = (state or prompt_state()).value
     output_folder_ = Path(output_folder)
     year_ = prompt_year() if year is None else year
+    log_path = _configure_logging(
+        "tariff_fetch_gas_urdb", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file
+    )
+    console.print(f"Logging to [blue]{log_path}[/]")
     try:
         process_rateacuity_gas_urdb(output_folder_, state_, year_)
     except AuthorizationError:
