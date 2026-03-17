@@ -77,7 +77,7 @@ def _select_tariffs(
             message="Select tariffs",
             choices=[
                 questionary.Choice(
-                    title=f"{_['tariff_name']} ({_['tariff_id']})",
+                    title=f"{_['tariff_name']} ({_['master_tariff_id']})",
                     value=(_["tariff_name"], _["master_tariff_id"]),  # pyright: ignore[reportAny]
                     checked=True,
                 )
@@ -124,7 +124,7 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], effect
     result: list[tariff.TariffExtended] = []
     with console.status("Fetching tariffs..."):
         for name, id_ in tariffs:
-            console.print(f"Tariff id: {name}")
+            console.print(f"Master tariff id: {id_} ({name})")
             page = api.tariffs.iter_pages(
                 fields="ext",
                 master_tariff_id=id_,
