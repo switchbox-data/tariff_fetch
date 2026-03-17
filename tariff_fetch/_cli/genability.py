@@ -54,13 +54,17 @@ def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
 
 
 def _select_tariffs(
-    api: ArcadiaSignalAPI, lse_id: int, customer_classes: list[CustomerClass], tariff_types: list[TariffType]
+    api: ArcadiaSignalAPI,
+    lse_id: int,
+    customer_classes: list[CustomerClass],
+    tariff_types: list[TariffType],
+    effective_on: date,
 ) -> list[tuple[str, int]]:
     with console.status("Fetching tariffs..."):
         tariffs = list(
             api.tariffs.iter_pages(
                 lse_id=lse_id,
-                effective_on=date.today(),
+                effective_on=effective_on,
                 customer_classes=customer_classes,
                 tariff_types=tariff_types,
             )
@@ -116,7 +120,7 @@ def _select_tariff_types() -> list[TariffType]:
     )
 
 
-def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]]):
+def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], effective_on: date):
     result: list[tariff.TariffExtended] = []
     with console.status("Fetching tariffs..."):
         for name, id_ in tariffs:
@@ -124,8 +128,7 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]]):
             page = api.tariffs.iter_pages(
                 fields="ext",
                 master_tariff_id=id_,
-                # effective_on=date.today(),
-                effective_on=date(2025, 6, 1),
+                effective_on=effective_on,
                 populate_properties=True,
                 populate_rates=True,
             )
@@ -133,7 +136,7 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]]):
     return result
 
 
-def process_genability(utility: Utility, output_folder: Path):
+def process_genability(utility: Utility, output_folder: Path, effective_on: date | None = None):
     _ = load_dotenv()
     if not os.getenv("ARCADIA_APP_ID"):
         console.print("[b]ARCADIA_APP_ID[/] environment variable is not set.")
@@ -144,6 +147,7 @@ def process_genability(utility: Utility, output_folder: Path):
         _ = console.input("Press enter to proceed...")
         return
     api = ArcadiaSignalAPI()
+    effective_on = effective_on or date.today()
 
     lse_id = _find_utility_lse_id(api, utility)
     if lse_id is None:
@@ -155,12 +159,12 @@ def process_genability(utility: Utility, output_folder: Path):
     if not (tariff_types := _select_tariff_types()):
         return
 
-    if not (tariffs := _select_tariffs(api, lse_id, customer_classes, tariff_types)):
+    if not (tariffs := _select_tariffs(api, lse_id, customer_classes, tariff_types, effective_on)):
         console.print("[red]No tariffs found[/]")
         _ = console.input("Press enter to proceed...")
         return
 
-    results = _fetch_tariffs(api, tariffs)
+    results = _fetch_tariffs(api, tariffs, effective_on)
     suggested_filename = f"arcadia_{utility.name}"
 
     if not (filename := prompt_filename(output_folder, suggested_filename, "json")):

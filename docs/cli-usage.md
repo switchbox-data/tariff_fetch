@@ -24,15 +24,24 @@ Run `uv run tariff-fetch` (or `python -m tariff_fetch.cli` / `just cli`) to laun
 ### Options
 
 - `--state` / `-s`: two-letter state abbreviation (case-insensitive). If omitted, the CLI prompts you.
-- `--providers` / `-p`: repeatable flag for each provider (`genability`, `openei`, `rateacuity`). Leaving it out opens a checkbox prompt so you can select multiple providers at once.
+- `--provider` / `-p`: provider to fetch (`genability`, `openei`, `rateacuity`). If omitted, the CLI prompts you.
 - `--output-folder` / `-o`: directory for exported JSON files. Defaults to `./outputs`.
+- `--effective-date`: provider query date in `YYYY-MM-DD` format.
+- `--log-dir`: directory for log files.
+- `--log-file`: exact file path for the log file.
 
 ### Workflow Overview
 
 1. Pick a state (option or prompt).
-2. Choose which providers to fetch (option or interactive checkbox).
+2. Choose which provider to fetch (option or prompt).
 3. Select a utility from the structured EIA list. The CLI fetches the latest CORE_EIA861 data to help you pick based on name, entity type, sales, revenue, and customer counts.
-4. For each provider selected, `tariff_fetch` runs the corresponding workflow (`process_genability`, `process_openei`, or `process_rateacuity`) and writes exports to the chosen output folder. Authentication failures print guidance about the relevant environment variables.
+4. `tariff_fetch` runs the selected workflow (`process_genability`, `process_openei`, or `process_rateacuity`) and writes exports to the chosen output folder. Authentication failures print guidance about the relevant environment variables.
+
+Example:
+
+```bash
+uv run tariff-fetch --state ca --provider genability --effective-date 2025-06-01
+```
 
 ## URDB CLI (`tariff-fetch urdb`)
 

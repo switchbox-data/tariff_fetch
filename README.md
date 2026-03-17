@@ -96,8 +96,11 @@ just cligas
 Options:
 
 - `--state` / `-s`: two-letter state abbreviation (default: prompt)
-- `--providers` / `-p`: (only for electricity benchmarks) repeat per provider (`genability`, `openei`, `rateacuity`)
+- `--provider` / `-p`: provider to fetch (`genability`, `openei`, `rateacuity`)
 - `--output-folder` / `-o`: directory for exports (default: `./outputs`)
+- `--effective-date`: provider query date in `YYYY-MM-DD` format
+- `--log-dir`: directory for log files
+- `--log-file`: exact log file path
 
 Omitted options will trigger interactive prompts.
 
@@ -107,11 +110,11 @@ Omitted options will trigger interactive prompts.
 # Fully interactive run
 uv run tariff-fetch
 
-# Scripted run for Genability and OpenEI
-uv run tariff-fetch.cli \
+# Scripted run for Genability
+uv run tariff-fetch \
   --state ca \
-  --providers genability \
-  --providers openei \
+  --provider genability \
+  --effective-date 2025-06-01 \
   --output-folder data/exports
 ```
 

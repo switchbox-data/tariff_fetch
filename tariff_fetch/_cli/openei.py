@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Literal, cast
 
@@ -39,7 +39,7 @@ def _prompt_detail_level() -> Literal["full", "minimal"]:
 
 
 def _get_tariffs(
-    eia_id: int, sector: UtilityRateSector, detail: Literal["full", "minimal"]
+    eia_id: int, sector: UtilityRateSector, detail: Literal["full", "minimal"], effective_on: date | None = None
 ) -> list[UtilityRatesResponseItem]:
     api_key = os.getenv("OPENEI_API_KEY")
     if not api_key:
@@ -47,7 +47,9 @@ def _get_tariffs(
     with console.status("Fetching rates..."):
         iterator = iter_utility_rates(
             api_key,
-            effective_on_date=datetime.now(UTC),
+            effective_on_date=datetime.combine(
+                effective_on or datetime.now(UTC).date(), datetime.min.time(), tzinfo=UTC
+            ),
             sector=sector,
             detail=detail,
             eia=eia_id,
@@ -65,7 +67,7 @@ def _prompt_tariffs(tariffs: list[UtilityRatesResponseItem]) -> list[UtilityRate
     )
 
 
-def process_openei(utility: Utility, output_folder: Path):
+def process_openei(utility: Utility, output_folder: Path, effective_on: date | None = None):
     _ = load_dotenv()
     if not os.getenv("OPENEI_API_KEY"):
         console.print("[b]OPENEI_API_KEY[/] environment variable is not set")
@@ -77,7 +79,7 @@ def process_openei(utility: Utility, output_folder: Path):
         return
     if not (detail_level := _prompt_detail_level()):
         return
-    tariffs = _get_tariffs(utility.eia_id, sector, detail_level)
+    tariffs = _get_tariffs(utility.eia_id, sector, detail_level, effective_on)
     if not tariffs:
         console.print("[red]No tariffs found[/]")
         _ = console.input("Press enter to proceed...")

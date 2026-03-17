@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -17,9 +18,10 @@ def test_raw_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(cli, "prompt_utility", lambda state: utility)
     monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
 
-    def fake_process_genability(*, utility: Utility, output_folder: Path):
+    def fake_process_genability(*, utility: Utility, output_folder: Path, effective_on: date | None = None):
         captured["utility"] = utility
         captured["output_folder"] = output_folder
+        captured["effective_on"] = effective_on
 
     monkeypatch.setattr(cli, "process_genability", fake_process_genability)
 
@@ -32,6 +34,7 @@ def test_raw_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     assert captured == {
         "utility": utility,
         "output_folder": tmp_path,
+        "effective_on": None,
     }
 
 
@@ -43,9 +46,10 @@ def test_raw_command_uses_prompted_provider_when_flag_is_missing(monkeypatch, tm
     monkeypatch.setattr(cli, "prompt_utility", lambda state: utility)
     monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
 
-    def fake_process_openei(selected_utility: Utility, output_folder: Path):
+    def fake_process_openei(selected_utility: Utility, output_folder: Path, effective_on: date | None = None):
         captured["utility"] = selected_utility
         captured["output_folder"] = output_folder
+        captured["effective_on"] = effective_on
 
     monkeypatch.setattr(cli, "process_openei", fake_process_openei)
 
@@ -58,6 +62,35 @@ def test_raw_command_uses_prompted_provider_when_flag_is_missing(monkeypatch, tm
     assert captured == {
         "utility": utility,
         "output_folder": tmp_path,
+        "effective_on": None,
+    }
+
+
+def test_default_command_passes_effective_date_to_provider(monkeypatch, tmp_path: Path):
+    utility = Utility(eia_id=303, name="Default Utility")
+    captured: dict[str, object] = {}
+
+    monkeypatch.setattr(cli, "prompt_provider", lambda: Provider.GENABILITY)
+    monkeypatch.setattr(cli, "prompt_utility", lambda state: utility)
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_process_genability(*, utility: Utility, output_folder: Path, effective_on: date | None = None):
+        captured["utility"] = utility
+        captured["output_folder"] = output_folder
+        captured["effective_on"] = effective_on
+
+    monkeypatch.setattr(cli, "process_genability", fake_process_genability)
+
+    result = runner.invoke(
+        cli.app,
+        ["--state", "ny", "--output-folder", str(tmp_path), "--effective-date", "2025-06-01"],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "utility": utility,
+        "output_folder": tmp_path,
+        "effective_on": date(2025, 6, 1),
     }
 
 

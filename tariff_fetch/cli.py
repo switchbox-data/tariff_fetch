@@ -25,7 +25,8 @@ from ._cli.types import Provider, StateCode, Utility
 
 app = typer.Typer(
     add_completion=False,
-    no_args_is_help=True,
+    invoke_without_command=True,
+    no_args_is_help=False,
 )
 
 ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
@@ -66,6 +67,15 @@ def _configure_logging(suffix: str, log_dir: Path | None = None, log_file: Path 
 
     logging.basicConfig(level=logging.DEBUG, handlers=[rich_handler, file_handler], force=True)
     return path
+
+
+def _parse_effective_date(value: str | None) -> date | None:
+    if value is None:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise typer.BadParameter("Effective date must be in YYYY-MM-DD format.") from exc
 
 
 @urdb_app.callback()
@@ -165,8 +175,43 @@ def main_raw(
     output_folder: Annotated[
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
+    effective_date: Annotated[
+        str | None, typer.Option("--effective-date", help="Effective date for provider queries in YYYY-MM-DD format")
+    ] = None,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+):
+    _run_raw(state, provider, output_folder, _parse_effective_date(effective_date), log_dir, log_file)
+
+
+@app.callback()
+def main_default(
+    ctx: typer.Context,
+    state: Annotated[
+        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
+    ] = None,
+    provider: Annotated[Provider | None, typer.Option("--provider", "-p", case_sensitive=False)] = None,
+    output_folder: Annotated[
+        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
+    ] = "./outputs",
+    effective_date: Annotated[
+        str | None, typer.Option("--effective-date", help="Effective date for provider queries in YYYY-MM-DD format")
+    ] = None,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+):
+    if ctx.invoked_subcommand is not None:
+        return
+    _run_raw(state, provider, output_folder, _parse_effective_date(effective_date), log_dir, log_file)
+
+
+def _run_raw(
+    state: StateCode | None,
+    provider: Provider | None,
+    output_folder: str,
+    effective_date: date | None,
+    log_dir: Path | None,
+    log_file: Path | None,
 ):
     state_ = state or prompt_state().value
     provider = provider or prompt_provider()
@@ -179,14 +224,14 @@ def main_raw(
         case Provider.GENABILITY:
             console.print("Processing [blue]Genability[/]")
             try:
-                process_genability(utility=utility, output_folder=output_folder_)
+                process_genability(utility=utility, output_folder=output_folder_, effective_on=effective_date)
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
                 raise typer.Exit(1) from e
         case Provider.OPENEI:
             console.print("Processing [blue]OpenEI[/]")
             try:
-                process_openei(utility, output_folder_)
+                process_openei(utility, output_folder_, effective_on=effective_date)
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
                 raise typer.Exit(1) from e
