@@ -10,6 +10,9 @@ uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch ta
 
 # gas
 uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch-gas
+
+# arcadia to urdb
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch urdb ni 522 2025
 ```
 
 All environment variables (API keys, credentials, etc.) still need to be exported or added to your `.env` file beforehand.
@@ -30,6 +33,29 @@ Run `uv run tariff-fetch` (or `python -m tariff_fetch.cli` / `just cli`) to laun
 2. Choose which providers to fetch (option or interactive checkbox).
 3. Select a utility from the structured EIA list. The CLI fetches the latest CORE_EIA861 data to help you pick based on name, entity type, sales, revenue, and customer counts.
 4. For each provider selected, `tariff_fetch` runs the corresponding workflow (`process_genability`, `process_openei`, or `process_rateacuity`) and writes exports to the chosen output folder. Authentication failures print guidance about the relevant environment variables.
+
+## URDB CLI (`tariff-fetch urdb`)
+
+Run `uv run tariff-fetch urdb` for the interactive Genability-to-URDB flow.
+
+### Options
+
+- `--state` / `-s`: two-letter state abbreviation (case-insensitive). If omitted, the CLI prompts you.
+- `--output-folder` / `-o`: directory for exported files. Defaults to `./outputs`.
+- `--year` / `-y`: year to convert. If omitted, the CLI prompts you.
+- `--log-dir`: directory for log files.
+- `--log-file`: exact file path for the log file.
+- `--fail-fast`: stop immediately on conversion errors instead of prompting to continue.
+
+### Subcommands
+
+- `ni`: convert one Arcadia master tariff directly to URDB JSON.
+
+Example:
+
+```bash
+uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
+```
 
 ## Gas CLI (`tariff-fetch-gas`)
 

@@ -83,7 +83,7 @@ With uv:
 ```bash
 uv run tariff-fetch [OPTIONS]
 uv run tariff-fetch-gas [OPTIONS]
-uv run tariff-fetch-arcadia-urdb MASTER_TARIFF_ID YEAR [OPTIONS]
+uv run tariff-fetch urdb ni MASTER_TARIFF_ID YEAR [OPTIONS]
 ```
 
 With Just:
@@ -123,7 +123,7 @@ can accept or override them.
 For direct conversion of a single Arcadia master tariff to URDB JSON:
 
 ```bash
-uv run tariff-fetch-arcadia-urdb 522 2025
+uv run tariff-fetch urdb ni 522 2025
 ```
 
 Useful options:

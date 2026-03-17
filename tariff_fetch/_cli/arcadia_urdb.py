@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import date
 from pathlib import Path
 from typing import cast
@@ -21,7 +20,7 @@ from . import console, prompt_filename
 from .types import Utility
 
 
-def process_genability(utility: Utility, output_folder: Path, year: int):
+def process_genability(utility: Utility, output_folder: Path, year: int, interactive_errors: bool):
     _ = load_dotenv()
     api = ArcadiaSignalAPI()
 
@@ -61,7 +60,7 @@ def process_genability(utility: Utility, output_folder: Path, year: int):
             apply_percentages=apply_percentages,
             charge_classes=charge_classes,
         )
-        urdb_tariff = build_urdb(api, scenario)
+        urdb_tariff = build_urdb(api, scenario, interactive_errors=interactive_errors)
         urdb_tariff["name"] = _prompt_tariff_name(urdb_tariff.get("name", ""))
 
         results.append(urdb_tariff)

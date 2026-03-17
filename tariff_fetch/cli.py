@@ -1,12 +1,13 @@
+import json
 import logging
 from datetime import date, datetime
 from pathlib import Path
-from typing import Annotated, cast
+from typing import Annotated, cast, get_args
 
 import polars as pl
 import questionary
 import typer
-from requests import HTTPError
+from dotenv import load_dotenv
 from rich.logging import RichHandler
 from rich.prompt import Prompt
 
@@ -14,7 +15,10 @@ from tariff_fetch._cli.arcadia_urdb import process_genability as process_genabil
 from tariff_fetch._cli.genability import process_genability
 from tariff_fetch._cli.openei import process_openei
 from tariff_fetch._cli.rateacuity import process_rateacuity
-from tariff_fetch.rateacuity.base import AuthorizationError
+from tariff_fetch.arcadia.api import ArcadiaSignalAPI
+from tariff_fetch.arcadia.schema.common import RateChargeClass
+from tariff_fetch.urdb.arcadia.build import build_urdb
+from tariff_fetch.urdb.arcadia.scenario import Scenario
 
 from ._cli import console
 from ._cli.types import Provider, StateCode, Utility
@@ -29,28 +33,44 @@ CORE_EIA861_YEARLY_SALES_HTTPS = (
     "https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/core_eia861__yearly_sales.parquet"
 )
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
+ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
 
 
-def _configure_logging(output_folder: Path) -> Path:
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_folder = output_folder / "logs"
-    log_folder.mkdir(parents=True, exist_ok=True)
-    log_path = log_folder / f"tariff_fetch_{timestamp}.log"
+urdb_app = typer.Typer(
+    invoke_without_command=True,
+    no_args_is_help=False,
+)
+app.add_typer(urdb_app, name="urdb")
+
+
+def _configure_logging(suffix: str, log_dir: Path | None = None, log_file: Path | None = None) -> Path:
+    if log_dir is not None and log_file is not None:
+        raise typer.BadParameter("Use either --log-dir or --log-file, not both.")
+
+    if log_file is None:
+        log_dir = log_dir or Path("./outputs/logs")
+        log_dir.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = log_dir / f"{suffix}_{timestamp}.log"
+    else:
+        log_file.parent.mkdir(parents=True, exist_ok=True)
+        path = log_file
 
     rich_handler = RichHandler(rich_tracebacks=True)
     rich_handler.setLevel(logging.DEBUG)
     rich_handler.setFormatter(logging.Formatter("%(message)s"))
 
-    file_handler = logging.FileHandler(log_path, encoding="utf-8")
+    file_handler = logging.FileHandler(path, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
     logging.basicConfig(level=logging.DEBUG, handlers=[rich_handler, file_handler], force=True)
-    return log_path
+    return path
 
 
-@app.command("urdb")
+@urdb_app.callback()
 def main_urdb(
+    ctx: typer.Context,
     state: Annotated[
         StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
     ] = None,
@@ -58,19 +78,82 @@ def main_urdb(
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
     year: Annotated[int | None, typer.Option("--year", "-y")] = None,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+    fail_fast: Annotated[
+        bool,
+        typer.Option("--fail-fast", help="Raise conversion errors immediately instead of prompting to continue"),
+    ] = False,
 ):
+    if ctx.invoked_subcommand is not None:
+        return
     state_ = state or prompt_state().value
     output_folder_ = Path(output_folder)
-    log_path = _configure_logging(output_folder_)
+    log_path = _configure_logging("tariff_fetch_urdb", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file)
     utility = prompt_utility(state_)
-    year = prompt_year()
+    year = prompt_year() if year is None else year
 
     console.print(f"Logging to [blue]{log_path}[/]")
     console.print("Processing [blue]Genability[/]")
     try:
-        process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
+        process_genability_urdb(
+            utility=utility, output_folder=output_folder_, year=year, interactive_errors=not fail_fast
+        )
     except Exception as e:
         logging.getLogger(__name__).exception(e)
+        raise typer.Exit(1) from e
+
+
+@urdb_app.command("ni")
+def urdb_direct(
+    master_tariff_id: Annotated[int, typer.Argument(help="Arcadia master tariff id to convert")],
+    year: Annotated[int, typer.Argument(help="Calendar year to convert")],
+    charge_classes: Annotated[
+        list[str] | None,
+        typer.Option("--charge-class", help="Arcadia charge class to include; repeat to include multiple"),
+    ] = None,
+    apply_percentages: Annotated[
+        bool,
+        typer.Option("--apply-percentages/--no-apply-percentages", help="Apply supported percentage rates"),
+    ] = True,
+    fail_fast: Annotated[
+        bool,
+        typer.Option("--fail-fast", help="Raise conversion errors immediately instead of prompting to continue"),
+    ] = False,
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the converted URDB JSON")] = None,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Overwrite the output file if it already exists"),
+    ] = False,
+):
+    _ = load_dotenv()
+    if output is None:
+        output = Path("./outputs")
+        output.mkdir(parents=True, exist_ok=True)
+    if output.is_dir():
+        output = output / f"arcadia_urdb_{master_tariff_id}_{year}.json"
+    if output.exists() and not force:
+        console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
+        raise typer.Exit(1)
+    log_path = _configure_logging("tariff_fetch_urdb", log_dir=log_dir or (output.parent / "logs"), log_file=log_file)
+    console.print(f"Logging to [blue]{log_path}[/]")
+    scenario_charge_classes = _parse_charge_classes(charge_classes)
+    scenario = Scenario(
+        master_tariff_id=master_tariff_id,
+        year=year,
+        apply_percentages=apply_percentages,
+        charge_classes=scenario_charge_classes,
+    )
+    api = ArcadiaSignalAPI()
+    try:
+        result = build_urdb(api, scenario, interactive_errors=not fail_fast)
+    except Exception as e:
+        logging.getLogger(__name__).exception(e)
+        raise typer.Exit(code=1) from e
+    else:
+        _ = output.write_text(json.dumps(result, indent=2))
 
 
 @app.command("raw")
@@ -82,14 +165,16 @@ def main_raw(
     output_folder: Annotated[
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
     state_ = state or prompt_state().value
     provider = provider or prompt_provider()
     output_folder_ = Path(output_folder)
-    log_path = _configure_logging(output_folder_)
+    log_path = _configure_logging("tariff_fetch", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file)
+    console.print(f"Logging to [blue]{log_path}[/]")
     utility = prompt_utility(state_)
 
-    console.print(f"Logging to [blue]{log_path}[/]")
     match provider:
         case Provider.GENABILITY:
             console.print("Processing [blue]Genability[/]")
@@ -97,17 +182,20 @@ def main_raw(
                 process_genability(utility=utility, output_folder=output_folder_)
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
+                raise typer.Exit(1) from e
         case Provider.OPENEI:
             console.print("Processing [blue]OpenEI[/]")
             try:
                 process_openei(utility, output_folder_)
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
+                raise typer.Exit(1) from e
         case Provider.RATEACUITY:
             try:
                 process_rateacuity(output_folder_, state_, utility)
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
+                raise typer.Exit(1) from e
 
 
 def main_cli():
@@ -234,6 +322,20 @@ def prompt_state() -> StateCode:
         case_sensitive=False,
     )
     return StateCode(choice.lower())
+
+
+def _parse_charge_classes(charge_classes: list[str] | None) -> set[RateChargeClass]:
+    if charge_classes is None:
+        return set(ALL_CHARGE_CLASSES)
+
+    normalized = [charge_class.strip().upper() for charge_class in charge_classes]
+    invalid = sorted(set(normalized) - set(ALL_CHARGE_CLASSES))
+    if invalid:
+        allowed = ", ".join(ALL_CHARGE_CLASSES)
+        console.print(f"[red]Invalid charge classes:[/] {', '.join(invalid)}")
+        console.print(f"Allowed values: {allowed}")
+        raise typer.Exit(code=1)
+    return {cast(RateChargeClass, charge_class) for charge_class in normalized}
 
 
 if __name__ == "__main__":
