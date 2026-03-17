@@ -7,6 +7,7 @@ import polars as pl
 import questionary
 import typer
 from requests import HTTPError
+from rich.logging import RichHandler
 from rich.prompt import Prompt
 
 from tariff_fetch._cli.arcadia_urdb import process_genability as process_genability_urdb
@@ -27,6 +28,23 @@ ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
 CORE_EIA861_YEARLY_SALES_HTTPS = (
     "https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/core_eia861__yearly_sales.parquet"
 )
+LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
+
+
+def _configure_logging(output_folder: Path) -> Path:
+    output_folder.mkdir(parents=True, exist_ok=True)
+    log_path = output_folder / "tariff_fetch.log"
+
+    rich_handler = RichHandler(rich_tracebacks=True)
+    rich_handler.setLevel(logging.DEBUG)
+    rich_handler.setFormatter(logging.Formatter("%(message)s"))
+
+    file_handler = logging.FileHandler(log_path, encoding="utf-8")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+
+    logging.basicConfig(level=logging.DEBUG, handlers=[rich_handler, file_handler], force=True)
+    return log_path
 
 
 @app.command("urdb")
@@ -39,23 +57,15 @@ def main_urdb(
     ] = "./outputs",
     year: Annotated[int | None, typer.Option("--year", "-y")] = None,
 ):
-    logging.basicConfig(level=logging.DEBUG)
     state_ = state or prompt_state().value
     output_folder_ = Path(output_folder)
+    log_path = _configure_logging(output_folder_)
     utility = prompt_utility(state_)
     year = prompt_year()
 
+    console.print(f"Logging to [blue]{log_path}[/]")
     console.print("Processing [blue]Genability[/]")
-    try:
-        process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
-    except HTTPError as e:
-        if e.response.status_code == 401:
-            console.print("Authorization failed")
-            console.print(
-                "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
-            )
-        else:
-            raise
+    process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
 
 
 @app.command("raw")
@@ -68,12 +78,13 @@ def main_raw(
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
 ):
-    logging.basicConfig(level=logging.DEBUG)
     state_ = state or prompt_state().value
     provider = provider or prompt_provider()
     output_folder_ = Path(output_folder)
+    log_path = _configure_logging(output_folder_)
     utility = prompt_utility(state_)
 
+    console.print(f"Logging to [blue]{log_path}[/]")
     match provider:
         case Provider.GENABILITY:
             console.print("Processing [blue]Genability[/]")
