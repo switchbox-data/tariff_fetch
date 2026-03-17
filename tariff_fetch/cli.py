@@ -65,7 +65,10 @@ def main_urdb(
 
     console.print(f"Logging to [blue]{log_path}[/]")
     console.print("Processing [blue]Genability[/]")
-    process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
+    try:
+        process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
+    except Exception as e:
+        logging.getLogger(__name__).exception(e)
 
 
 @app.command("raw")
@@ -88,26 +91,21 @@ def main_raw(
     match provider:
         case Provider.GENABILITY:
             console.print("Processing [blue]Genability[/]")
-            process_genability(utility=utility, output_folder=output_folder_)
+            try:
+                process_genability(utility=utility, output_folder=output_folder_)
+            except Exception as e:
+                logging.getLogger(__name__).exception(e)
         case Provider.OPENEI:
             console.print("Processing [blue]OpenEI[/]")
             try:
                 process_openei(utility, output_folder_)
-            except HTTPError as e:
-                if e.response.status_code == 403:
-                    console.print("Authorization failed")
-                    console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
-                else:
-                    raise
+            except Exception as e:
+                logging.getLogger(__name__).exception(e)
         case Provider.RATEACUITY:
-            console.print("Processing [blue]RateAcuity[/]")
             try:
                 process_rateacuity(output_folder_, state_, utility)
-            except AuthorizationError:
-                console.print("Authorization failed")
-                console.print(
-                    "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
-                )
+            except Exception as e:
+                logging.getLogger(__name__).exception(e)
 
 
 def main_cli():
