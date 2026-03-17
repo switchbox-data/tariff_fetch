@@ -29,29 +29,97 @@ CORE_EIA861_YEARLY_SALES_HTTPS = (
 )
 
 
-def prompt_year() -> int:
-    result = cast(
-        str, questionary.text("Enter year", default=str(date.today().year - 1), validate=_is_valid_year).ask()
-    )
-    return int(result)
+@app.command("urdb")
+def main_urdb(
+    state: Annotated[
+        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
+    ] = None,
+    output_folder: Annotated[
+        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
+    ] = "./outputs",
+    year: Annotated[int | None, typer.Option("--year", "-y")] = None,
+):
+    logging.basicConfig(level=logging.DEBUG)
+    state_ = state or prompt_state().value
+    output_folder_ = Path(output_folder)
+    utility = prompt_utility(state_)
+    year = prompt_year()
 
-
-def _is_valid_year(value: str) -> bool:
+    console.print("Processing [blue]Genability[/]")
     try:
-        _ = date(int(value), 1, 1)
-    except (TypeError, ValueError):
-        return False
-    return True
+        process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
+    except HTTPError as e:
+        if e.response.status_code == 401:
+            console.print("Authorization failed")
+            console.print(
+                "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
+            )
+        else:
+            raise
 
 
-def prompt_state() -> StateCode:
-    choice = Prompt.ask(
-        "Enter two-letter state abbreviation",
-        choices=[state.value for state in StateCode],
-        show_choices=False,
-        case_sensitive=False,
+@app.command("raw")
+def main_raw(
+    state: Annotated[
+        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
+    ] = None,
+    provider: Annotated[Provider | None, typer.Option("--provider", "-p", case_sensitive=False)] = None,
+    output_folder: Annotated[
+        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
+    ] = "./outputs",
+):
+    logging.basicConfig(level=logging.DEBUG)
+    state_ = state or prompt_state().value
+    provider = provider or prompt_provider()
+    output_folder_ = Path(output_folder)
+    utility = prompt_utility(state_)
+
+    match provider:
+        case Provider.GENABILITY:
+            console.print("Processing [blue]Genability[/]")
+            try:
+                process_genability(utility=utility, output_folder=output_folder_)
+            except HTTPError as e:
+                if e.response.status_code == 401:
+                    console.print("Authorization failed")
+                    console.print(
+                        "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
+                    )
+                else:
+                    raise
+        case Provider.OPENEI:
+            console.print("Processing [blue]OpenEI[/]")
+            try:
+                process_openei(utility, output_folder_)
+            except HTTPError as e:
+                if e.response.status_code == 403:
+                    console.print("Authorization failed")
+                    console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
+                else:
+                    raise
+        case Provider.RATEACUITY:
+            console.print("Processing [blue]RateAcuity[/]")
+            try:
+                process_rateacuity(output_folder_, state_, utility)
+            except AuthorizationError:
+                console.print("Authorization failed")
+                console.print(
+                    "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
+                )
+
+
+def main_cli():
+    app()
+
+
+def prompt_provider() -> Provider:
+    return cast(
+        Provider,
+        questionary.select(
+            message="Select provider",
+            choices=[questionary.Choice(title=_.value, value=_) for _ in Provider],
+        ).ask(),
     )
-    return StateCode(choice.lower())
 
 
 def prompt_utility(state: str) -> Utility:
@@ -141,99 +209,29 @@ def prompt_utility(state: str) -> Utility:
     return result
 
 
-@app.command("urdb")
-def main_urdb(
-    state: Annotated[
-        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
-    ] = None,
-    output_folder: Annotated[
-        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
-    ] = "./outputs",
-    year: Annotated[int | None, typer.Option("--year", "-y")] = None,
-):
-    logging.basicConfig(level=logging.DEBUG)
-    # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
-    state_ = state or prompt_state().value
-    output_folder_ = Path(output_folder)
-    utility = prompt_utility(state_)
-    year = prompt_year()
-
-    console.print("Processing [blue]Genability[/]")
-    try:
-        process_genability_urdb(utility=utility, output_folder=output_folder_, year=year)
-    except HTTPError as e:
-        if e.response.status_code == 401:
-            console.print("Authorization failed")
-            console.print(
-                "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
-            )
-        else:
-            raise
-
-
-@app.command("raw")
-def main_raw(
-    state: Annotated[
-        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
-    ] = None,
-    provider: Annotated[Provider | None, typer.Option("--provider", "-p", case_sensitive=False)] = None,
-    output_folder: Annotated[
-        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
-    ] = "./outputs",
-):
-    logging.basicConfig(level=logging.DEBUG)
-    # print(pl.read_parquet(CoreEIA861_ASSN_UTILITY.https))
-    state_ = state or prompt_state().value
-    provider = provider or prompt_provider()
-    output_folder_ = Path(output_folder)
-    utility = prompt_utility(state_)
-
-    match provider:
-        case Provider.GENABILITY:
-            console.print("Processing [blue]Genability[/]")
-            try:
-                process_genability(utility=utility, output_folder=output_folder_)
-            except HTTPError as e:
-                if e.response.status_code == 401:
-                    console.print("Authorization failed")
-                    console.print(
-                        "Check if credentials set via [b]ARCADIA_APP_ID[/] and [b]ARCADIA_APP_KEY[/] environment variables are correct"
-                    )
-                else:
-                    raise
-        case Provider.OPENEI:
-            console.print("Processing [blue]OpenEI[/]")
-            try:
-                process_openei(utility, output_folder_)
-            except HTTPError as e:
-                if e.response.status_code == 403:
-                    console.print("Authorization failed")
-                    console.print("Check if [b]OPENEI_API_KEY[/] environment variable is correct")
-                else:
-                    raise
-        case Provider.RATEACUITY:
-            console.print("Processing [blue]RateAcuity[/]")
-            try:
-                process_rateacuity(output_folder_, state_, utility)
-            except AuthorizationError:
-                console.print("Authorization failed")
-                console.print(
-                    "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
-                )
-
-
-def main_cli():
-    app()
-
-
-def prompt_provider() -> Provider:
-    return cast(
-        Provider,
-        questionary.select(
-            message="Select provider",
-            choices=[questionary.Choice(title=_.value, value=_) for _ in Provider],
-        ).ask(),
+def prompt_year() -> int:
+    result = cast(
+        str, questionary.text("Enter year", default=str(date.today().year - 1), validate=_is_valid_year).ask()
     )
+    return int(result)
+
+
+def _is_valid_year(value: str) -> bool:
+    try:
+        _ = date(int(value), 1, 1)
+    except (TypeError, ValueError):
+        return False
+    return True
+
+
+def prompt_state() -> StateCode:
+    choice = Prompt.ask(
+        "Enter two-letter state abbreviation",
+        choices=[state.value for state in StateCode],
+        show_choices=False,
+        case_sensitive=False,
+    )
+    return StateCode(choice.lower())
 
 
 if __name__ == "__main__":
