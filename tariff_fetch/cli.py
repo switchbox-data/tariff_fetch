@@ -1,5 +1,5 @@
 import logging
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Annotated, cast
 
@@ -32,8 +32,10 @@ LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
 
 
 def _configure_logging(output_folder: Path) -> Path:
-    output_folder.mkdir(parents=True, exist_ok=True)
-    log_path = output_folder / "tariff_fetch.log"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_folder = output_folder / "logs"
+    log_folder.mkdir(parents=True, exist_ok=True)
+    log_path = log_folder / f"tariff_fetch_{timestamp}.log"
 
     rich_handler = RichHandler(rich_tracebacks=True)
     rich_handler.setLevel(logging.DEBUG)
