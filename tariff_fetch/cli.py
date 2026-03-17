@@ -31,14 +31,6 @@ app = typer.Typer(
     no_args_is_help=False,
 )
 
-ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
-CORE_EIA861_YEARLY_SALES_HTTPS = (
-    "https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/core_eia861__yearly_sales.parquet"
-)
-LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
-ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
-
-
 urdb_app = typer.Typer(
     invoke_without_command=True,
     no_args_is_help=False,
@@ -51,39 +43,51 @@ gas_app = typer.Typer(
 )
 app.add_typer(gas_app, name="gas")
 
-
-def _configure_logging(suffix: str, log_dir: Path | None = None, log_file: Path | None = None) -> Path:
-    if log_dir is not None and log_file is not None:
-        raise typer.BadParameter("Use either --log-dir or --log-file, not both.")
-
-    if log_file is None:
-        log_dir = log_dir or Path("./outputs/logs")
-        log_dir.mkdir(parents=True, exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        path = log_dir / f"{suffix}_{timestamp}.log"
-    else:
-        log_file.parent.mkdir(parents=True, exist_ok=True)
-        path = log_file
-
-    rich_handler = RichHandler(rich_tracebacks=True)
-    rich_handler.setLevel(logging.DEBUG)
-    rich_handler.setFormatter(logging.Formatter("%(message)s"))
-
-    file_handler = logging.FileHandler(path, encoding="utf-8")
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
-
-    logging.basicConfig(level=logging.DEBUG, handlers=[rich_handler, file_handler], force=True)
-    return path
+ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
+CORE_EIA861_YEARLY_SALES_HTTPS = (
+    "https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/core_eia861__yearly_sales.parquet"
+)
+LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
+ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
 
 
-def _parse_effective_date(value: str | None) -> date | None:
-    if value is None:
-        return None
-    try:
-        return date.fromisoformat(value)
-    except ValueError as exc:
-        raise typer.BadParameter("Effective date must be in YYYY-MM-DD format.") from exc
+@app.callback()
+def main_default(
+    ctx: typer.Context,
+    state: Annotated[
+        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
+    ] = None,
+    provider: Annotated[Provider | None, typer.Option("--provider", "-p", case_sensitive=False)] = None,
+    output_folder: Annotated[
+        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
+    ] = "./outputs",
+    effective_date: Annotated[
+        str | None, typer.Option("--effective-date", help="Effective date for provider queries in YYYY-MM-DD format")
+    ] = None,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+):
+    if ctx.invoked_subcommand is not None:
+        return
+    _run_raw(state, provider, output_folder, _parse_effective_date(effective_date), log_dir, log_file)
+
+
+@app.command("raw")
+def main_raw(
+    state: Annotated[
+        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
+    ] = None,
+    provider: Annotated[Provider | None, typer.Option("--provider", "-p", case_sensitive=False)] = None,
+    output_folder: Annotated[
+        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
+    ] = "./outputs",
+    effective_date: Annotated[
+        str | None, typer.Option("--effective-date", help="Effective date for provider queries in YYYY-MM-DD format")
+    ] = None,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+):
+    _run_raw(state, provider, output_folder, _parse_effective_date(effective_date), log_dir, log_file)
 
 
 @urdb_app.callback()
@@ -174,83 +178,6 @@ def urdb_direct(
         _ = output.write_text(json.dumps(result, indent=2))
 
 
-@app.command("raw")
-def main_raw(
-    state: Annotated[
-        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
-    ] = None,
-    provider: Annotated[Provider | None, typer.Option("--provider", "-p", case_sensitive=False)] = None,
-    output_folder: Annotated[
-        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
-    ] = "./outputs",
-    effective_date: Annotated[
-        str | None, typer.Option("--effective-date", help="Effective date for provider queries in YYYY-MM-DD format")
-    ] = None,
-    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
-    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
-):
-    _run_raw(state, provider, output_folder, _parse_effective_date(effective_date), log_dir, log_file)
-
-
-@app.callback()
-def main_default(
-    ctx: typer.Context,
-    state: Annotated[
-        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
-    ] = None,
-    provider: Annotated[Provider | None, typer.Option("--provider", "-p", case_sensitive=False)] = None,
-    output_folder: Annotated[
-        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
-    ] = "./outputs",
-    effective_date: Annotated[
-        str | None, typer.Option("--effective-date", help="Effective date for provider queries in YYYY-MM-DD format")
-    ] = None,
-    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
-    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
-):
-    if ctx.invoked_subcommand is not None:
-        return
-    _run_raw(state, provider, output_folder, _parse_effective_date(effective_date), log_dir, log_file)
-
-
-def _run_raw(
-    state: StateCode | None,
-    provider: Provider | None,
-    output_folder: str,
-    effective_date: date | None,
-    log_dir: Path | None,
-    log_file: Path | None,
-):
-    state_ = state or prompt_state().value
-    provider = provider or prompt_provider()
-    output_folder_ = Path(output_folder)
-    log_path = _configure_logging("tariff_fetch", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file)
-    console.print(f"Logging to [blue]{log_path}[/]")
-    utility = prompt_utility(state_)
-
-    match provider:
-        case Provider.GENABILITY:
-            console.print("Processing [blue]Genability[/]")
-            try:
-                process_genability(utility=utility, output_folder=output_folder_, effective_on=effective_date)
-            except Exception as e:
-                logging.getLogger(__name__).exception(e)
-                raise typer.Exit(1) from e
-        case Provider.OPENEI:
-            console.print("Processing [blue]OpenEI[/]")
-            try:
-                process_openei(utility, output_folder_, effective_on=effective_date)
-            except Exception as e:
-                logging.getLogger(__name__).exception(e)
-                raise typer.Exit(1) from e
-        case Provider.RATEACUITY:
-            try:
-                process_rateacuity(output_folder_, state_, utility)
-            except Exception as e:
-                logging.getLogger(__name__).exception(e)
-                raise typer.Exit(1) from e
-
-
 @gas_app.callback()
 def main_gas(
     ctx: typer.Context,
@@ -299,6 +226,78 @@ def main_gas_urdb(
 
 def main_cli():
     app()
+
+
+def _run_raw(
+    state: StateCode | None,
+    provider: Provider | None,
+    output_folder: str,
+    effective_date: date | None,
+    log_dir: Path | None,
+    log_file: Path | None,
+):
+    state_ = state or prompt_state().value
+    provider = provider or prompt_provider()
+    output_folder_ = Path(output_folder)
+    log_path = _configure_logging("tariff_fetch", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file)
+    console.print(f"Logging to [blue]{log_path}[/]")
+    utility = prompt_utility(state_)
+
+    match provider:
+        case Provider.GENABILITY:
+            console.print("Processing [blue]Genability[/]")
+            try:
+                process_genability(utility=utility, output_folder=output_folder_, effective_on=effective_date)
+            except Exception as e:
+                logging.getLogger(__name__).exception(e)
+                raise typer.Exit(1) from e
+        case Provider.OPENEI:
+            console.print("Processing [blue]OpenEI[/]")
+            try:
+                process_openei(utility, output_folder_, effective_on=effective_date)
+            except Exception as e:
+                logging.getLogger(__name__).exception(e)
+                raise typer.Exit(1) from e
+        case Provider.RATEACUITY:
+            try:
+                process_rateacuity(output_folder_, state_, utility)
+            except Exception as e:
+                logging.getLogger(__name__).exception(e)
+                raise typer.Exit(1) from e
+
+
+def _configure_logging(suffix: str, log_dir: Path | None = None, log_file: Path | None = None) -> Path:
+    if log_dir is not None and log_file is not None:
+        raise typer.BadParameter("Use either --log-dir or --log-file, not both.")
+
+    if log_file is None:
+        log_dir = log_dir or Path("./outputs/logs")
+        log_dir.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = log_dir / f"{suffix}_{timestamp}.log"
+    else:
+        log_file.parent.mkdir(parents=True, exist_ok=True)
+        path = log_file
+
+    rich_handler = RichHandler(rich_tracebacks=True)
+    rich_handler.setLevel(logging.DEBUG)
+    rich_handler.setFormatter(logging.Formatter("%(message)s"))
+
+    file_handler = logging.FileHandler(path, encoding="utf-8")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+
+    logging.basicConfig(level=logging.DEBUG, handlers=[rich_handler, file_handler], force=True)
+    return path
+
+
+def _parse_effective_date(value: str | None) -> date | None:
+    if value is None:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise typer.BadParameter("Effective date must be in YYYY-MM-DD format.") from exc
 
 
 def prompt_provider() -> Provider:
@@ -405,14 +404,6 @@ def prompt_year() -> int:
     return int(result)
 
 
-def _is_valid_year(value: str) -> bool:
-    try:
-        _ = date(int(value), 1, 1)
-    except (TypeError, ValueError):
-        return False
-    return True
-
-
 def prompt_state() -> StateCode:
     choice = Prompt.ask(
         "Enter two-letter state abbreviation",
@@ -435,6 +426,14 @@ def _parse_charge_classes(charge_classes: list[str] | None) -> set[RateChargeCla
         console.print(f"Allowed values: {allowed}")
         raise typer.Exit(code=1)
     return {cast(RateChargeClass, charge_class) for charge_class in normalized}
+
+
+def _is_valid_year(value: str) -> bool:
+    try:
+        _ = date(int(value), 1, 1)
+    except (TypeError, ValueError):
+        return False
+    return True
 
 
 if __name__ == "__main__":
