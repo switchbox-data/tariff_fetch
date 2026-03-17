@@ -14,9 +14,11 @@ from rich.prompt import Prompt
 from tariff_fetch._cli.arcadia_urdb import process_genability as process_genability_urdb
 from tariff_fetch._cli.genability import process_genability
 from tariff_fetch._cli.openei import process_openei
-from tariff_fetch._cli.rateacuity import process_rateacuity
+from tariff_fetch._cli.rateacuity import process_rateacuity, process_rateacuity_gas
+from tariff_fetch._cli.rateacuity_gas_urdb import process_rateacuity_gas_urdb
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.arcadia.schema.common import RateChargeClass
+from tariff_fetch.rateacuity.base import AuthorizationError
 from tariff_fetch.urdb.arcadia.build import build_urdb
 from tariff_fetch.urdb.arcadia.scenario import Scenario
 
@@ -42,6 +44,12 @@ urdb_app = typer.Typer(
     no_args_is_help=False,
 )
 app.add_typer(urdb_app, name="urdb")
+
+gas_app = typer.Typer(
+    invoke_without_command=True,
+    no_args_is_help=False,
+)
+app.add_typer(gas_app, name="gas")
 
 
 def _configure_logging(suffix: str, log_dir: Path | None = None, log_file: Path | None = None) -> Path:
@@ -241,6 +249,52 @@ def _run_raw(
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
                 raise typer.Exit(1) from e
+
+
+@gas_app.callback()
+def main_gas(
+    ctx: typer.Context,
+    state: Annotated[
+        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
+    ] = None,
+    output_folder: Annotated[
+        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
+    ] = "./outputs",
+):
+    if ctx.invoked_subcommand is not None:
+        return
+
+    state_ = (state or prompt_state()).value
+    output_folder_ = Path(output_folder)
+    try:
+        process_rateacuity_gas(output_folder_, state_)
+    except AuthorizationError:
+        console.print("Authorization failed")
+        console.print(
+            "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
+        )
+
+
+@gas_app.command("urdb")
+def main_gas_urdb(
+    state: Annotated[
+        StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
+    ] = None,
+    output_folder: Annotated[
+        str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
+    ] = "./outputs",
+    year: Annotated[int | None, typer.Option("--year", "-y")] = None,
+):
+    state_ = (state or prompt_state()).value
+    output_folder_ = Path(output_folder)
+    year_ = prompt_year() if year is None else year
+    try:
+        process_rateacuity_gas_urdb(output_folder_, state_, year_)
+    except AuthorizationError:
+        console.print("Authorization failed")
+        console.print(
+            "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
+        )
 
 
 def main_cli():

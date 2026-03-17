@@ -38,7 +38,6 @@ Documentation = "https://switchbox-data.github.io/tariff_fetch/"
 
 [project.scripts]
 tariff-fetch = "tariff_fetch.cli:main_cli"
-tariff-fetch-gas = "tariff_fetch.cli_gas:main_cli"
 
 [dependency-groups]
 dev = [

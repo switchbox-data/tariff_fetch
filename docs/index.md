@@ -20,16 +20,16 @@ cd tariff_fetch
 uv sync                   # or: python -m venv .venv && source .venv/bin/activate && pip install -e .
 
 # run electricity CLI
-uv run tariff-fetch --state ca --providers genability --providers openei --output-folder outputs
+uv run tariff-fetch --state ca --provider genability --output-folder outputs
 
 # run gas CLI
-uv run tariff-fetch-gas --state tx --output-folder outputs
+uv run tariff-fetch gas --state tx --output-folder outputs
 ```
 
 Other entry points:
 
-- `python -m tariff_fetch.cli` / `python -m tariff_fetch.cli_gas`
-- `just cli` / `just cligas` (from the repo root)
+- `python -m tariff_fetch.cli`
+- `just cli` (from the repo root)
 
 Populate a `.env` file (or export variables) before running:
 

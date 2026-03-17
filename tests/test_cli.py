@@ -154,3 +154,57 @@ def test_urdb_ni_command_runs_end_to_end(monkeypatch, tmp_path: Path):
         "name": "Tariff",
         "country": "USA",
     }
+
+
+def test_gas_command_runs_end_to_end(monkeypatch, tmp_path: Path):
+    captured: dict[str, object] = {}
+
+    monkeypatch.setattr(
+        cli,
+        "process_rateacuity_gas",
+        lambda output_folder, state: captured.update(
+            {
+                "output_folder": output_folder,
+                "state": state,
+            }
+        ),
+    )
+
+    result = runner.invoke(
+        cli.app,
+        ["gas", "--state", "tx", "--output-folder", str(tmp_path)],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "output_folder": tmp_path,
+        "state": "tx",
+    }
+
+
+def test_gas_urdb_command_runs_end_to_end(monkeypatch, tmp_path: Path):
+    captured: dict[str, object] = {}
+
+    monkeypatch.setattr(
+        cli,
+        "process_rateacuity_gas_urdb",
+        lambda output_folder, state, year: captured.update(
+            {
+                "output_folder": output_folder,
+                "state": state,
+                "year": year,
+            }
+        ),
+    )
+
+    result = runner.invoke(
+        cli.app,
+        ["gas", "urdb", "--state", "tx", "--output-folder", str(tmp_path), "--year", "2025"],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "output_folder": tmp_path,
+        "state": "tx",
+        "year": 2025,
+    }

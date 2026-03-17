@@ -53,7 +53,7 @@ uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch ta
 Or, for gas tariffs:
 
 ```bash
-uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch-gas
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch gas
 ```
 
 ## Installation
@@ -75,14 +75,14 @@ pip install -e .
 
 ```bash
 python -m tariff_fetch.cli [OPTIONS]
-python -m tariff_fetch.cli_gas [OPTIONS]
 ```
 
 With uv:
 
 ```bash
 uv run tariff-fetch [OPTIONS]
-uv run tariff-fetch-gas [OPTIONS]
+uv run tariff-fetch gas [OPTIONS]
+uv run tariff-fetch gas urdb [OPTIONS]
 uv run tariff-fetch urdb ni MASTER_TARIFF_ID YEAR [OPTIONS]
 ```
 
@@ -90,7 +90,6 @@ With Just:
 
 ```bash
 just cli
-just cligas
 ```
 
 Options:

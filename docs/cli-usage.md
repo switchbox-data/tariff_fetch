@@ -9,7 +9,7 @@ If you prefer not to clone the repository or manage a local virtual environment,
 uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch
 
 # gas
-uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch-gas
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch gas
 
 # arcadia to urdb
 uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch urdb ni 522 2025
@@ -66,18 +66,28 @@ Example:
 uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
 ```
 
-## Gas CLI (`tariff-fetch-gas`)
+## Gas CLI (`tariff-fetch gas`)
 
-Run `uv run tariff-fetch-gas` (or `python -m tariff_fetch.cli_gas` / `just cligas`).
+Run `uv run tariff-fetch gas` (or `python -m tariff_fetch.cli gas` / `just cli`).
 
 ### Options
 
 - `--state` / `-s`: gas benchmark state (prompts if omitted).
 - `--output-folder` / `-o`: output directory (defaults to `./outputs`).
-- `--urdb`: use this flag to convert to URDB format
+
+### Subcommands
+
+- `urdb`: convert gas tariffs to URDB format.
+
+Examples:
+
+```bash
+uv run tariff-fetch gas --state tx --output-folder outputs
+uv run tariff-fetch gas urdb --state tx --year 2025 --output-folder outputs
+```
 
 ### Workflow Overview
 
 This command only targets RateAcuity’s gas workflow. After you confirm the state, the CLI launches the Selenium flow via `process_rateacuity_gas`, exporting the selected schedules. Failures typically mean the `RATEACUITY_USERNAME`/`RATEACUITY_PASSWORD` credentials or local Chrome/Chromium installation need attention.
 
-You may be presented with additional questions when converting to URDB format.
+`tariff-fetch gas urdb` runs the RateAcuity gas-to-URDB flow and may prompt for a year if `--year` is omitted.
