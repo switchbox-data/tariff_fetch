@@ -94,6 +94,7 @@ class HistoryData:
 class _Row(BaseModel):
     rate: str
     season: Season | None
+    year: int
     effective_date: str | None
     start: float | None = None
     end: float | None = None
@@ -183,6 +184,7 @@ Row = ConsumptionRow | PercentageRow | FixedChargeRow
 def _row_to_model(row: dict[str, Any], location_avg_factor: float, month_column_names: list[str]) -> Row:  # pyright: ignore[reportExplicitAny]
     result = row.copy()
     result["month_values"] = []
+    result["year"] = datetime.strptime(month_column_names[0], "%m/%d/%Y").year
     for col in month_column_names:
         value = cast(float | None, row[col])
         del result[col]
