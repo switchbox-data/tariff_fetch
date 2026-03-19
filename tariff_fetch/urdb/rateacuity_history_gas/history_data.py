@@ -1,11 +1,12 @@
 import contextlib
+import re
 from collections.abc import Iterator
 from datetime import datetime
 from math import inf
-from typing import Any, cast, final
+from typing import Any, NamedTuple, cast, final
 
 import polars as pl
-from pydantic import BaseModel, TypeAdapter, ValidationError
+from pydantic import BaseModel, TypeAdapter, ValidationError, field_validator
 from typing_extensions import override
 
 from .exceptions import IncorrectDataframeSchemaMonths, IncorrectDataframeSchemaMultipleYears
@@ -16,6 +17,19 @@ from .types import (
     FixedRateDeterminant,
     PercentRateDeterminant,
 )
+
+
+class DayOfMonth(NamedTuple):
+    day: int
+    month: int
+
+
+class Season(NamedTuple):
+    start: DayOfMonth
+    end: DayOfMonth
+
+
+_SEASON_PATTERN = re.compile(r"^\s*(\d{2})/(\d{2})\s*-\s*(\d{2})/(\d{2})\s*$")
 
 
 @final
@@ -79,7 +93,7 @@ class HistoryData:
 
 class _Row(BaseModel):
     rate: str
-    season: str | None
+    season: Season | None
     effective_date: str | None
     start: float | None = None
     end: float | None = None
@@ -88,6 +102,24 @@ class _Row(BaseModel):
     location: str | None = None
     month_values: list[float | None]
     location_avg_factor: float
+
+    @field_validator("season", mode="before")
+    @classmethod
+    def _parse_season(cls, value: object) -> object:
+        if value is None or value == "":
+            return None
+        if isinstance(value, Season):
+            return value
+        if not isinstance(value, str):
+            return value
+        match = _SEASON_PATTERN.fullmatch(value)
+        if match is None:
+            return value
+        start_month, start_day, end_month, end_day = (int(part) for part in match.groups())
+        return Season(
+            start=DayOfMonth(day=start_day, month=start_month),
+            end=DayOfMonth(day=end_day, month=end_month),
+        )
 
     @property
     def start_kwh(self) -> float:
