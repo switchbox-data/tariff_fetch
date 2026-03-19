@@ -1,5 +1,6 @@
 import contextlib
 import re
+from calendar import monthrange
 from collections.abc import Iterator
 from datetime import datetime
 from math import inf
@@ -118,8 +119,8 @@ class _Row(BaseModel):
             return value
         start_month, start_day, end_month, end_day = (int(part) for part in match.groups())
         return Season(
-            start=DayOfMonth(day=start_day, month=start_month),
-            end=DayOfMonth(day=end_day, month=end_month),
+            start=_validated_day_of_month(start_month, start_day),
+            end=_validated_day_of_month(end_month, end_day),
         )
 
     @property
@@ -206,3 +207,12 @@ def _get_month_column_names(df: pl.DataFrame):
     if len({c.year for c in date_columns_datetimes}) != 1:
         raise IncorrectDataframeSchemaMultipleYears()
     return date_columns
+
+
+def _validated_day_of_month(month: int, day: int) -> DayOfMonth:
+    if not 1 <= month <= 12:
+        raise ValueError(f"Invalid season month: {month}")
+    # Use a leap year so recurring seasonal boundaries can represent Feb 29.
+    if not 1 <= day <= monthrange(2024, month)[1]:
+        raise ValueError(f"Invalid season day {day} for month {month}")
+    return DayOfMonth(day=day, month=month)
