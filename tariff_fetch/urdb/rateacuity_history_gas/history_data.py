@@ -1,11 +1,13 @@
 import contextlib
+import re
+from calendar import monthrange
 from collections.abc import Iterator
 from datetime import datetime
 from math import inf
-from typing import Any, cast, final
+from typing import Any, NamedTuple, cast, final
 
 import polars as pl
-from pydantic import BaseModel, TypeAdapter, ValidationError
+from pydantic import BaseModel, TypeAdapter, ValidationError, field_validator
 from typing_extensions import override
 
 from .exceptions import IncorrectDataframeSchemaMonths, IncorrectDataframeSchemaMultipleYears
@@ -16,6 +18,19 @@ from .types import (
     FixedRateDeterminant,
     PercentRateDeterminant,
 )
+
+
+class DayOfMonth(NamedTuple):
+    day: int
+    month: int
+
+
+class Season(NamedTuple):
+    start: DayOfMonth
+    end: DayOfMonth
+
+
+_SEASON_PATTERN = re.compile(r"^\s*(\d{2})/(\d{2})\s*-\s*(\d{2})/(\d{2})\s*$")
 
 
 @final
@@ -79,7 +94,8 @@ class HistoryData:
 
 class _Row(BaseModel):
     rate: str
-    season: str | None
+    season: Season | None
+    year: int
     effective_date: str | None
     start: float | None = None
     end: float | None = None
@@ -88,6 +104,24 @@ class _Row(BaseModel):
     location: str | None = None
     month_values: list[float | None]
     location_avg_factor: float
+
+    @field_validator("season", mode="before")
+    @classmethod
+    def _parse_season(cls, value: object) -> object:
+        if value is None or value == "":
+            return None
+        if isinstance(value, Season):
+            return value
+        if not isinstance(value, str):
+            return value
+        match = _SEASON_PATTERN.fullmatch(value)
+        if match is None:
+            return value
+        start_month, start_day, end_month, end_day = (int(part) for part in match.groups())
+        return Season(
+            start=_validated_day_of_month(start_month, start_day),
+            end=_validated_day_of_month(end_month, end_day),
+        )
 
     @property
     def start_kwh(self) -> float:
@@ -151,6 +185,7 @@ Row = ConsumptionRow | PercentageRow | FixedChargeRow
 def _row_to_model(row: dict[str, Any], location_avg_factor: float, month_column_names: list[str]) -> Row:  # pyright: ignore[reportExplicitAny]
     result = row.copy()
     result["month_values"] = []
+    result["year"] = datetime.strptime(month_column_names[0], "%m/%d/%Y").year
     for col in month_column_names:
         value = cast(float | None, row[col])
         del result[col]
@@ -172,3 +207,12 @@ def _get_month_column_names(df: pl.DataFrame):
     if len({c.year for c in date_columns_datetimes}) != 1:
         raise IncorrectDataframeSchemaMultipleYears()
     return date_columns
+
+
+def _validated_day_of_month(month: int, day: int) -> DayOfMonth:
+    if not 1 <= month <= 12:
+        raise ValueError(f"Invalid season month: {month}")
+    # Use a leap year so recurring seasonal boundaries can represent Feb 29.
+    if not 1 <= day <= monthrange(2024, month)[1]:
+        raise ValueError(f"Invalid season day {day} for month {month}")
+    return DayOfMonth(day=day, month=month)
