@@ -2,6 +2,8 @@
 
 import logging
 
+import typer
+
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.questionary_typed import confirm
 from tariff_fetch.urdb.arcadia.library import Library
@@ -21,16 +23,22 @@ def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario, *, interactive_errors:
     library = Library(api, properties=scenario.properties)
     try:
         energy_schedule = build_energy_schedule(scenario, library)
+    except typer.Exit:
+        raise
     except Exception as e:
         energy_schedule = _confirm_proceed(e, "energy rate strucutre", interactive_errors=interactive_errors)
 
     try:
         fixed_charge = build_fixed_charge(scenario, library)
+    except typer.Exit:
+        raise
     except Exception as e:
         fixed_charge = _confirm_proceed(e, "fixed charges", interactive_errors=interactive_errors)
 
     try:
         metadata = build_metadata(scenario, library)
+    except typer.Exit:
+        raise
     except Exception as e:
         metadata = _confirm_proceed(e, "metadata", interactive_errors=interactive_errors)
 

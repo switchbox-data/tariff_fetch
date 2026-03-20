@@ -62,7 +62,7 @@ def prompt_string(tariff_property: TariffPropertyStandard) -> str | None:
     return q.text(
         _get_property_title(tariff_property),
         default=default_value or "",
-    ).ask()
+    ).ask_or_exit()
 
 
 def prompt_choice(tariff_property: TariffPropertyStandard) -> list[str] | None:
@@ -82,7 +82,7 @@ def prompt_choice(tariff_property: TariffPropertyStandard) -> list[str] | None:
             q.Choice(title=item["display_value"], value=item["value"], checked=item["value"] in default_value)
             for item in choices
         ],
-    ).ask()
+    ).ask_or_exit()
 
 
 def prompt_boolean(tariff_property: TariffPropertyStandard) -> bool | None:
@@ -93,7 +93,7 @@ def prompt_boolean(tariff_property: TariffPropertyStandard) -> bool | None:
     default_value = True if default_value == "true" else (False if default_value == "false" else None)
     result = q.confirm(
         _get_property_title(tariff_property), default=default_value if default_value is not None else False
-    ).ask()
+    ).ask_or_exit()
     return result
 
 
@@ -114,9 +114,7 @@ def prompt_decimal(tariff_property: TariffPropertyStandard) -> float | None:
         _get_property_title(tariff_property),
         default=str(default_value) if default_value else "",
         validate=_is_float,
-    ).ask()
-    if result_str is None:
-        return None
+    ).ask_or_exit()
     return float(result_str)
 
 
@@ -131,9 +129,7 @@ def prompt_integer(tariff_property: TariffPropertyStandard) -> float | None:
         _get_property_title(tariff_property),
         default=str(default_value) if default_value else "",
         validate=_is_int,
-    ).ask()
-    if result_str is None:
-        return None
+    ).ask_or_exit()
     return float(result_str)
 
 
