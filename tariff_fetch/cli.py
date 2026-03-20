@@ -1,12 +1,13 @@
 import json
 import logging
+import os
 import shutil
 from collections.abc import Callable
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from enum import Enum
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Annotated, BinaryIO, TypeVar, cast, get_args
+from typing import Annotated, BinaryIO, Literal, TypeVar, cast, get_args
 from urllib.request import urlopen
 
 import polars as pl
@@ -25,6 +26,7 @@ from tariff_fetch._cli.rateacuity_gas_urdb import process_rateacuity_gas_urdb
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.arcadia.schema import tariff
 from tariff_fetch.arcadia.schema.common import RateChargeClass
+from tariff_fetch.openei.utility_rates import UtilityRateSector, UtilityRatesResponseItem, iter_utility_rates
 from tariff_fetch.rateacuity.base import AuthorizationError
 from tariff_fetch.urdb.arcadia.build import build_urdb
 from tariff_fetch.urdb.arcadia.scenario import Scenario, ScenarioPropertyValue
@@ -382,6 +384,59 @@ def ni_arcadia(
     console.print(f"Wrote [blue]{len(results)}[/] records to {output}")
 
 
+@ni_app.command("openei", help="Fetch OpenEI tariffs for a specific utility EIA id as raw JSON.")
+def ni_openei(
+    eia_id: Annotated[int, typer.Argument(help="Utility EIA id to fetch tariffs for")],
+    sector: Annotated[
+        Literal["Residential", "Commercial", "Industrial", "Lighting"],
+        typer.Argument(help="OpenEI sector to fetch"),
+    ],
+    effective_date: Annotated[
+        str | None,
+        typer.Argument(help="Effective date in YYYY-MM-DD format; defaults to today if omitted"),
+    ] = None,
+    detail: Annotated[
+        Literal["full", "minimal"], typer.Option("--detail", help="OpenEI response detail level")
+    ] = "full",
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the fetched tariff JSON")] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Overwrite the output file if it already exists"),
+    ] = False,
+):
+    _configure_interaction(no_input)
+    _ = load_dotenv()
+    effective_on = _parse_effective_date(effective_date) or date.today()
+    if output is None:
+        output = Path("./outputs")
+        output.mkdir(parents=True, exist_ok=True)
+    if output.is_dir():
+        output = output / f"openei_{eia_id}_{sector}_{detail}_{effective_on.isoformat()}.json"
+    if output.exists() and not force:
+        console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
+        raise typer.Exit(1)
+
+    _ = _configure_command_logging(
+        "tariff_fetch_ni_openei",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or (output.parent / "logs"),
+        log_file=log_file,
+    )
+    results = _run_cli_command(
+        lambda: _fetch_openei_tariffs(eia_id=eia_id, sector=sector, detail=detail, effective_on=effective_on)
+    )
+    _ = output.write_text(json.dumps({"items": results}, indent=2))
+    console.print(f"Wrote [blue]{len(results)}[/] items to {output}")
+
+
 @app.command("show-properties", help="Show Arcadia tariff properties for a master tariff.")
 def show_properties(
     master_tariff_id: Annotated[int, typer.Argument(help="Arcadia master tariff id to inspect")],
@@ -627,23 +682,29 @@ def prompt_utility(state: str) -> Utility:
         return f"{value:,.0f}"
 
     utility_name_header = "Utility Name"
+    eia_id_header = "EIA ID"
     entity_type_header = "Entity Type"
     sales_header = "Sales (MWh)"
     revenue_header = "Revenue ($)"
     customers_header = "Customers"
 
     largest_utility_name = max(len(utility_name_header), *(len(row["utility_name"]) for row in rows))  # pyright: ignore[reportAny]
+    largest_eia_id = max(len(eia_id_header), *(len(str(row["utility_id_eia"])) for row in rows))  # pyright: ignore[reportAny]
     largest_entity_type = max(len(entity_type_header), *(len(row["entity_type"][:18]) for row in rows))  # pyright: ignore[reportAny]
     largest_sales_col = max(len(sales_header), *(len(fmt_number(row["sales_mwh"])) for row in rows))  # pyright: ignore[reportAny]
     largest_revenue_col = max(len(revenue_header), *(len(fmt_number(row["sales_revenue"])) for row in rows))  # pyright: ignore[reportAny]
     largest_customers_col = max(len(customers_header), *(len(fmt_number(row["customers"])) for row in rows))  # pyright: ignore[reportAny]
 
     header_str_utility_name = utility_name_header.ljust(largest_utility_name)
+    header_str_eia_id = eia_id_header.ljust(largest_eia_id)
     header_str_entity_type = entity_type_header.ljust(largest_entity_type)
     header_str_sales = sales_header.ljust(largest_sales_col)
     header_str_revenue = revenue_header.ljust(largest_revenue_col)
     header_str_customers = customers_header.ljust(largest_customers_col)
-    header_str = f"{header_str_utility_name} | {header_str_entity_type} | {header_str_sales} | {header_str_revenue} | {header_str_customers}"
+    header_str = (
+        f"{header_str_utility_name} | {header_str_eia_id} | {header_str_entity_type} | "
+        f"{header_str_sales} | {header_str_revenue} | {header_str_customers}"
+    )
     separator = q.Separator(line="-" * len(header_str))
 
     header = q.Choice[Utility | None](
@@ -653,11 +714,12 @@ def prompt_utility(state: str) -> Utility:
 
     def build_choice(row: dict[str, str | int | float | None]) -> q.Choice[Utility | None]:
         name_col = cast(str, row["utility_name"]).ljust(largest_utility_name)
+        eia_id_col = str(cast(int, row["utility_id_eia"])).ljust(largest_eia_id)
         entity_type = (cast(str, row["entity_type"]) or "-")[:18].ljust(largest_entity_type)
         sales_col = fmt_number(cast(float, row["sales_mwh"])).ljust(largest_sales_col)
         revenue_col = fmt_number(cast(float, row["sales_revenue"])).ljust(largest_revenue_col)
         customers_col = fmt_number(cast(float, row["customers"])).ljust(largest_customers_col)
-        title = f"{name_col} | {entity_type} | {sales_col} | {revenue_col} | {customers_col}"
+        title = f"{name_col} | {eia_id_col} | {entity_type} | {sales_col} | {revenue_col} | {customers_col}"
         return q.Choice(
             title=title,
             value=Utility(eia_id=cast(int, row["utility_id_eia"]), name=cast(str, row["utility_name"])),
@@ -746,6 +808,28 @@ def _fetch_arcadia_tariffs(
             populate_rates=populate_rates,
         )
     )
+
+
+def _fetch_openei_tariffs(
+    *,
+    eia_id: int,
+    sector: UtilityRateSector,
+    detail: str,
+    effective_on: date,
+) -> list[UtilityRatesResponseItem]:
+    api_key = os.getenv("OPENEI_API_KEY")
+    if not api_key:
+        raise ValueError("API Key is not set (via OPENEI_API_KEY variable)")
+    with console.status("Fetching rates..."):
+        return list(
+            iter_utility_rates(
+                api_key,
+                effective_on_date=datetime.combine(effective_on, datetime.min.time(), tzinfo=UTC),
+                sector=sector,
+                detail=cast(Literal["full", "minimal"], detail),
+                eia=eia_id,
+            )
+        )
 
 
 def _print_arcadia_properties(tariffs: list[tariff.TariffExtended]) -> None:
