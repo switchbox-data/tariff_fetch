@@ -160,6 +160,8 @@ def main_urdb(
         process_genability_urdb(
             utility=utility, output_folder=output_folder_, year=year, interactive_errors=not fail_fast
         )
+    except typer.Exit as e:
+        _handle_expected_exit(e)
     except Exception as e:
         logging.getLogger(__name__).exception(e)
         raise typer.Exit(1) from e
@@ -218,6 +220,8 @@ def urdb_direct(
     api = ArcadiaSignalAPI()
     try:
         result = build_urdb(api, scenario, interactive_errors=not fail_fast)
+    except typer.Exit as e:
+        _handle_expected_exit(e)
     except Exception as e:
         logging.getLogger(__name__).exception(e)
         raise typer.Exit(code=1) from e
@@ -325,6 +329,8 @@ def _run_raw(
             console.print("Processing [blue]Genability[/]")
             try:
                 process_genability(utility=utility, output_folder=output_folder_, effective_on=effective_date)
+            except typer.Exit as e:
+                _handle_expected_exit(e)
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
                 raise typer.Exit(1) from e
@@ -332,12 +338,16 @@ def _run_raw(
             console.print("Processing [blue]OpenEI[/]")
             try:
                 process_openei(utility, output_folder_, effective_on=effective_date)
+            except typer.Exit as e:
+                _handle_expected_exit(e)
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
                 raise typer.Exit(1) from e
         case Provider.RATEACUITY:
             try:
                 process_rateacuity(output_folder_, state_, utility)
+            except typer.Exit as e:
+                _handle_expected_exit(e)
             except Exception as e:
                 logging.getLogger(__name__).exception(e)
                 raise typer.Exit(1) from e
@@ -402,6 +412,12 @@ def _configure_noisy_loggers(log_level: int) -> None:
     noisy_level = max(log_level, logging.INFO)
     for logger_name in noisy_logger_names:
         logging.getLogger(logger_name).setLevel(noisy_level)
+
+
+def _handle_expected_exit(exc: typer.Exit) -> None:
+    if exc.exit_code not in (None, 0):
+        console.print("[yellow]Cancelled by user[/]")
+    raise exc
 
 
 def prompt_provider() -> Provider:
