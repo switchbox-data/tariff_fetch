@@ -89,6 +89,6 @@ def process_openei(utility: Utility, output_folder: Path, effective_on: date | N
         return
 
     filepath.parent.mkdir(exist_ok=True)
-    print(filepath)
-    _ = filepath.write_text(json.dumps(tariffs, indent=2))
+    wrapped_items = {"items": tariffs}
+    _ = filepath.write_text(json.dumps(wrapped_items, indent=2))
     console.print(f"Wrote [blue]{len(tariffs)}[/] items to {filepath}")
