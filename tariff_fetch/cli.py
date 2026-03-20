@@ -311,12 +311,10 @@ def _parse_effective_date(value: str | None) -> date | None:
 
 
 def prompt_provider() -> Provider:
-    result = q.select(
+    return q.select(
         message="Select provider",
         choices=[q.Choice(title=provider.value, value=provider) for provider in Provider],
-    ).ask()
-    assert result is not None
-    return result
+    ).ask_or_exit()
 
 
 def prompt_utility(state: str) -> Utility:
@@ -393,22 +391,18 @@ def prompt_utility(state: str) -> Utility:
 
     result: Utility | None = None
     while result is None:
-        selected = q.select(
+        result = q.select(
             message="Select a utility",
             choices=[header, separator, *[build_choice(row) for row in rows]],
             use_search_filter=True,
             use_jk_keys=False,
             use_shortcuts=False,
-        ).ask()
-        if selected is None:
-            raise typer.Exit(code=1)
-        result = selected
+        ).ask_or_exit()
     return result
 
 
 def prompt_year() -> int:
-    result = q.text("Enter year", default=str(date.today().year - 1), validate=_is_valid_year).ask()
-    assert result is not None
+    result = q.text("Enter year", default=str(date.today().year - 1), validate=_is_valid_year).ask_or_exit()
     return int(result)
 
 

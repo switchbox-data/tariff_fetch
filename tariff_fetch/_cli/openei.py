@@ -22,8 +22,7 @@ def _prompt_sector() -> UtilityRateSector:
             "Industrial",
             "Lighting",
         ],
-    ).ask()
-    assert result is not None
+    ).ask_or_exit()
     return cast(UtilityRateSector, result)
 
 
@@ -31,8 +30,7 @@ def _prompt_detail_level() -> Literal["full", "minimal"]:
     result = q.select(
         message="Select level of detail",
         choices=["full", "minimal"],
-    ).ask()
-    assert result is not None
+    ).ask_or_exit()
     return cast(Literal["full", "minimal"], result)
 
 

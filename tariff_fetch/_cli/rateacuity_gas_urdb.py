@@ -54,9 +54,7 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                     use_jk_keys=False,
                     use_search_filter=True,
                     use_shortcuts=False,
-                ).ask()
-                if not selected_utility:
-                    return
+                ).ask_or_exit()
             with console.status("Fetching list of tariffs..."):
                 scraping_state = scraping_state.select_utility(selected_utility)
                 tariffs = [_ for _ in scraping_state.get_schedules() if _]
@@ -67,7 +65,7 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                     use_jk_keys=False,
                     use_search_filter=True,
                     validate=lambda items: bool(items) or "Select at least one tariff",
-                ).ask()
+                ).ask_or_exit()
 
             if not tariffs_to_include:
                 console.print("[red]No tariffs selected[/]")
@@ -112,24 +110,18 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                         console.print("Percentages will be applied to the final result as is")
                         apply_percentages = Confirm.ask("Apply percentages? (otherwise percentages will be ignored)")
 
-                    label = q.text("Label", default=_utility_name_to_label(selected_utility)).ask()
-                    if label is None:
-                        exit()
+                    label = q.text("Label", default=_utility_name_to_label(selected_utility)).ask_or_exit()
                     sector = q.select(
                         "Sector",
                         default="Residential",
                         choices=get_args(RateSector),
-                    ).ask()
-                    if sector is None:
-                        exit()
+                    ).ask_or_exit()
 
                     servicetype = q.select(
                         "Sector",
                         default="Bundled",
                         choices=get_args(ServiceType),
-                    ).ask()
-                    if servicetype is None:
-                        exit()
+                    ).ask_or_exit()
 
                     try:
                         urdb = build_urdb(rows, apply_percentages)

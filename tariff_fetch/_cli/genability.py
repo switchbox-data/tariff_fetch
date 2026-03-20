@@ -82,8 +82,8 @@ def _select_tariffs(
         ],
         use_search_filter=True,
         use_jk_keys=False,
-    ).ask()
-    return result or []
+    ).ask_or_exit()
+    return result
 
 
 def _select_customer_classes() -> list[CustomerClass]:
@@ -96,8 +96,8 @@ def _select_customer_classes() -> list[CustomerClass]:
         message="Select customer classes",
         choices=choices,
         validate=lambda items: True if items else "Select at least one customer class",
-    ).ask()
-    return result or []
+    ).ask_or_exit()
+    return result
 
 
 def _select_tariff_types() -> list[TariffType]:
@@ -111,8 +111,8 @@ def _select_tariff_types() -> list[TariffType]:
         message="Select tariff types",
         choices=choices,
         validate=lambda items: bool(items) or "Select at least one tariff type",
-    ).ask()
-    return result or []
+    ).ask_or_exit()
+    return result
 
 
 def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], effective_on: date):
