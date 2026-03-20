@@ -3,8 +3,7 @@
 from datetime import date
 from typing import cast, get_args
 
-import questionary
-
+from tariff_fetch import questionary_typed as q
 from tariff_fetch.arcadia.schema.common import RateChargeClass
 from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyStandard
 
@@ -38,36 +37,30 @@ def prompt_charge_classes() -> set[RateChargeClass] | None:
     """Prompt for the Arcadia charge classes to include in conversion."""
 
     choices = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
-    result_raw = cast(
-        list[RateChargeClass] | None,
-        questionary.checkbox(
-            "Select charge classes",
-            choices=[
-                questionary.Choice(
-                    title=choice,
-                    value=choice,
-                    checked=True,
-                )
-                for choice in choices
-            ],
-        ).ask(),
-    )
+    result_raw = q.checkbox(
+        "Select charge classes",
+        choices=[
+            q.Choice(
+                title=choice,
+                value=choice,
+                checked=True,
+            )
+            for choice in choices
+        ],
+    ).ask()
     if result_raw is None:
         return None
-    return set(result_raw)
+    return cast(set[RateChargeClass], set(result_raw))
 
 
 def prompt_string(tariff_property: TariffPropertyStandard) -> str | None:
     """Prompt for a string-valued Arcadia tariff property."""
 
     default_value = tariff_property.get("property_value") if tariff_property["is_default"] else None
-    return cast(
-        str | None,
-        questionary.text(
-            _get_property_msg(tariff_property),
-            default=default_value or "",
-        ).ask(),
-    )
+    return q.text(
+        _get_property_msg(tariff_property),
+        default=default_value or "",
+    ).ask()
 
 
 def prompt_choice(tariff_property: TariffPropertyStandard) -> list[str] | None:
@@ -80,18 +73,13 @@ def prompt_choice(tariff_property: TariffPropertyStandard) -> list[str] | None:
         default_value: set[str] = set()
     if not (choices := tariff_property.get("choices")):
         raise ValueError("Expected a list of choices for CHOICE property")
-    return cast(
-        list[str] | None,
-        questionary.checkbox(
-            _get_property_msg(tariff_property),
-            choices=[
-                questionary.Choice(
-                    title=item["display_value"], value=item["value"], checked=item["value"] in default_value
-                )
-                for item in choices
-            ],
-        ).ask(),
-    )
+    return q.checkbox(
+        _get_property_msg(tariff_property),
+        choices=[
+            q.Choice(title=item["display_value"], value=item["value"], checked=item["value"] in default_value)
+            for item in choices
+        ],
+    ).ask()
 
 
 def prompt_boolean(tariff_property: TariffPropertyStandard) -> bool | None:
@@ -99,12 +87,9 @@ def prompt_boolean(tariff_property: TariffPropertyStandard) -> bool | None:
 
     default_value = tariff_property.get("property_value") if tariff_property["is_default"] else None
     default_value = True if default_value == "true" else (False if default_value == "false" else None)
-    result = cast(
-        bool | None,
-        questionary.confirm(
-            _get_property_msg(tariff_property), default=default_value if default_value is not None else False
-        ).ask(),
-    )
+    result = q.confirm(
+        _get_property_msg(tariff_property), default=default_value if default_value is not None else False
+    ).ask()
     return result
 
 
@@ -120,14 +105,11 @@ def prompt_decimal(tariff_property: TariffPropertyStandard) -> float | None:
     default_value = tariff_property.get("property_value") if tariff_property["is_default"] else None
     default_value = float(default_value) if default_value else None
 
-    result_str = cast(
-        str | None,
-        questionary.text(
-            _get_property_msg(tariff_property),
-            default=str(default_value) if default_value else "",
-            validate=_is_float,
-        ).ask(),
-    )
+    result_str = q.text(
+        _get_property_msg(tariff_property),
+        default=str(default_value) if default_value else "",
+        validate=_is_float,
+    ).ask()
     if result_str is None:
         return None
     return float(result_str)
@@ -139,14 +121,11 @@ def prompt_integer(tariff_property: TariffPropertyStandard) -> float | None:
     default_value = tariff_property.get("property_value") if tariff_property["is_default"] else None
     default_value = int(default_value) if default_value else None
 
-    result_str = cast(
-        str | None,
-        questionary.text(
-            _get_property_msg(tariff_property),
-            default=str(default_value) if default_value else "",
-            validate=_is_int,
-        ).ask(),
-    )
+    result_str = q.text(
+        _get_property_msg(tariff_property),
+        default=str(default_value) if default_value else "",
+        validate=_is_int,
+    ).ask()
     if result_str is None:
         return None
     return float(result_str)

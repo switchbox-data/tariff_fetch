@@ -1,11 +1,9 @@
 """Build URDB-style output from Arcadia tariff data for a conversion scenario."""
 
 import logging
-from typing import cast
-
-import questionary
 
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
+from tariff_fetch.questionary_typed import confirm
 from tariff_fetch.urdb.arcadia.exception import ConversionCancelled
 from tariff_fetch.urdb.arcadia.library import Library
 from tariff_fetch.urdb.schema import URDBRate
@@ -50,10 +48,7 @@ def _confirm_proceed(e: Exception, processing: str, *, interactive_errors: bool)
     if not interactive_errors:
         raise e from None
 
-    response = cast(
-        bool | None,
-        questionary.confirm(f"Error while converting: {processing}: {e}. Continue or print traceback and exit?").ask(),
-    )
+    response = confirm(f"Error while converting: {processing}: {e}. Continue or print traceback and exit?").ask()
     if response is None:
         raise ConversionCancelled from None
     if response:

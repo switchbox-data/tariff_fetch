@@ -1,10 +1,10 @@
 import json
 from datetime import date
 from pathlib import Path
-from typing import cast
 
-import questionary
 from dotenv import load_dotenv
+
+from tariff_fetch import questionary_typed as q
 
 # from tariff_fetch.genability.lse import get_lses_page
 # from tariff_fetch.genability.tariffs import CustomerClass, TariffType, tariffs_paginate
@@ -44,7 +44,7 @@ def process_genability(utility: Utility, output_folder: Path, year: int, interac
 
     # tariff_ids = {id_ for _, id_ in tariffs}
 
-    apply_percentages = cast(bool | None, questionary.confirm("Apply percentage rates?").ask())
+    apply_percentages = q.confirm("Apply percentage rates?").ask()
     if apply_percentages is None:
         return
 
@@ -97,15 +97,14 @@ def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
         return utility_lse_id
     else:
         # Nothing found; this should *theoretically* never happen but let's keep it just in case
-        choices = [questionary.Choice(title=_["name"], value=_["lse_id"]) for _ in lses]
-        choices.append(questionary.Separator())
-        choices.append(questionary.Choice(title="None of these", value=None))
-        utility_lse_id = cast(
-            int | None,
-            questionary.select(
-                message=f"Found multiple utilities with lse id = {utility.eia_id}. Select one.", choices=choices
-            ).ask(),
-        )
+        choices: list[q.Choice[int | None] | q.Separator] = [
+            q.Choice(title=lse["name"], value=lse["lse_id"]) for lse in lses
+        ]
+        choices.append(q.Separator())
+        choices.append(q.Choice(title="None of these", value=None))
+        utility_lse_id = q.select(
+            message=f"Found multiple utilities with lse id = {utility.eia_id}. Select one.", choices=choices
+        ).ask()
         if utility_lse_id is None:
             console.print("No utility chosen")
             return None
@@ -126,53 +125,49 @@ def _select_tariffs(
         )
     if not tariffs:
         return []
-    return cast(
-        list[tuple[str, int]],
-        questionary.checkbox(
-            message="Select tariffs",
-            choices=[
-                questionary.Choice(
-                    title=f"{_['tariff_name']} ({_['master_tariff_id']})",
-                    value=(_["tariff_name"], _["master_tariff_id"]),  # pyright: ignore[reportAny]
-                    checked=True,
-                )
-                for _ in tariffs
-            ],
-            use_search_filter=True,
-            use_jk_keys=False,
-        ).ask(),
-    )
+    result = q.checkbox(
+        message="Select tariffs",
+        choices=[
+            q.Choice(
+                title=f"{tariff_['tariff_name']} ({tariff_['master_tariff_id']})",
+                value=(tariff_["tariff_name"], tariff_["master_tariff_id"]),
+                checked=True,
+            )
+            for tariff_ in tariffs
+        ],
+        use_search_filter=True,
+        use_jk_keys=False,
+    ).ask()
+    return result or []
 
 
 def _select_customer_classes() -> list[CustomerClass]:
-    return cast(
-        list[CustomerClass],
-        questionary.checkbox(
-            message="Select customer classes",
-            choices=[
-                questionary.Choice(title="Residential", value="RESIDENTIAL"),
-                questionary.Choice(title="General", value="GENERAL"),
-                questionary.Choice(title="Special Use", value="SPECIAL_USE"),
-            ],
-            validate=lambda _: True if _ else "Select at least one customer class",
-        ).ask(),
-    )
+    choices: list[q.Choice[CustomerClass]] = [
+        q.Choice(title="Residential", value="RESIDENTIAL"),
+        q.Choice(title="General", value="GENERAL"),
+        q.Choice(title="Special Use", value="SPECIAL_USE"),
+    ]
+    result = q.checkbox(
+        message="Select customer classes",
+        choices=choices,
+        validate=lambda items: True if items else "Select at least one customer class",
+    ).ask()
+    return result or []
 
 
 def _select_tariff_types() -> list[TariffType]:
-    return cast(
-        list[TariffType],
-        questionary.checkbox(
-            message="Select tariff types",
-            choices=[
-                questionary.Choice(title="Default", value="DEFAULT"),
-                questionary.Choice(title="Alternative", value="ALTERNATIVE"),
-                questionary.Choice(title="Optional extra", value="OPTIONAL_EXTRA"),
-                questionary.Choice(title="Rider", value="RIDER"),
-            ],
-            validate=lambda _: bool(_) or "Select at least one tariff type",
-        ).ask(),
-    )
+    choices: list[q.Choice[TariffType]] = [
+        q.Choice(title="Default", value="DEFAULT"),
+        q.Choice(title="Alternative", value="ALTERNATIVE"),
+        q.Choice(title="Optional extra", value="OPTIONAL_EXTRA"),
+        q.Choice(title="Rider", value="RIDER"),
+    ]
+    result = q.checkbox(
+        message="Select tariff types",
+        choices=choices,
+        validate=lambda items: bool(items) or "Select at least one tariff type",
+    ).ask()
+    return result or []
 
 
 def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], year: int):
@@ -192,7 +187,7 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], year: 
 
 
 def _prompt_tariff_name(default: str) -> str:
-    result = cast(str | None, questionary.text("Tariff name", default=default).ask())
+    result = q.text("Tariff name", default=default).ask()
     if result is None:
         exit()
     return result

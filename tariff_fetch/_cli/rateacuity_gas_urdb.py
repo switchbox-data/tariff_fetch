@@ -6,12 +6,12 @@ from pathlib import Path
 from statistics import mean
 from typing import cast, get_args
 
-import questionary
 import tenacity
 from dotenv import load_dotenv
 from rich.prompt import Confirm
 from selenium.common.exceptions import WebDriverException
 
+from tariff_fetch import questionary_typed as q
 from tariff_fetch.rateacuity import LoginState, create_context
 from tariff_fetch.urdb.rateacuity_history_gas import (
     build_urdb,
@@ -48,32 +48,26 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                 )
                 utilities = [_ for _ in scraping_state.get_utilities() if _]
             if selected_utility is None:
-                selected_utility = cast(
-                    str,
-                    questionary.select(
-                        message="Select a utility from available choices",
-                        choices=utilities,
-                        use_jk_keys=False,
-                        use_search_filter=True,
-                        use_shortcuts=False,
-                    ).ask(),
-                )
+                selected_utility = q.select(
+                    message="Select a utility from available choices",
+                    choices=utilities,
+                    use_jk_keys=False,
+                    use_search_filter=True,
+                    use_shortcuts=False,
+                ).ask()
                 if not selected_utility:
                     return
             with console.status("Fetching list of tariffs..."):
                 scraping_state = scraping_state.select_utility(selected_utility)
                 tariffs = [_ for _ in scraping_state.get_schedules() if _]
             if tariffs_to_include is None:
-                tariffs_to_include = cast(
-                    list[str],
-                    questionary.checkbox(
-                        message="Select tariffs to include",
-                        choices=tariffs,
-                        use_jk_keys=False,
-                        use_search_filter=True,
-                        validate=lambda _: bool(_) or "Select at least one tariff",
-                    ).ask(),
-                )
+                tariffs_to_include = q.checkbox(
+                    message="Select tariffs to include",
+                    choices=tariffs,
+                    use_jk_keys=False,
+                    use_search_filter=True,
+                    validate=lambda items: bool(items) or "Select at least one tariff",
+                ).ask()
 
             if not tariffs_to_include:
                 console.print("[red]No tariffs selected[/]")
@@ -118,30 +112,22 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                         console.print("Percentages will be applied to the final result as is")
                         apply_percentages = Confirm.ask("Apply percentages? (otherwise percentages will be ignored)")
 
-                    label = cast(
-                        str | None, questionary.text("Label", default=_utility_name_to_label(selected_utility)).ask()
-                    )
+                    label = q.text("Label", default=_utility_name_to_label(selected_utility)).ask()
                     if label is None:
                         exit()
-                    sector = cast(
-                        RateSector | None,
-                        questionary.select(
-                            "Sector",
-                            default="Residential",
-                            choices=get_args(RateSector),
-                        ).ask(),
-                    )
+                    sector = q.select(
+                        "Sector",
+                        default="Residential",
+                        choices=get_args(RateSector),
+                    ).ask()
                     if sector is None:
                         exit()
 
-                    servicetype = cast(
-                        ServiceType | None,
-                        questionary.select(
-                            "Sector",
-                            default="Bundled",
-                            choices=get_args(ServiceType),
-                        ).ask(),
-                    )
+                    servicetype = q.select(
+                        "Sector",
+                        default="Bundled",
+                        choices=get_args(ServiceType),
+                    ).ask()
                     if servicetype is None:
                         exit()
 
@@ -153,8 +139,8 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                         urdb["utility"] = selected_utility
                         urdb["name"] = tariff
                         urdb["label"] = label
-                        urdb["sector"] = sector
-                        urdb["servicetype"] = servicetype
+                        urdb["sector"] = cast(RateSector, sector)
+                        urdb["servicetype"] = cast(ServiceType, servicetype)
                         urdb["demandunits"] = "kW"
                         urdb["mincharge"] = 0.0
                         urdb["minchargeunits"] = "$/month"

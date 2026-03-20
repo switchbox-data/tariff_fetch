@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Annotated, cast, get_args
 
 import polars as pl
-import questionary
 import typer
 from dotenv import load_dotenv
 from rich.logging import RichHandler
@@ -22,6 +21,7 @@ from tariff_fetch.rateacuity.base import AuthorizationError
 from tariff_fetch.urdb.arcadia.build import build_urdb
 from tariff_fetch.urdb.arcadia.scenario import Scenario
 
+from . import questionary_typed as q
 from ._cli import console
 from ._cli.types import Provider, StateCode, Utility
 
@@ -311,13 +311,12 @@ def _parse_effective_date(value: str | None) -> date | None:
 
 
 def prompt_provider() -> Provider:
-    return cast(
-        Provider,
-        questionary.select(
-            message="Select provider",
-            choices=[questionary.Choice(title=_.value, value=_) for _ in Provider],
-        ).ask(),
-    )
+    result = q.select(
+        message="Select provider",
+        choices=[q.Choice(title=provider.value, value=provider) for provider in Provider],
+    ).ask()
+    assert result is not None
+    return result
 
 
 def prompt_utility(state: str) -> Utility:
@@ -373,44 +372,43 @@ def prompt_utility(state: str) -> Utility:
     header_str_revenue = revenue_header.ljust(largest_revenue_col)
     header_str_customers = customers_header.ljust(largest_customers_col)
     header_str = f"{header_str_utility_name} | {header_str_entity_type} | {header_str_sales} | {header_str_revenue} | {header_str_customers}"
-    separator = questionary.Separator(line="-" * len(header_str))
+    separator = q.Separator(line="-" * len(header_str))
 
-    header = questionary.Choice(
+    header = q.Choice[Utility | None](
         title=header_str,
-        value=0,
+        value=None,
     )
 
-    def build_choice(row: dict[str, str | int | float | None]) -> questionary.Choice:
+    def build_choice(row: dict[str, str | int | float | None]) -> q.Choice[Utility | None]:
         name_col = cast(str, row["utility_name"]).ljust(largest_utility_name)
         entity_type = (cast(str, row["entity_type"]) or "-")[:18].ljust(largest_entity_type)
         sales_col = fmt_number(cast(float, row["sales_mwh"])).ljust(largest_sales_col)
         revenue_col = fmt_number(cast(float, row["sales_revenue"])).ljust(largest_revenue_col)
         customers_col = fmt_number(cast(float, row["customers"])).ljust(largest_customers_col)
         title = f"{name_col} | {entity_type} | {sales_col} | {revenue_col} | {customers_col}"
-        return questionary.Choice(
+        return q.Choice(
             title=title,
             value=Utility(eia_id=cast(int, row["utility_id_eia"]), name=cast(str, row["utility_name"])),
         )
 
-    result = 0
-    while result == 0:
-        result = cast(
-            Utility,
-            questionary.select(
-                message="Select a utility",
-                choices=[header, separator, *[build_choice(row) for row in rows]],
-                use_search_filter=True,
-                use_jk_keys=False,
-                use_shortcuts=False,
-            ).ask(),
-        )
+    result: Utility | None = None
+    while result is None:
+        selected = q.select(
+            message="Select a utility",
+            choices=[header, separator, *[build_choice(row) for row in rows]],
+            use_search_filter=True,
+            use_jk_keys=False,
+            use_shortcuts=False,
+        ).ask()
+        if selected is None:
+            raise typer.Exit(code=1)
+        result = selected
     return result
 
 
 def prompt_year() -> int:
-    result = cast(
-        str, questionary.text("Enter year", default=str(date.today().year - 1), validate=_is_valid_year).ask()
-    )
+    result = q.text("Enter year", default=str(date.today().year - 1), validate=_is_valid_year).ask()
+    assert result is not None
     return int(result)
 
 
