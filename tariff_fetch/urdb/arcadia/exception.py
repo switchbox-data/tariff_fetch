@@ -13,15 +13,6 @@ class ConversionError(Exception):
 
 
 @final
-class ConversionCancelled(ConversionError):
-    """Raised when a user cancels an interactive conversion flow."""
-
-    @override
-    def __str__(self) -> str:
-        return "Conversion cancelled by user"
-
-
-@final
 class TariffConversionError(ConversionError):
     """Conversion error scoped to a master Arcadia tariff."""
 

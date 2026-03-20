@@ -4,7 +4,6 @@ import logging
 
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.questionary_typed import confirm
-from tariff_fetch.urdb.arcadia.exception import ConversionCancelled
 from tariff_fetch.urdb.arcadia.library import Library
 from tariff_fetch.urdb.schema import URDBRate
 
@@ -48,9 +47,9 @@ def _confirm_proceed(e: Exception, processing: str, *, interactive_errors: bool)
     if not interactive_errors:
         raise e from None
 
-    response = confirm(f"Error while converting: {processing}: {e}. Continue or print traceback and exit?").ask()
-    if response is None:
-        raise ConversionCancelled from None
+    response = confirm(
+        f"Error while converting: {processing}: {e}. Continue or print traceback and exit?"
+    ).ask_or_exit()
     if response:
         return {}
     raise e from None
