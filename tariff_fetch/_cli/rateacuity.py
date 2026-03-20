@@ -19,16 +19,16 @@ from . import console, prompt_filename
 logger = logging.getLogger(__name__)
 
 
-def _rateacuity_match_score(query: str, choice: str) -> int:
+def rateacuity_match_score(query: str, choice: str) -> int:
     return int(fuzz.ratio(query.lower(), choice.lower()))  # pyright: ignore[reportUnknownMemberType]
 
 
-def _rank_rateacuity_choices(query: str, choices: Sequence[str]) -> list[str]:
-    return sorted(choices, key=lambda choice: (_rateacuity_match_score(query, choice), choice.lower()), reverse=True)
+def rank_rateacuity_choices(query: str, choices: Sequence[str]) -> list[str]:
+    return sorted(choices, key=lambda choice: (rateacuity_match_score(query, choice), choice.lower()), reverse=True)
 
 
-def _match_rateacuity_choice(*, query: str, choices: Sequence[str], category: str) -> str:
-    ranked_choices = _rank_rateacuity_choices(query, choices)
+def match_rateacuity_choice(*, query: str, choices: Sequence[str], category: str) -> str:
+    ranked_choices = rank_rateacuity_choices(query, choices)
     if not ranked_choices:
         raise RuntimeError(f"RateAcuity shows no {category.lower()} choices for this selection")
     match = ranked_choices[0]
@@ -36,10 +36,10 @@ def _match_rateacuity_choice(*, query: str, choices: Sequence[str], category: st
     return match
 
 
-def _match_rateacuity_choices(*, queries: Sequence[str], choices: Sequence[str], category: str) -> list[str]:
+def match_rateacuity_choices(*, queries: Sequence[str], choices: Sequence[str], category: str) -> list[str]:
     selected_choices: list[str] = []
     for query in queries:
-        match = _match_rateacuity_choice(query=query, choices=choices, category=category)
+        match = match_rateacuity_choice(query=query, choices=choices, category=category)
         if match not in selected_choices:
             selected_choices.append(match)
     return selected_choices
@@ -146,7 +146,7 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
                 raise RuntimeError(f"Something's wrong: rateacuity shows no utilities for this state ({state})")
 
             if selected_utility is None:
-                utilities_scored = _rank_rateacuity_choices(utility.name, utilities)
+                utilities_scored = rank_rateacuity_choices(utility.name, utilities)
                 selected_utility = utilities_scored.pop(0)
                 confirmed = q.confirm(f"Is this the correct utility: {selected_utility} ?").ask_or_exit()
                 if not confirmed:
@@ -220,13 +220,13 @@ def fetch_rateacuity_tariffs(
             if not utilities:
                 raise RuntimeError(f"Something's wrong: rateacuity shows no utilities for this state ({state})")
 
-            selected_utility = _match_rateacuity_choice(query=utility_query, choices=utilities, category="Utility")
+            selected_utility = match_rateacuity_choice(query=utility_query, choices=utilities, category="Utility")
 
             with console.status("Fetching list of tariffs..."):
                 scraping_state = scraping_state.select_utility(selected_utility)
                 tariffs = [_ for _ in scraping_state.get_schedules() if _]
 
-            selected_tariffs = _match_rateacuity_choices(
+            selected_tariffs = match_rateacuity_choices(
                 queries=tariff_queries,
                 choices=tariffs,
                 category="Tariff",
@@ -270,13 +270,13 @@ def fetch_rateacuity_gas_tariffs(
             if not utilities:
                 raise RuntimeError(f"Something's wrong: rateacuity shows no utilities for this state ({state})")
 
-            selected_utility = _match_rateacuity_choice(query=utility_query, choices=utilities, category="Utility")
+            selected_utility = match_rateacuity_choice(query=utility_query, choices=utilities, category="Utility")
 
             with console.status("Fetching list of tariffs..."):
                 scraping_state = scraping_state.select_utility(selected_utility)
                 tariffs = [_ for _ in scraping_state.get_schedules() if _]
 
-            selected_tariffs = _match_rateacuity_choices(
+            selected_tariffs = match_rateacuity_choices(
                 queries=tariff_queries,
                 choices=tariffs,
                 category="Tariff",

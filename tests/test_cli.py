@@ -284,6 +284,74 @@ def test_gas_ni_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     assert json.loads(output_path.read_text()) == fake_results
 
 
+def test_gas_urdb_ni_command_runs_end_to_end(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "gas_rateacuity_urdb.json"
+    captured: dict[str, object] = {}
+    fake_results = [{"label": "ceg", "utility": "Consolidated Edison Gas", "name": "Firm Gas Service"}]
+
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_fetch_rateacuity_gas_urdb_rates(
+        *,
+        state: str,
+        utility_query: str,
+        tariff_queries: list[str],
+        year: int,
+        apply_percentages: bool,
+        label: str | None,
+        sector: str,
+        servicetype: str,
+    ):
+        captured["state"] = state
+        captured["utility_query"] = utility_query
+        captured["tariff_queries"] = tariff_queries
+        captured["year"] = year
+        captured["apply_percentages"] = apply_percentages
+        captured["label"] = label
+        captured["sector"] = sector
+        captured["servicetype"] = servicetype
+        return "Consolidated Edison Gas", fake_results
+
+    monkeypatch.setattr(cli, "fetch_rateacuity_gas_urdb_rates", fake_fetch_rateacuity_gas_urdb_rates)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "gas",
+            "urdb",
+            "ni",
+            "ny",
+            "con ed gas",
+            "--year",
+            "2025",
+            "--tariff",
+            "firm gas service",
+            "--label",
+            "ceg",
+            "--sector",
+            "Commercial",
+            "--servicetype",
+            "Delivery",
+            "--apply-percentages",
+            "--output",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "state": "ny",
+        "utility_query": "con ed gas",
+        "tariff_queries": ["firm gas service"],
+        "year": 2025,
+        "apply_percentages": True,
+        "label": "ceg",
+        "sector": "Commercial",
+        "servicetype": "Delivery",
+    }
+    assert json.loads(output_path.read_text()) == {"items": fake_results}
+
+
 def test_ni_arcadia_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     output_path = tmp_path / "arcadia.json"
     captured: dict[str, object] = {}

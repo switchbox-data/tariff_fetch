@@ -1,9 +1,10 @@
-from tariff_fetch._cli.rateacuity import _match_rateacuity_choice, _match_rateacuity_choices
+from tariff_fetch._cli.rateacuity import match_rateacuity_choice, match_rateacuity_choices
 
 
 def test_match_rateacuity_choice_compares_case_insensitively():
     assert (
-        _match_rateacuity_choice(
+        match_rateacuity_choice(
+            # Fuzzy matching should ignore case for runtime dropdown text.
             query="con ed",
             choices=[
                 "Pacific Gas and Electric Company",
@@ -16,7 +17,7 @@ def test_match_rateacuity_choice_compares_case_insensitively():
 
 
 def test_match_rateacuity_choices_deduplicates_repeated_matches():
-    assert _match_rateacuity_choices(
+    assert match_rateacuity_choices(
         queries=["residential service", "RESIDENTIAL"],
         choices=[
             "General Service Demand",

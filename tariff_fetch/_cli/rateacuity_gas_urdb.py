@@ -20,6 +20,7 @@ from tariff_fetch.urdb.rateacuity_history_gas.history_data import HistoryData, P
 from tariff_fetch.urdb.schema import RateSector, ServiceType, URDBRate
 
 from . import console, prompt_filename
+from .rateacuity import match_rateacuity_choice, match_rateacuity_choices
 
 # TODO: This is ungodly ugly but it works
 
@@ -151,6 +152,95 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
     filename.parent.mkdir(exist_ok=True)
     wrapped_result = {"items": result}
     _ = filename.write_text(json.dumps(wrapped_result, indent=2))
+
+
+def fetch_rateacuity_gas_urdb_rates(
+    *,
+    state: str,
+    utility_query: str,
+    tariff_queries: Collection[str],
+    year: int,
+    apply_percentages: bool,
+    label: str | None,
+    sector: RateSector,
+    servicetype: ServiceType,
+) -> tuple[str, list[URDBRate]]:
+    _ = load_dotenv()
+    username = os.getenv("RATEACUITY_USERNAME")
+    password = os.getenv("RATEACUITY_PASSWORD")
+    if not username:
+        raise ValueError("RATEACUITY_USERNAME environment variable is not set")
+    if not password:
+        raise ValueError("RATEACUITY_PASSWORD environment variable is not set")
+
+    selected_utility = ""
+    result: list[URDBRate] = []
+    for attempt in tenacity.Retrying(
+        stop=tenacity.stop_after_attempt(3), retry=tenacity.retry_if_exception_type(WebDriverException)
+    ):
+        with attempt, create_context() as context:
+            with console.status("Fetching list of utilities..."):
+                scraping_state = (
+                    LoginState(context).login(username, password).gas().history().select_state(state.upper())
+                )
+                utilities = [_ for _ in scraping_state.get_utilities() if _]
+            selected_utility = match_rateacuity_choice(query=utility_query, choices=utilities, category="Utility")
+            with console.status("Fetching list of tariffs..."):
+                scraping_state = scraping_state.select_utility(selected_utility)
+                tariffs = [_ for _ in scraping_state.get_schedules() if _]
+            selected_tariffs = match_rateacuity_choices(
+                queries=list(tariff_queries),
+                choices=tariffs,
+                category="Tariff",
+            )
+
+            console.print("Fetching tariffs")
+            while selected_tariffs:
+                tariff = selected_tariffs.pop(0)
+                console.log(f"Fetching {tariff}")
+                scraping_state = (
+                    scraping_state.select_schedule(tariff)
+                    .set_enddate(date(year, 12, 1))
+                    .set_number_of_comparisons(12)
+                    .set_frequency(1)
+                )
+                df = scraping_state.as_dataframe()
+                hd = HistoryData(df)
+                validation_errors = hd.validate_rows()
+                if validation_errors:
+                    console.print("Following rows cannot be processed and will be ignored:")
+                    for error in validation_errors:
+                        console.print(f" - {error.row}")
+
+                if unknown_non_empty_columns := hd.get_unknown_nonempty_columns():
+                    console.print("Found following unknown non-empty columns. Their values will be ignored:")
+                    for col in unknown_non_empty_columns:
+                        console.print(f" - {col}")
+
+                rows = list(hd.rows())
+                try:
+                    urdb = build_urdb(rows, apply_percentages)
+                except ValueError as e:
+                    raise ValueError(f"Cannot convert tariff {tariff!r} to URDB: {e}") from e
+
+                urdb["utility"] = selected_utility
+                urdb["name"] = tariff
+                urdb["label"] = label or _utility_name_to_label(selected_utility)
+                urdb["sector"] = sector
+                urdb["servicetype"] = servicetype
+                urdb["demandunits"] = "kW"
+                urdb["mincharge"] = 0.0
+                urdb["minchargeunits"] = "$/month"
+                urdb["country"] = "USA"
+                result.append(urdb)
+
+                scraping_state = (
+                    scraping_state.back_to_selections()
+                    .history()
+                    .select_state(state.upper())
+                    .select_utility(selected_utility)
+                )
+    return selected_utility, result
 
 
 def _utility_name_to_label(utility_name: str) -> str:

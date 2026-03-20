@@ -28,7 +28,7 @@ from tariff_fetch._cli.rateacuity import (
     process_rateacuity,
     process_rateacuity_gas,
 )
-from tariff_fetch._cli.rateacuity_gas_urdb import process_rateacuity_gas_urdb
+from tariff_fetch._cli.rateacuity_gas_urdb import fetch_rateacuity_gas_urdb_rates, process_rateacuity_gas_urdb
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.arcadia.schema import tariff
 from tariff_fetch.arcadia.schema.common import RateChargeClass
@@ -58,6 +58,12 @@ gas_app = typer.Typer(
     no_args_is_help=False,
 )
 app.add_typer(gas_app, name="gas", help="Fetch and convert RateAcuity gas tariffs.")
+
+gas_urdb_app = typer.Typer(
+    invoke_without_command=True,
+    no_args_is_help=False,
+)
+gas_app.add_typer(gas_urdb_app, name="urdb", help="Convert RateAcuity gas tariffs to URDB format.")
 
 ni_app = typer.Typer(
     invoke_without_command=False,
@@ -319,8 +325,9 @@ def main_gas(
     _run_rateacuity_command(lambda: process_rateacuity_gas(output_folder_, state_))
 
 
-@gas_app.command("urdb", help="Convert RateAcuity gas tariffs to URDB format.")
+@gas_urdb_app.callback()
 def main_gas_urdb(
+    ctx: typer.Context,
     state: Annotated[
         StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
     ] = None,
@@ -337,6 +344,8 @@ def main_gas_urdb(
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
+    if ctx.invoked_subcommand is not None:
+        return
     _configure_interaction(no_input)
     state_ = (state or prompt_state()).value
     output_folder_ = Path(output_folder)
@@ -348,6 +357,63 @@ def main_gas_urdb(
         log_file=log_file,
     )
     _run_rateacuity_command(lambda: process_rateacuity_gas_urdb(output_folder_, state_, year_))
+
+
+@gas_urdb_app.command("ni", help="Convert gas RateAcuity tariffs to URDB using fuzzy-matched utility and tariff names.")
+def main_gas_urdb_ni(
+    state: Annotated[StateCode, typer.Argument(help="Two-letter state abbreviation")],
+    utility: Annotated[str, typer.Argument(help="Utility name query to fuzzy-match against RateAcuity choices")],
+    year: Annotated[int, typer.Option("--year", "-y", help="Calendar year to convert")],
+    tariffs: Annotated[
+        list[str] | None,
+        typer.Option("--tariff", help="Tariff name query to fuzzy-match; repeat to include multiple tariffs"),
+    ] = None,
+    label: Annotated[
+        str | None,
+        typer.Option("--label", help="URDB label override; defaults to an acronym derived from the utility name"),
+    ] = None,
+    sector: Annotated[
+        Literal["Residential", "Commercial", "Industrial", "Lighting"],
+        typer.Option("--sector", help="URDB sector"),
+    ] = "Residential",
+    servicetype: Annotated[
+        Literal["Bundled", "Energy", "Delivery", "Delivery with Standard Offer"],
+        typer.Option("--servicetype", help="URDB service type"),
+    ] = "Bundled",
+    apply_percentages: Annotated[
+        bool,
+        typer.Option("--apply-percentages/--no-apply-percentages", help="Apply supported percentage rows"),
+    ] = False,
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the converted URDB JSON")] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Overwrite the output file if it already exists"),
+    ] = False,
+):
+    _run_rateacuity_gas_urdb_ni(
+        state=state.value,
+        utility_query=utility,
+        year=year,
+        tariffs=tariffs,
+        label=label,
+        sector=sector,
+        servicetype=servicetype,
+        apply_percentages=apply_percentages,
+        output=output,
+        log_level=log_level,
+        no_input=no_input,
+        log_dir=log_dir,
+        log_file=log_file,
+        force=force,
+    )
 
 
 @gas_app.command("ni", help="Fetch gas RateAcuity tariffs by fuzzy-matched state, utility, and tariff names.")
@@ -997,6 +1063,61 @@ def _run_rateacuity_gas_ni(
     output.parent.mkdir(parents=True, exist_ok=True)
     _ = output.write_text(json.dumps(results, indent=2))
     console.print(f"Wrote [blue]{len(results)}[/] records to {output}")
+
+
+def _run_rateacuity_gas_urdb_ni(
+    *,
+    state: str,
+    utility_query: str,
+    year: int,
+    tariffs: list[str] | None,
+    label: str | None,
+    sector: Literal["Residential", "Commercial", "Industrial", "Lighting"],
+    servicetype: Literal["Bundled", "Energy", "Delivery", "Delivery with Standard Offer"],
+    apply_percentages: bool,
+    output: Path | None,
+    log_level: LogLevel,
+    no_input: bool,
+    log_dir: Path | None,
+    log_file: Path | None,
+    force: bool,
+) -> None:
+    _configure_interaction(no_input)
+    if not tariffs:
+        raise typer.BadParameter("Pass at least one --tariff value.", param_hint="--tariff")
+    if output is None:
+        output = Path("./outputs")
+        output.mkdir(parents=True, exist_ok=True)
+    elif output.exists() and output.is_file() and not force:
+        console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
+        raise typer.Exit(1)
+
+    _ = _configure_command_logging(
+        "tariff_fetch_gas_urdb_ni",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or ((output if output.is_dir() else output.parent) / "logs"),
+        log_file=log_file,
+    )
+    selected_utility, result = _run_rateacuity_command(
+        lambda: fetch_rateacuity_gas_urdb_rates(
+            state=state,
+            utility_query=utility_query,
+            tariff_queries=tariffs,
+            year=year,
+            apply_percentages=apply_percentages,
+            label=label,
+            sector=sector,
+            servicetype=servicetype,
+        )
+    )
+    if output.is_dir():
+        output = output / f"{sanitize_filename(f'rateacuity_{selected_utility}.urdb.{year}.')}.json"
+    if output.exists() and not force:
+        console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
+        raise typer.Exit(1)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    _ = output.write_text(json.dumps({"items": result}, indent=2))
+    console.print(f"Wrote [blue]{len(result)}[/] items to {output}")
 
 
 def _parse_property_assignments(values: list[str] | None) -> dict[str, ScenarioPropertyValue]:
