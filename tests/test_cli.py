@@ -1,12 +1,14 @@
 import json
 from datetime import date
 from pathlib import Path
+from typing import cast
 
 from typer.testing import CliRunner
 
 from tariff_fetch import cli
 from tariff_fetch._cli import console
 from tariff_fetch._cli.types import Provider, Utility
+from tariff_fetch.urdb.arcadia.scenario import Scenario
 
 runner = CliRunner()
 
@@ -102,17 +104,25 @@ def test_urdb_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(cli, "prompt_year", lambda: 2024)
     monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
 
-    def fake_process_genability_urdb(*, utility: Utility, output_folder: Path, year: int, interactive_errors: bool):
+    def fake_process_genability_urdb(
+        *,
+        utility: Utility,
+        output_folder: Path,
+        year: int,
+        interactive_errors: bool,
+        properties: dict[str, object] | None = None,
+    ):
         captured["utility"] = utility
         captured["output_folder"] = output_folder
         captured["year"] = year
         captured["interactive_errors"] = interactive_errors
+        captured["properties"] = properties
 
     monkeypatch.setattr(cli, "process_genability_urdb", fake_process_genability_urdb)
 
     result = runner.invoke(
         cli.app,
-        ["urdb", "--state", "wa", "--output-folder", str(tmp_path)],
+        ["urdb", "--state", "wa", "--output-folder", str(tmp_path), "--property", "territoryId=1"],
     )
 
     assert result.exit_code == 0, result.stdout
@@ -121,6 +131,7 @@ def test_urdb_command_runs_end_to_end(monkeypatch, tmp_path: Path):
         "output_folder": tmp_path,
         "year": 2024,
         "interactive_errors": True,
+        "properties": {"territoryId": "1"},
     }
 
 
@@ -132,7 +143,7 @@ def test_urdb_ni_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(cli, "ArcadiaSignalAPI", lambda: object())
     monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
 
-    def fake_build_urdb(api, scenario, *, interactive_errors: bool):
+    def fake_build_urdb(api, scenario: Scenario, *, interactive_errors: bool):
         captured["api"] = api
         captured["scenario"] = scenario
         captured["interactive_errors"] = interactive_errors
@@ -142,11 +153,26 @@ def test_urdb_ni_command_runs_end_to_end(monkeypatch, tmp_path: Path):
 
     result = runner.invoke(
         cli.app,
-        ["urdb", "ni", "123", "2025", "--output", str(output_path), "--fail-fast"],
+        [
+            "urdb",
+            "ni",
+            "123",
+            "2025",
+            "--output",
+            str(output_path),
+            "--fail-fast",
+            "--property",
+            "territoryId=1",
+            "--property",
+            "territoryId=2",
+            "--property",
+            "netMetering=true",
+        ],
     )
 
     assert result.exit_code == 0, result.stdout
     assert captured["interactive_errors"] is False
+    assert cast(Scenario, captured["scenario"]).properties == {"territoryId": ["1", "2"], "netMetering": "true"}
     assert output_path.exists()
     assert json.loads(output_path.read_text()) == {
         "label": "UTIL",

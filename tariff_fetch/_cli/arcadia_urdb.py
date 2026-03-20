@@ -13,14 +13,20 @@ from tariff_fetch.arcadia.schema.common import CustomerClass, TariffType
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
 from tariff_fetch.urdb.arcadia.build import build_urdb
 from tariff_fetch.urdb.arcadia.prompts import prompt_charge_classes
-from tariff_fetch.urdb.arcadia.scenario import Scenario
+from tariff_fetch.urdb.arcadia.scenario import Scenario, ScenarioPropertyValue
 from tariff_fetch.urdb.schema import URDBRate
 
 from . import console, prompt_filename
 from .types import Utility
 
 
-def process_genability(utility: Utility, output_folder: Path, year: int, interactive_errors: bool):
+def process_genability(
+    utility: Utility,
+    output_folder: Path,
+    year: int,
+    interactive_errors: bool,
+    properties: dict[str, ScenarioPropertyValue] | None = None,
+):
     _ = load_dotenv()
     api = ArcadiaSignalAPI()
 
@@ -57,6 +63,7 @@ def process_genability(utility: Utility, output_folder: Path, year: int, interac
             year=year,
             apply_percentages=apply_percentages,
             charge_classes=charge_classes,
+            properties=properties or {},
         )
         urdb_tariff = build_urdb(api, scenario, interactive_errors=interactive_errors)
         urdb_tariff["name"] = _prompt_tariff_name(urdb_tariff.get("name", ""))

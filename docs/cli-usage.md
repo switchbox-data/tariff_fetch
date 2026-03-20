@@ -60,6 +60,7 @@ Run `uv run tariff-fetch urdb` for the interactive Genability-to-URDB flow.
 - `--log-dir`: directory for log files.
 - `--log-file`: exact file path for the log file.
 - `--fail-fast`: stop immediately on conversion errors instead of prompting to continue.
+- `--property`: tariff property override in `key=value` form; repeat to provide multiple values.
 
 ### Subcommands
 
@@ -69,6 +70,17 @@ Example:
 
 ```bash
 uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
+```
+
+Arcadia property overrides accept either the canonical property key or the user-facing property name. For CHOICE
+properties, values can be either Arcadia option values or user-facing choice labels.
+
+Example:
+
+```bash
+uv run tariff-fetch urdb ni 522 2025 \
+  --property territoryId=123 \
+  --property "Territory=Primary Territory"
 ```
 
 ## Direct Fetch CLI (`tariff-fetch ni`)

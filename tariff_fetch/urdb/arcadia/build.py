@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario, *, interactive_errors: bool = True) -> URDBRate:
     """Build a URDB record by combining energy, fixed-charge, and metadata chunks."""
 
-    library = Library(api)
+    library = Library(api, properties=scenario.properties)
     try:
         energy_schedule = build_energy_schedule(scenario, library)
     except Exception as e:

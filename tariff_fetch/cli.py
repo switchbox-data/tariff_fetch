@@ -25,7 +25,7 @@ from tariff_fetch.arcadia.schema import tariff
 from tariff_fetch.arcadia.schema.common import RateChargeClass
 from tariff_fetch.rateacuity.base import AuthorizationError
 from tariff_fetch.urdb.arcadia.build import build_urdb
-from tariff_fetch.urdb.arcadia.scenario import Scenario
+from tariff_fetch.urdb.arcadia.scenario import Scenario, ScenarioPropertyValue
 
 from . import questionary_typed as q
 from ._cli import console
@@ -160,6 +160,10 @@ def main_urdb(
         bool,
         typer.Option("--fail-fast", help="Raise conversion errors immediately instead of prompting to continue"),
     ] = False,
+    properties: Annotated[
+        list[str] | None,
+        typer.Option("--property", help="Tariff property override in key=value form; repeat for multiple values"),
+    ] = None,
 ):
     if ctx.invoked_subcommand is not None:
         return
@@ -178,7 +182,11 @@ def main_urdb(
     console.print("Processing [blue]Genability[/]")
     try:
         process_genability_urdb(
-            utility=utility, output_folder=output_folder_, year=year, interactive_errors=not fail_fast
+            utility=utility,
+            output_folder=output_folder_,
+            year=year,
+            interactive_errors=not fail_fast,
+            properties=_parse_property_assignments(properties),
         )
     except typer.Exit as e:
         _handle_expected_exit(e)
@@ -203,6 +211,10 @@ def urdb_direct(
         bool,
         typer.Option("--fail-fast", help="Raise conversion errors immediately instead of prompting to continue"),
     ] = False,
+    properties: Annotated[
+        list[str] | None,
+        typer.Option("--property", help="Tariff property override in key=value form; repeat for multiple values"),
+    ] = None,
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
@@ -236,6 +248,7 @@ def urdb_direct(
         year=year,
         apply_percentages=apply_percentages,
         charge_classes=scenario_charge_classes,
+        properties=_parse_property_assignments(properties),
     )
     api = ArcadiaSignalAPI()
     try:
@@ -631,6 +644,32 @@ def _parse_charge_classes(charge_classes: list[str] | None) -> set[RateChargeCla
         console.print(f"Allowed values: {allowed}")
         raise typer.Exit(code=1)
     return {cast(RateChargeClass, charge_class) for charge_class in normalized}
+
+
+def _parse_property_assignments(values: list[str] | None) -> dict[str, ScenarioPropertyValue]:
+    if values is None:
+        return {}
+
+    result: dict[str, ScenarioPropertyValue] = {}
+    for value in values:
+        if "=" not in value:
+            raise typer.BadParameter("Property overrides must use key=value format.", param_hint="--property")
+        key, raw_value = value.split("=", 1)
+        key = key.strip()
+        if not key:
+            raise typer.BadParameter("Property overrides must include a property key.", param_hint="--property")
+        existing = result.get(key)
+        if existing is None:
+            result[key] = raw_value
+        elif isinstance(existing, list):
+            existing.append(raw_value)
+        elif isinstance(existing, str):
+            result[key] = [existing, raw_value]
+        else:
+            raise typer.BadParameter(
+                f"Property override for {key} was parsed into an unexpected type.", param_hint="--property"
+            )
+    return result
 
 
 def _get_cached_utility_sales_parquet(now: datetime | None = None) -> Path:

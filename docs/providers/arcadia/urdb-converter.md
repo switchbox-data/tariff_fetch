@@ -18,6 +18,24 @@ Example:
 uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
 ```
 
+You can also pre-fill Arcadia tariff properties from the command line:
+
+```bash
+uv run tariff-fetch urdb ni 522 2025 \
+  --property territoryId=123 \
+  --property "Territory=Primary Territory"
+```
+
+Property overrides accept either:
+
+- the canonical Arcadia property key such as `territoryId`
+- the user-facing property name such as `Territory`
+
+For CHOICE properties, values can be either:
+
+- the Arcadia machine value
+- the user-facing choice label shown in interactive prompts
+
 ## What it converts
 
 The converter is designed for Arcadia electricity tariffs with:

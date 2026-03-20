@@ -141,7 +141,19 @@ Useful options:
 - `--output` / `-o`: output file path
 - `--apply-percentages` / `--no-apply-percentages`
 - `--charge-class`: repeat to include multiple charge classes
+- `--property`: repeat `key=value` to pre-fill Arcadia tariff properties
 - `--force` / `-f`: overwrite an existing output file
+
+Arcadia property overrides accept either the machine-readable property key or the user-facing property name. For
+CHOICE properties, the value can be either the Arcadia option value or the user-facing choice label.
+
+Example:
+
+```bash
+uv run tariff-fetch urdb ni 522 2025 \
+  --property territoryId=123 \
+  --property "Territory=Primary Territory"
+```
 
 ## Direct Arcadia Raw Fetch
 
