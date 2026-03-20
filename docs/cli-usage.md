@@ -94,15 +94,62 @@ Use this command to fetch provider data directly by identifier.
 ### Subcommands
 
 - `arcadia`: fetch one Arcadia master tariff as raw JSON.
+- `rateacuity fuzzy`: fetch one or more electric RateAcuity tariffs by fuzzy-matched state, utility, and tariff names.
+- `rateacuity eia-id`: resolve an electric utility from the cached utility parquet by EIA ID, then fuzzy-match tariff names.
 
 Examples:
 
 ```bash
 uv run tariff-fetch ni arcadia 522
 uv run tariff-fetch ni arcadia 522 2025-06-01 --output ./outputs/arcadia_522_2025-06-01.json
+uv run tariff-fetch ni rateacuity fuzzy ny "con ed" --tariff "residential service"
+uv run tariff-fetch ni rateacuity eia-id 123 --tariff "small commercial"
 ```
 
 If the effective date is omitted, the command uses today.
+
+### RateAcuity Fuzzy Matching
+
+RateAcuity does not offer a stable tariff identifier through this CLI, so the non-interactive commands match against
+the live dropdown labels returned by the RateAcuity web portal.
+
+The matching rules are:
+
+1. The CLI loads the available utility or tariff strings from RateAcuity at runtime.
+2. Your query and each available choice are both lowercased before comparison.
+3. The CLI computes a fuzzy score and picks the highest-scoring match.
+4. For repeated `--tariff` flags, each query is matched independently and duplicate resolved tariffs are removed.
+
+That means these inputs are treated similarly:
+
+```bash
+uv run tariff-fetch ni rateacuity fuzzy ny "con ed" --tariff "residential service"
+uv run tariff-fetch ni rateacuity fuzzy ny "CON ED" --tariff "RESIDENTIAL SERVICE"
+uv run tariff-fetch ni rateacuity fuzzy ny "consolidated edison" --tariff "residential"
+```
+
+The first two are typically safe because they are distinctive and close to the portal text. The third may still work,
+but broader queries are inherently riskier because the command will choose the best-scoring match without pausing for
+confirmation.
+
+Practical guidance:
+
+- Prefer distinctive phrases over generic fragments.
+- Use the interactive RateAcuity flow once if you need to learn the exact utility and tariff naming used in the portal.
+- Treat `--tariff "service"` or `--tariff "residential"` as ambiguous unless you know the target list is small.
+
+Examples:
+
+```bash
+# Electric raw fetch with state + utility query
+uv run tariff-fetch ni rateacuity fuzzy ny "con ed" \
+  --tariff "residential service" \
+  --tariff "time of use"
+
+# Electric raw fetch with utility resolved from cached parquet by EIA id
+uv run tariff-fetch ni rateacuity eia-id 123 \
+  --tariff "small commercial"
+```
 
 ## Property Inspection CLI (`tariff-fetch show-properties`)
 
@@ -143,13 +190,16 @@ Run `uv run tariff-fetch gas` (or `python -m tariff_fetch.cli gas` / `just cli`)
 
 ### Subcommands
 
+- `ni`: fetch gas tariffs non-interactively by fuzzy-matched state, utility, and tariff names.
 - `urdb`: convert gas tariffs to URDB format.
 
 Examples:
 
 ```bash
 uv run tariff-fetch gas --state tx --output-folder outputs
+uv run tariff-fetch gas ni ny "con ed gas" --tariff "firm gas service"
 uv run tariff-fetch gas urdb --state tx --year 2025 --output-folder outputs
+uv run tariff-fetch gas urdb ni ny "con ed gas" --year 2025 --tariff "firm gas service"
 ```
 
 ### Workflow Overview
@@ -157,3 +207,22 @@ uv run tariff-fetch gas urdb --state tx --year 2025 --output-folder outputs
 This command only targets RateAcuity’s gas workflow. After you confirm the state, the CLI launches the Selenium flow via `process_rateacuity_gas`, exporting the selected schedules. Failures typically mean the `RATEACUITY_USERNAME`/`RATEACUITY_PASSWORD` credentials or local Chrome/Chromium installation need attention.
 
 `tariff-fetch gas urdb` runs the RateAcuity gas-to-URDB flow and may prompt for a year if `--year` is omitted.
+
+`tariff-fetch gas ni` uses the same lowercase fuzzy-matching behavior as `tariff-fetch ni rateacuity fuzzy`, but targets
+the gas benchmark workflow instead of electric rates.
+
+`tariff-fetch gas urdb ni` applies the same fuzzy utility/tariff matching to the gas history-to-URDB conversion flow.
+Because this mode is non-interactive, you must provide the conversion year explicitly, and you can optionally control
+URDB metadata with flags like `--label`, `--sector`, `--servicetype`, and `--apply-percentages`.
+
+Example:
+
+```bash
+uv run tariff-fetch gas urdb ni ny "con ed gas" \
+  --year 2025 \
+  --tariff "firm gas service" \
+  --label ceg \
+  --sector Commercial \
+  --servicetype Delivery \
+  --apply-percentages
+```

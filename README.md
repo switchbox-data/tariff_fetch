@@ -82,8 +82,12 @@ With uv:
 ```bash
 uv run tariff-fetch [OPTIONS]
 uv run tariff-fetch ni arcadia MASTER_TARIFF_ID [EFFECTIVE_DATE] [OPTIONS]
+uv run tariff-fetch ni rateacuity fuzzy STATE UTILITY_QUERY --tariff TARIFF_QUERY [--tariff TARIFF_QUERY ...] [OPTIONS]
+uv run tariff-fetch ni rateacuity eia-id EIA_ID --tariff TARIFF_QUERY [--tariff TARIFF_QUERY ...] [OPTIONS]
 uv run tariff-fetch gas [OPTIONS]
+uv run tariff-fetch gas ni STATE UTILITY_QUERY --tariff TARIFF_QUERY [OPTIONS]
 uv run tariff-fetch gas urdb [OPTIONS]
+uv run tariff-fetch gas urdb ni STATE UTILITY_QUERY --year YEAR --tariff TARIFF_QUERY [OPTIONS]
 uv run tariff-fetch urdb ni MASTER_TARIFF_ID YEAR [OPTIONS]
 ```
 
@@ -176,6 +180,83 @@ Useful options:
 - `--force` / `-f`: overwrite an existing output file
 - `--log-dir`: directory for log files
 - `--log-file`: exact log file path
+
+## Direct RateAcuity Fetch
+
+RateAcuity does not expose a stable tariff identifier like Arcadia's `master_tariff_id`, so the non-interactive
+commands work by fuzzy-matching your input against the live dropdown choices shown in the RateAcuity web portal at
+runtime.
+
+Available commands:
+
+```bash
+uv run tariff-fetch ni rateacuity fuzzy ny "con ed" --tariff "residential service"
+uv run tariff-fetch ni rateacuity eia-id 123 --tariff "residential service"
+uv run tariff-fetch gas ni ny "con ed gas" --tariff "firm gas service"
+uv run tariff-fetch gas urdb ni ny "con ed gas" --year 2025 --tariff "firm gas service"
+```
+
+### How fuzzy matching works
+
+- The CLI loads the current RateAcuity utility list for the requested state.
+- It lowercases both your query and every available RateAcuity choice before scoring them.
+- It picks the highest-scoring utility match.
+- After selecting that utility, it loads the current tariff list and fuzzy-matches each `--tariff` query the same way.
+- If multiple `--tariff` queries resolve to the same RateAcuity tariff, the duplicate is ignored and that tariff is only fetched once.
+
+This means your query does not need to be an exact string from the portal. Shortened, lowercased, or partial input is
+usually fine.
+
+Examples:
+
+```bash
+# Utility query does not need to match RateAcuity text exactly
+uv run tariff-fetch ni rateacuity fuzzy ny "con ed" --tariff "residential service"
+
+# Tariff queries are also fuzzy-matched and case-insensitive
+uv run tariff-fetch ni rateacuity fuzzy ny "consolidated edison" \
+  --tariff "RESIDENTIAL" \
+  --tariff "time of use"
+
+# Electric raw fetch using EIA-based utility lookup from the cached parquet
+uv run tariff-fetch ni rateacuity eia-id 123 --tariff "small commercial"
+```
+
+### Important fuzzy-matching behavior
+
+- Matching is performed against the live strings that RateAcuity returns in the browser session.
+- Matching is case-insensitive because both sides are compared as lowercase.
+- The command does not stop to ask "did you mean X?" in non-interactive mode. It chooses the best match and proceeds.
+- If your query is too broad, the "best" result may still be the wrong tariff.
+
+In practice, use queries that are distinctive enough to narrow the target:
+
+- Better: `"residential service"`
+- Riskier: `"residential"`
+- Better: `"firm gas service"`
+- Riskier: `"service"`
+
+When you are unsure what RateAcuity calls a tariff, start with the interactive flow once, note the exact names shown in
+the dropdowns, and then use those strings in the non-interactive commands.
+
+### RateAcuity command summary
+
+- `tariff-fetch ni rateacuity fuzzy`: electric raw fetch by state plus fuzzy utility/tariff matching
+- `tariff-fetch ni rateacuity eia-id`: electric raw fetch by utility EIA id, then fuzzy tariff matching
+- `tariff-fetch gas ni`: gas raw fetch by state plus fuzzy utility/tariff matching
+- `tariff-fetch gas urdb ni`: gas URDB conversion by state plus fuzzy utility/tariff matching
+
+For `tariff-fetch gas urdb ni`, you must also provide the conversion year and any URDB metadata you want to override:
+
+```bash
+uv run tariff-fetch gas urdb ni ny "con ed gas" \
+  --year 2025 \
+  --tariff "firm gas service" \
+  --label ceg \
+  --sector Commercial \
+  --servicetype Delivery \
+  --apply-percentages
+```
 
 ## Show Arcadia Properties
 
