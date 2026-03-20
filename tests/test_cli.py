@@ -246,6 +246,44 @@ def test_gas_urdb_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     }
 
 
+def test_gas_ni_command_runs_end_to_end(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "gas_rateacuity.json"
+    captured: dict[str, object] = {}
+    fake_results = [{"schedule": "Firm Gas Service", "sections": []}]
+
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_fetch_rateacuity_gas_tariffs(*, state: str, utility_query: str, tariff_queries: list[str]):
+        captured["state"] = state
+        captured["utility_query"] = utility_query
+        captured["tariff_queries"] = tariff_queries
+        return "Consolidated Edison Gas", fake_results
+
+    monkeypatch.setattr(cli, "fetch_rateacuity_gas_tariffs", fake_fetch_rateacuity_gas_tariffs)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "gas",
+            "ni",
+            "ny",
+            "con ed gas",
+            "--tariff",
+            "firm gas service",
+            "--output",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "state": "ny",
+        "utility_query": "con ed gas",
+        "tariff_queries": ["firm gas service"],
+    }
+    assert json.loads(output_path.read_text()) == fake_results
+
+
 def test_ni_arcadia_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     output_path = tmp_path / "arcadia.json"
     captured: dict[str, object] = {}

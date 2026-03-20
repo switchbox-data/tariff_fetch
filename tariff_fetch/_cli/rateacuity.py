@@ -241,3 +241,53 @@ def fetch_rateacuity_tariffs(
                     scraping_state = scraping_state.back_to_selections()
 
     return selected_utility, results
+
+
+def fetch_rateacuity_gas_tariffs(
+    *, state: str, utility_query: str, tariff_queries: Sequence[str]
+) -> tuple[str, list[Tariff]]:
+    _ = load_dotenv()
+    username = os.getenv("RATEACUITY_USERNAME")
+    password = os.getenv("RATEACUITY_PASSWORD")
+    if not username:
+        raise ValueError("RATEACUITY_USERNAME environment variable is not set")
+    if not password:
+        raise ValueError("RATEACUITY_PASSWORD environment variable is not set")
+
+    selected_utility = ""
+    results: list[Tariff] = []
+
+    for attempt in tenacity.Retrying(
+        stop=tenacity.stop_after_attempt(3), retry=tenacity.retry_if_exception_type(WebDriverException)
+    ):
+        with attempt, create_context() as context:
+            with console.status("Fetching list of utilities..."):
+                scraping_state = (
+                    LoginState(context).login(username, password).gas().benchmark_all().select_state(state.upper())
+                )
+                utilities = [_ for _ in scraping_state.get_utilities() if _]
+
+            if not utilities:
+                raise RuntimeError(f"Something's wrong: rateacuity shows no utilities for this state ({state})")
+
+            selected_utility = _match_rateacuity_choice(query=utility_query, choices=utilities, category="Utility")
+
+            with console.status("Fetching list of tariffs..."):
+                scraping_state = scraping_state.select_utility(selected_utility)
+                tariffs = [_ for _ in scraping_state.get_schedules() if _]
+
+            selected_tariffs = _match_rateacuity_choices(
+                queries=tariff_queries,
+                choices=tariffs,
+                category="Tariff",
+            )
+
+            with console.status("Fetching tariffs..."):
+                for tariff in selected_tariffs:
+                    console.log(f"Fetching {tariff}")
+                    scraping_state = scraping_state.select_schedule(tariff)
+                    sections = scraping_state.as_sections()
+                    results.append({"schedule": tariff, "sections": sections})
+                    scraping_state = scraping_state.back_to_selections()
+
+    return selected_utility, results
