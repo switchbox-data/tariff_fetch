@@ -371,6 +371,7 @@ def _configure_logging(
     file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
     logging.basicConfig(level=log_level, handlers=[rich_handler, file_handler], force=True)
+    _configure_noisy_loggers(log_level)
     return path
 
 
@@ -388,6 +389,19 @@ def _log_level_to_int(value: LogLevel) -> int:
     if not isinstance(level, int):
         raise typer.BadParameter(f"Unsupported log level: {value.value}")
     return level
+
+
+def _configure_noisy_loggers(log_level: int) -> None:
+    # Browser automation pulls in urllib3/http chatter and asyncio selector noise.
+    noisy_logger_names = (
+        "selenium",
+        "urllib3",
+        "urllib3.connectionpool",
+        "asyncio",
+    )
+    noisy_level = max(log_level, logging.INFO)
+    for logger_name in noisy_logger_names:
+        logging.getLogger(logger_name).setLevel(noisy_level)
 
 
 def prompt_provider() -> Provider:
