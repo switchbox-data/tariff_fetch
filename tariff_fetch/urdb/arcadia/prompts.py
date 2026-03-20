@@ -48,9 +48,7 @@ def prompt_charge_classes() -> set[RateChargeClass] | None:
             )
             for choice in choices
         ],
-    ).ask()
-    if result_raw is None:
-        return None
+    ).ask_or_exit()
     return cast(set[RateChargeClass], set(result_raw))
 
 
