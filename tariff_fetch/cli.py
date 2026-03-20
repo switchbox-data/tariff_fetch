@@ -322,6 +322,11 @@ def clear_cache():
     console.print(f"Cleared cached utilities parquet at [blue]{UTILITY_CACHE_PATH}[/]")
 
 
+@cache_app.command("location", help="Show the cached EIA utility parquet file path.")
+def cache_location():
+    console.print(f"Utility parquet cache path: [blue]{UTILITY_CACHE_PATH}[/]")
+
+
 def main_cli():
     app()
 

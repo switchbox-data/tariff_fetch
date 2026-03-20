@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import Callable, Generic, Protocol, TypeVar, cast, overload
+from typing import Generic, Protocol, TypeVar, cast, overload
 
 import questionary
 import typer
