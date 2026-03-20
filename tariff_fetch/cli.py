@@ -1,11 +1,12 @@
 import json
 import logging
 import shutil
+from collections.abc import Callable
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Annotated, BinaryIO, cast, get_args
+from typing import Annotated, BinaryIO, TypeVar, cast, get_args
 from urllib.request import urlopen
 
 import polars as pl
@@ -71,6 +72,7 @@ UTILITY_CACHE_DIR = Path(user_cache_dir("tariff_fetch"))
 UTILITY_CACHE_PATH = UTILITY_CACHE_DIR / "core_eia861__yearly_sales.parquet"
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
 ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
+_T = TypeVar("_T")
 
 
 class LogLevel(str, Enum):
@@ -170,7 +172,7 @@ def main_urdb(
         return
     state_ = state or prompt_state().value
     output_folder_ = Path(output_folder)
-    log_path = _configure_logging(
+    _ = _configure_command_logging(
         "tariff_fetch_urdb",
         log_level=_log_level_to_int(log_level),
         log_dir=log_dir or (output_folder_ / "logs"),
@@ -179,21 +181,16 @@ def main_urdb(
     utility = prompt_utility(state_)
     year = prompt_year() if year is None else year
 
-    console.print(f"Logging to [blue]{log_path}[/]")
     console.print("Processing [blue]Genability[/]")
-    try:
-        process_genability_urdb(
+    _run_cli_command(
+        lambda: process_genability_urdb(
             utility=utility,
             output_folder=output_folder_,
             year=year,
             interactive_errors=not fail_fast,
             properties=_parse_property_assignments(properties),
         )
-    except typer.Exit as e:
-        _handle_expected_exit(e)
-    except Exception as e:
-        logging.getLogger(__name__).exception(e)
-        raise typer.Exit(1) from e
+    )
 
 
 @urdb_app.command("ni", help="Convert a specific Arcadia master tariff directly to URDB JSON.")
@@ -236,13 +233,12 @@ def urdb_direct(
     if output.exists() and not force:
         console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
         raise typer.Exit(1)
-    log_path = _configure_logging(
+    _ = _configure_command_logging(
         "tariff_fetch_urdb",
         log_level=_log_level_to_int(log_level),
         log_dir=log_dir or (output.parent / "logs"),
         log_file=log_file,
     )
-    console.print(f"Logging to [blue]{log_path}[/]")
     scenario_charge_classes = _parse_charge_classes(charge_classes)
     scenario = Scenario(
         master_tariff_id=master_tariff_id,
@@ -252,15 +248,8 @@ def urdb_direct(
         properties=_parse_property_assignments(properties),
     )
     api = ArcadiaSignalAPI()
-    try:
-        result = build_urdb(api, scenario, interactive_errors=not fail_fast)
-    except typer.Exit as e:
-        _handle_expected_exit(e)
-    except Exception as e:
-        logging.getLogger(__name__).exception(e)
-        raise typer.Exit(code=1) from e
-    else:
-        _ = output.write_text(json.dumps(result, indent=2))
+    result = _run_cli_command(lambda: build_urdb(api, scenario, interactive_errors=not fail_fast))
+    _ = output.write_text(json.dumps(result, indent=2))
 
 
 @gas_app.callback()
@@ -283,25 +272,13 @@ def main_gas(
 
     state_ = (state or prompt_state()).value
     output_folder_ = Path(output_folder)
-    log_path = _configure_logging(
+    _ = _configure_command_logging(
         "tariff_fetch_gas",
         log_level=_log_level_to_int(log_level),
         log_dir=log_dir or (output_folder_ / "logs"),
         log_file=log_file,
     )
-    console.print(f"Logging to [blue]{log_path}[/]")
-    try:
-        process_rateacuity_gas(output_folder_, state_)
-    except typer.Exit as e:
-        _handle_expected_exit(e)
-    except AuthorizationError:
-        console.print("Authorization failed")
-        console.print(
-            "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
-        )
-    except Exception as e:
-        logging.getLogger(__name__).exception(e)
-        raise typer.Exit(1) from e
+    _run_rateacuity_command(lambda: process_rateacuity_gas(output_folder_, state_))
 
 
 @gas_app.command("urdb", help="Convert RateAcuity gas tariffs to URDB format.")
@@ -322,25 +299,13 @@ def main_gas_urdb(
     state_ = (state or prompt_state()).value
     output_folder_ = Path(output_folder)
     year_ = prompt_year() if year is None else year
-    log_path = _configure_logging(
+    _ = _configure_command_logging(
         "tariff_fetch_gas_urdb",
         log_level=_log_level_to_int(log_level),
         log_dir=log_dir or (output_folder_ / "logs"),
         log_file=log_file,
     )
-    console.print(f"Logging to [blue]{log_path}[/]")
-    try:
-        process_rateacuity_gas_urdb(output_folder_, state_, year_)
-    except typer.Exit as e:
-        _handle_expected_exit(e)
-    except AuthorizationError:
-        console.print("Authorization failed")
-        console.print(
-            "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
-        )
-    except Exception as e:
-        logging.getLogger(__name__).exception(e)
-        raise typer.Exit(1) from e
+    _run_rateacuity_command(lambda: process_rateacuity_gas_urdb(output_folder_, state_, year_))
 
 
 @ni_app.command("arcadia", help="Fetch a specific Arcadia master tariff as raw JSON.")
@@ -372,28 +337,21 @@ def ni_arcadia(
         console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
         raise typer.Exit(1)
 
-    log_path = _configure_logging(
+    _ = _configure_command_logging(
         "tariff_fetch_ni_arcadia",
         log_level=_log_level_to_int(log_level),
         log_dir=log_dir or (output.parent / "logs"),
         log_file=log_file,
     )
-    console.print(f"Logging to [blue]{log_path}[/]")
-
-    try:
-        results = _fetch_arcadia_tariffs(
+    results = _run_cli_command(
+        lambda: _fetch_arcadia_tariffs(
             master_tariff_id=master_tariff_id,
             effective_on=effective_on,
             populate_rates=True,
         )
-    except typer.Exit as e:
-        _handle_expected_exit(e)
-    except Exception as e:
-        logging.getLogger(__name__).exception(e)
-        raise typer.Exit(code=1) from e
-    else:
-        _ = output.write_bytes(TypeAdapter(list[tariff.TariffExtended]).dump_json(results, indent=2))
-        console.print(f"Wrote [blue]{len(results)}[/] records to {output}")
+    )
+    _ = output.write_bytes(TypeAdapter(list[tariff.TariffExtended]).dump_json(results, indent=2))
+    console.print(f"Wrote [blue]{len(results)}[/] records to {output}")
 
 
 @app.command("show-properties", help="Show Arcadia tariff properties for a master tariff.")
@@ -411,27 +369,20 @@ def show_properties(
 ):
     _ = load_dotenv()
     effective_on = _parse_effective_date(effective_date) or date.today()
-    log_path = _configure_logging(
+    _ = _configure_command_logging(
         "tariff_fetch_show_properties_arcadia",
         log_level=_log_level_to_int(log_level),
         log_dir=log_dir or (Path("./outputs") / "logs"),
         log_file=log_file,
     )
-    console.print(f"Logging to [blue]{log_path}[/]")
-
-    try:
-        tariffs = _fetch_arcadia_tariffs(
+    tariffs = _run_cli_command(
+        lambda: _fetch_arcadia_tariffs(
             master_tariff_id=master_tariff_id,
             effective_on=effective_on,
             populate_rates=True,
         )
-    except typer.Exit as e:
-        _handle_expected_exit(e)
-    except Exception as e:
-        logging.getLogger(__name__).exception(e)
-        raise typer.Exit(code=1) from e
-    else:
-        _print_arcadia_properties(tariffs)
+    )
+    _print_arcadia_properties(tariffs)
 
 
 @cache_app.command("clear", help="Delete the cached EIA utility parquet file.")
@@ -465,42 +416,25 @@ def _run_raw(
     state_ = state or prompt_state().value
     provider = provider or prompt_provider()
     output_folder_ = Path(output_folder)
-    log_path = _configure_logging(
+    _ = _configure_command_logging(
         "tariff_fetch",
         log_level=log_level,
         log_dir=log_dir or (output_folder_ / "logs"),
         log_file=log_file,
     )
-    console.print(f"Logging to [blue]{log_path}[/]")
     utility = prompt_utility(state_)
 
     match provider:
         case Provider.GENABILITY:
             console.print("Processing [blue]Genability[/]")
-            try:
-                process_genability(utility=utility, output_folder=output_folder_, effective_on=effective_date)
-            except typer.Exit as e:
-                _handle_expected_exit(e)
-            except Exception as e:
-                logging.getLogger(__name__).exception(e)
-                raise typer.Exit(1) from e
+            _run_cli_command(
+                lambda: process_genability(utility=utility, output_folder=output_folder_, effective_on=effective_date)
+            )
         case Provider.OPENEI:
             console.print("Processing [blue]OpenEI[/]")
-            try:
-                process_openei(utility, output_folder_, effective_on=effective_date)
-            except typer.Exit as e:
-                _handle_expected_exit(e)
-            except Exception as e:
-                logging.getLogger(__name__).exception(e)
-                raise typer.Exit(1) from e
+            _run_cli_command(lambda: process_openei(utility, output_folder_, effective_on=effective_date))
         case Provider.RATEACUITY:
-            try:
-                process_rateacuity(output_folder_, state_, utility)
-            except typer.Exit as e:
-                _handle_expected_exit(e)
-            except Exception as e:
-                logging.getLogger(__name__).exception(e)
-                raise typer.Exit(1) from e
+            _run_rateacuity_command(lambda: process_rateacuity(output_folder_, state_, utility))
 
 
 def _configure_logging(
@@ -533,6 +467,50 @@ def _configure_logging(
     logging.basicConfig(level=log_level, handlers=[rich_handler, file_handler], force=True)
     _configure_noisy_loggers(log_level)
     return path
+
+
+def _configure_command_logging(
+    suffix: str,
+    *,
+    log_level: int,
+    log_dir: Path | None = None,
+    log_file: Path | None = None,
+) -> Path:
+    log_path = _configure_logging(suffix, log_level=log_level, log_dir=log_dir, log_file=log_file)
+    console.print(f"Logging to [blue]{log_path}[/]")
+    return log_path
+
+
+def _run_cli_command(command: Callable[[], _T]) -> _T:
+    try:
+        return command()
+    except typer.Exit as e:
+        _handle_expected_exit(e)
+        raise AssertionError("unreachable") from None
+    except Exception as e:
+        logging.getLogger(__name__).exception(e)
+        raise typer.Exit(1) from e
+
+
+def _run_rateacuity_command(command: Callable[[], _T]) -> _T:
+    try:
+        return command()
+    except typer.Exit as e:
+        _handle_expected_exit(e)
+        raise AssertionError("unreachable") from None
+    except AuthorizationError:
+        _print_authorization_failed()
+        raise typer.Exit(1) from None
+    except Exception as e:
+        logging.getLogger(__name__).exception(e)
+        raise typer.Exit(1) from e
+
+
+def _print_authorization_failed() -> None:
+    console.print("Authorization failed")
+    console.print(
+        "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
+    )
 
 
 def _parse_effective_date(value: str | None) -> date | None:
