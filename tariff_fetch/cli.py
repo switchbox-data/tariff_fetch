@@ -7,12 +7,13 @@ from datetime import UTC, date, datetime
 from enum import Enum
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Annotated, BinaryIO, Literal, TypeVar, cast, get_args
+from typing import Annotated, BinaryIO, Literal, NamedTuple, TypeVar, cast, get_args
 from urllib.request import urlopen
 
 import polars as pl
 import typer
 from dotenv import load_dotenv
+from pathvalidate import sanitize_filename
 from platformdirs import user_cache_dir
 from pydantic import TypeAdapter
 from rich.logging import RichHandler
@@ -21,7 +22,7 @@ from rich.table import Table
 from tariff_fetch._cli.arcadia_urdb import process_genability as process_genability_urdb
 from tariff_fetch._cli.genability import process_genability
 from tariff_fetch._cli.openei import process_openei
-from tariff_fetch._cli.rateacuity import process_rateacuity, process_rateacuity_gas
+from tariff_fetch._cli.rateacuity import fetch_rateacuity_tariffs, process_rateacuity, process_rateacuity_gas
 from tariff_fetch._cli.rateacuity_gas_urdb import process_rateacuity_gas_urdb
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.arcadia.schema import tariff
@@ -58,6 +59,16 @@ ni_app = typer.Typer(
     no_args_is_help=True,
 )
 app.add_typer(ni_app, name="ni", help="Fetch provider data directly by identifier.")
+
+rateacuity_ni_app = typer.Typer(
+    invoke_without_command=False,
+    no_args_is_help=True,
+)
+ni_app.add_typer(
+    rateacuity_ni_app,
+    name="rateacuity",
+    help="Fetch RateAcuity tariffs in non-interactive modes.",
+)
 
 cache_app = typer.Typer(
     invoke_without_command=False,
@@ -437,6 +448,76 @@ def ni_openei(
     console.print(f"Wrote [blue]{len(results)}[/] items to {output}")
 
 
+@rateacuity_ni_app.command("fuzzy", help="Fetch RateAcuity tariffs by fuzzy-matched state, utility, and tariff names.")
+def ni_rateacuity_fuzzy(
+    state: Annotated[StateCode, typer.Argument(help="Two-letter state abbreviation")],
+    utility: Annotated[str, typer.Argument(help="Utility name query to fuzzy-match against RateAcuity choices")],
+    tariffs: Annotated[
+        list[str] | None,
+        typer.Option("--tariff", help="Tariff name query to fuzzy-match; repeat to include multiple tariffs"),
+    ] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the fetched tariff JSON")] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Overwrite the output file if it already exists"),
+    ] = False,
+):
+    _run_rateacuity_ni(
+        state=state.value,
+        utility_query=utility,
+        tariffs=tariffs,
+        output=output,
+        log_level=log_level,
+        no_input=no_input,
+        log_dir=log_dir,
+        log_file=log_file,
+        force=force,
+    )
+
+
+@rateacuity_ni_app.command("eia-id", help="Fetch RateAcuity tariffs by utility EIA id via the cached parquet.")
+def ni_rateacuity_eia_id(
+    eia_id: Annotated[int, typer.Argument(help="Utility EIA id to resolve via the cached utilities parquet")],
+    tariffs: Annotated[
+        list[str] | None,
+        typer.Option("--tariff", help="Tariff name query to fuzzy-match; repeat to include multiple tariffs"),
+    ] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the fetched tariff JSON")] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Overwrite the output file if it already exists"),
+    ] = False,
+):
+    utility_record = _get_utility_by_eia_id(eia_id)
+    _run_rateacuity_ni(
+        state=utility_record.state.lower(),
+        utility_query=utility_record.name,
+        tariffs=tariffs,
+        output=output,
+        log_level=log_level,
+        no_input=no_input,
+        log_dir=log_dir,
+        log_file=log_file,
+        force=force,
+    )
+
+
 @app.command("show-properties", help="Show Arcadia tariff properties for a master tariff.")
 def show_properties(
     master_tariff_id: Annotated[int, typer.Argument(help="Arcadia master tariff id to inspect")],
@@ -646,6 +727,12 @@ def prompt_provider() -> Provider:
     ).ask_or_exit()
 
 
+class _UtilityLookup(NamedTuple):
+    eia_id: int
+    name: str
+    state: str
+
+
 def prompt_utility(state: str) -> Utility:
     with console.status("Fetching utilities..."):
         yearly_sales_df = (
@@ -737,6 +824,30 @@ def prompt_utility(state: str) -> Utility:
     return result
 
 
+def _get_utility_by_eia_id(eia_id: int) -> _UtilityLookup:
+    with console.status("Resolving utility from cached parquet..."):
+        rows = (
+            pl.read_parquet(_get_cached_utility_sales_parquet())  # pyright: ignore[reportUnknownMemberType]
+            .filter(pl.col("utility_id_eia") == eia_id)
+            .filter(pl.col("report_date") == pl.col("report_date").max().over("utility_id_eia"))  # pyright: ignore[reportUnknownMemberType]
+            .select("utility_id_eia", "utility_name_eia", "state")
+            .unique()
+            .iter_rows(named=True)
+        )
+        row = next(rows, None)
+
+    if row is None:
+        raise typer.BadParameter(
+            f"No utility with EIA ID {eia_id} was found in the cached parquet.", param_hint="--eia-id"
+        )
+
+    return _UtilityLookup(
+        eia_id=cast(int, row["utility_id_eia"]),
+        name=cast(str, row["utility_name_eia"]),
+        state=cast(str, row["state"]),
+    )
+
+
 def prompt_year() -> int:
     result = q.text("Enter year", default=str(date.today().year - 1), validate=_is_valid_year).ask_or_exit()
     return int(result)
@@ -764,6 +875,47 @@ def _parse_charge_classes(charge_classes: list[str] | None) -> set[RateChargeCla
         console.print(f"Allowed values: {allowed}")
         raise typer.Exit(code=1)
     return {cast(RateChargeClass, charge_class) for charge_class in normalized}
+
+
+def _run_rateacuity_ni(
+    *,
+    state: str,
+    utility_query: str,
+    tariffs: list[str] | None,
+    output: Path | None,
+    log_level: LogLevel,
+    no_input: bool,
+    log_dir: Path | None,
+    log_file: Path | None,
+    force: bool,
+) -> None:
+    _configure_interaction(no_input)
+    if not tariffs:
+        raise typer.BadParameter("Pass at least one --tariff value.", param_hint="--tariff")
+    if output is None:
+        output = Path("./outputs")
+        output.mkdir(parents=True, exist_ok=True)
+    elif output.exists() and output.is_file() and not force:
+        console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
+        raise typer.Exit(1)
+
+    _ = _configure_command_logging(
+        "tariff_fetch_ni_rateacuity",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or ((output if output.is_dir() else output.parent) / "logs"),
+        log_file=log_file,
+    )
+    selected_utility, results = _run_rateacuity_command(
+        lambda: fetch_rateacuity_tariffs(state=state, utility_query=utility_query, tariff_queries=tariffs)
+    )
+    if output.is_dir():
+        output = output / f"{sanitize_filename(f'rateacuity_{selected_utility}')}.json"
+    if output.exists() and not force:
+        console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
+        raise typer.Exit(1)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    _ = output.write_text(json.dumps(results, indent=2))
+    console.print(f"Wrote [blue]{len(results)}[/] records to {output}")
 
 
 def _parse_property_assignments(values: list[str] | None) -> dict[str, ScenarioPropertyValue]:

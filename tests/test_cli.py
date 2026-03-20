@@ -366,6 +366,90 @@ def test_ni_openei_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     assert json.loads(output_path.read_text()) == {"items": fake_results}
 
 
+def test_ni_rateacuity_command_runs_end_to_end(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "rateacuity.json"
+    captured: dict[str, object] = {}
+    fake_results = [{"schedule": "Residential Service", "sections": []}]
+
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_fetch_rateacuity_tariffs(*, state: str, utility_query: str, tariff_queries: list[str]):
+        captured["state"] = state
+        captured["utility_query"] = utility_query
+        captured["tariff_queries"] = tariff_queries
+        return "Consolidated Edison Company of New York", fake_results
+
+    monkeypatch.setattr(cli, "fetch_rateacuity_tariffs", fake_fetch_rateacuity_tariffs)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "ni",
+            "rateacuity",
+            "fuzzy",
+            "ny",
+            "con ed",
+            "--tariff",
+            "residential service",
+            "--tariff",
+            "time of use",
+            "--output",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "state": "ny",
+        "utility_query": "con ed",
+        "tariff_queries": ["residential service", "time of use"],
+    }
+    assert json.loads(output_path.read_text()) == fake_results
+
+
+def test_ni_rateacuity_command_supports_eia_id_lookup(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "rateacuity.json"
+    captured: dict[str, object] = {}
+    fake_results = [{"schedule": "Residential Service", "sections": []}]
+
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        cli,
+        "_get_utility_by_eia_id",
+        lambda eia_id: cli._UtilityLookup(eia_id=eia_id, name="Consolidated Edison", state="NY"),
+    )
+
+    def fake_fetch_rateacuity_tariffs(*, state: str, utility_query: str, tariff_queries: list[str]):
+        captured["state"] = state
+        captured["utility_query"] = utility_query
+        captured["tariff_queries"] = tariff_queries
+        return "Consolidated Edison Company of New York", fake_results
+
+    monkeypatch.setattr(cli, "fetch_rateacuity_tariffs", fake_fetch_rateacuity_tariffs)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "ni",
+            "rateacuity",
+            "eia-id",
+            "123",
+            "--tariff",
+            "residential service",
+            "--output",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "state": "ny",
+        "utility_query": "Consolidated Edison",
+        "tariff_queries": ["residential service"],
+    }
+    assert json.loads(output_path.read_text()) == fake_results
+
+
 def test_collect_arcadia_property_rows_merges_choices_across_tariffs():
     tariffs = [
         {
