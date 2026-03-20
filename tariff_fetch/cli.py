@@ -40,19 +40,19 @@ urdb_app = typer.Typer(
     invoke_without_command=True,
     no_args_is_help=False,
 )
-app.add_typer(urdb_app, name="urdb")
+app.add_typer(urdb_app, name="urdb", help="Convert Arcadia tariffs to URDB JSON.")
 
 gas_app = typer.Typer(
     invoke_without_command=True,
     no_args_is_help=False,
 )
-app.add_typer(gas_app, name="gas")
+app.add_typer(gas_app, name="gas", help="Fetch and convert RateAcuity gas tariffs.")
 
 cache_app = typer.Typer(
     invoke_without_command=False,
     no_args_is_help=True,
 )
-app.add_typer(cache_app, name="cache")
+app.add_typer(cache_app, name="cache", help="Manage local CLI caches.")
 
 ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
 CORE_EIA861_YEARLY_SALES_HTTPS = (
@@ -105,7 +105,7 @@ def main_default(
     )
 
 
-@app.command("raw")
+@app.command("raw", help="Fetch raw tariff data from the selected provider.")
 def main_raw(
     state: Annotated[
         StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
@@ -180,7 +180,7 @@ def main_urdb(
         raise typer.Exit(1) from e
 
 
-@urdb_app.command("ni")
+@urdb_app.command("ni", help="Convert a specific Arcadia master tariff directly to URDB JSON.")
 def urdb_direct(
     master_tariff_id: Annotated[int, typer.Argument(help="Arcadia master tariff id to convert")],
     year: Annotated[int, typer.Argument(help="Calendar year to convert")],
@@ -278,7 +278,7 @@ def main_gas(
         )
 
 
-@gas_app.command("urdb")
+@gas_app.command("urdb", help="Convert RateAcuity gas tariffs to URDB format.")
 def main_gas_urdb(
     state: Annotated[
         StateCode | None, typer.Option("--state", "-s", help="Two-letter state abbreviation", case_sensitive=False)
@@ -312,7 +312,7 @@ def main_gas_urdb(
         )
 
 
-@cache_app.command("clear")
+@cache_app.command("clear", help="Delete the cached EIA utility parquet file.")
 def clear_cache():
     if not UTILITY_CACHE_PATH.exists():
         console.print(f"No cached utilities parquet found at [blue]{UTILITY_CACHE_PATH}[/]")
