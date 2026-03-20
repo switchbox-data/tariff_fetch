@@ -37,6 +37,8 @@ Run `uv run tariff-fetch` (or `python -m tariff_fetch.cli` / `just cli`) to laun
 3. Select a utility from the structured EIA list. The CLI fetches the latest CORE_EIA861 data to help you pick based on name, entity type, sales, revenue, and customer counts.
 4. `tariff_fetch` runs the selected workflow (`process_genability`, `process_openei`, or `process_rateacuity`) and writes exports to the chosen output folder. Authentication failures print guidance about the relevant environment variables.
 
+The utility picker caches the CORE_EIA861 parquet for 1 hour in the platform-specific user cache directory, so repeated runs usually reuse the local copy instead of downloading it again.
+
 Example:
 
 ```bash
@@ -64,6 +66,20 @@ Example:
 
 ```bash
 uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
+```
+
+## Cache CLI (`tariff-fetch cache`)
+
+Use this command to clear the cached utility parquet used by the interactive utility picker.
+
+### Subcommands
+
+- `clear`: remove the cached CORE_EIA861 parquet file.
+
+Example:
+
+```bash
+uv run tariff-fetch cache clear
 ```
 
 ## Gas CLI (`tariff-fetch gas`)

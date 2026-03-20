@@ -103,6 +103,13 @@ Options:
 
 Omitted options will trigger interactive prompts.
 
+When the CLI reaches the utility selection step, it caches the EIA utility parquet for 1 hour in the platform-specific
+user cache directory so repeated runs do not re-download it every time. You can clear that cache with:
+
+```bash
+uv run tariff-fetch cache clear
+```
+
 ### Examples
 
 ```bash
@@ -134,3 +141,11 @@ Useful options:
 - `--apply-percentages` / `--no-apply-percentages`
 - `--charge-class`: repeat to include multiple charge classes
 - `--force` / `-f`: overwrite an existing output file
+
+## Cache Management
+
+Clear the cached utility parquet used by the interactive utility picker:
+
+```bash
+uv run tariff-fetch cache clear
+```

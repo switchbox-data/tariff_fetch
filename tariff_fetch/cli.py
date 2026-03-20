@@ -1,13 +1,17 @@
 import json
 import logging
+import shutil
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Annotated, cast, get_args
+from tempfile import NamedTemporaryFile
+from typing import Annotated, BinaryIO, cast, get_args
+from urllib.request import urlopen
 
 import polars as pl
 import typer
 from dotenv import load_dotenv
+from platformdirs import user_cache_dir
 from rich.logging import RichHandler
 from rich.prompt import Prompt
 
@@ -44,10 +48,19 @@ gas_app = typer.Typer(
 )
 app.add_typer(gas_app, name="gas")
 
+cache_app = typer.Typer(
+    invoke_without_command=False,
+    no_args_is_help=True,
+)
+app.add_typer(cache_app, name="cache")
+
 ENTITY_TYPES_SORTORDER = ["Investor Owned", "Cooperative", "Municipal"]
 CORE_EIA861_YEARLY_SALES_HTTPS = (
     "https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/nightly/core_eia861__yearly_sales.parquet"
 )
+UTILITY_CACHE_TTL_SECONDS = 60 * 60
+UTILITY_CACHE_DIR = Path(user_cache_dir("tariff_fetch"))
+UTILITY_CACHE_PATH = UTILITY_CACHE_DIR / "core_eia861__yearly_sales.parquet"
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
 ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
 
@@ -299,6 +312,16 @@ def main_gas_urdb(
         )
 
 
+@cache_app.command("clear")
+def clear_cache():
+    if not UTILITY_CACHE_PATH.exists():
+        console.print(f"No cached utilities parquet found at [blue]{UTILITY_CACHE_PATH}[/]")
+        return
+
+    UTILITY_CACHE_PATH.unlink()
+    console.print(f"Cleared cached utilities parquet at [blue]{UTILITY_CACHE_PATH}[/]")
+
+
 def main_cli():
     app()
 
@@ -430,7 +453,7 @@ def prompt_provider() -> Provider:
 def prompt_utility(state: str) -> Utility:
     with console.status("Fetching utilities..."):
         yearly_sales_df = (
-            pl.read_parquet(CORE_EIA861_YEARLY_SALES_HTTPS)  # pyright: ignore[reportUnknownMemberType]
+            pl.read_parquet(_get_cached_utility_sales_parquet())  # pyright: ignore[reportUnknownMemberType]
             .filter(pl.col("state") == state.upper())
             .filter(pl.col("report_date") == pl.col("report_date").max().over("utility_id_eia"))  # pyright: ignore[reportUnknownMemberType]
             .filter(pl.col("entity_type").is_in(ENTITY_TYPES_SORTORDER))
@@ -538,6 +561,48 @@ def _parse_charge_classes(charge_classes: list[str] | None) -> set[RateChargeCla
         console.print(f"Allowed values: {allowed}")
         raise typer.Exit(code=1)
     return {cast(RateChargeClass, charge_class) for charge_class in normalized}
+
+
+def _get_cached_utility_sales_parquet(now: datetime | None = None) -> Path:
+    logger = logging.getLogger(__name__)
+    current_time = now or datetime.now()
+    UTILITY_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+    if _is_fresh_cache(UTILITY_CACHE_PATH, current_time):
+        logger.debug("Using cached utility parquet at %s", UTILITY_CACHE_PATH)
+        return UTILITY_CACHE_PATH
+
+    try:
+        _download_utility_sales_parquet(UTILITY_CACHE_PATH)
+    except Exception:
+        if UTILITY_CACHE_PATH.exists():
+            logger.warning(
+                "Failed to refresh utility parquet cache; falling back to stale cache at %s",
+                UTILITY_CACHE_PATH,
+                exc_info=True,
+            )
+            return UTILITY_CACHE_PATH
+        raise
+
+    logger.debug("Refreshed utility parquet cache at %s", UTILITY_CACHE_PATH)
+    return UTILITY_CACHE_PATH
+
+
+def _is_fresh_cache(path: Path, now: datetime) -> bool:
+    if not path.exists():
+        return False
+    age_seconds = now.timestamp() - path.stat().st_mtime
+    return age_seconds < UTILITY_CACHE_TTL_SECONDS
+
+
+def _download_utility_sales_parquet(destination: Path) -> None:
+    with (
+        cast(BinaryIO, urlopen(CORE_EIA861_YEARLY_SALES_HTTPS)) as response,
+        NamedTemporaryFile(dir=destination.parent, delete=False) as temporary_file,
+    ):
+        shutil.copyfileobj(response, temporary_file)
+        temp_path = Path(temporary_file.name)
+    _ = temp_path.replace(destination)
 
 
 def _is_valid_year(value: str) -> bool:
