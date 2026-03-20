@@ -12,6 +12,7 @@ import polars as pl
 import typer
 from dotenv import load_dotenv
 from platformdirs import user_cache_dir
+from pydantic import TypeAdapter
 from rich.logging import RichHandler
 from rich.prompt import Prompt
 
@@ -21,6 +22,7 @@ from tariff_fetch._cli.openei import process_openei
 from tariff_fetch._cli.rateacuity import process_rateacuity, process_rateacuity_gas
 from tariff_fetch._cli.rateacuity_gas_urdb import process_rateacuity_gas_urdb
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
+from tariff_fetch.arcadia.schema import tariff
 from tariff_fetch.arcadia.schema.common import RateChargeClass
 from tariff_fetch.rateacuity.base import AuthorizationError
 from tariff_fetch.urdb.arcadia.build import build_urdb
@@ -47,6 +49,12 @@ gas_app = typer.Typer(
     no_args_is_help=False,
 )
 app.add_typer(gas_app, name="gas", help="Fetch and convert RateAcuity gas tariffs.")
+
+ni_app = typer.Typer(
+    invoke_without_command=False,
+    no_args_is_help=True,
+)
+app.add_typer(ni_app, name="ni", help="Fetch provider data directly by identifier.")
 
 cache_app = typer.Typer(
     invoke_without_command=False,
@@ -310,6 +318,64 @@ def main_gas_urdb(
         console.print(
             "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
         )
+
+
+@ni_app.command("arcadia", help="Fetch a specific Arcadia master tariff as raw JSON.")
+def ni_arcadia(
+    master_tariff_id: Annotated[int, typer.Argument(help="Arcadia master tariff id to fetch")],
+    effective_date: Annotated[
+        str | None,
+        typer.Argument(help="Effective date in YYYY-MM-DD format; defaults to today if omitted"),
+    ] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the fetched tariff JSON")] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Overwrite the output file if it already exists"),
+    ] = False,
+):
+    _ = load_dotenv()
+    effective_on = _parse_effective_date(effective_date) or date.today()
+    if output is None:
+        output = Path("./outputs")
+        output.mkdir(parents=True, exist_ok=True)
+    if output.is_dir():
+        output = output / f"arcadia_{master_tariff_id}_{effective_on.isoformat()}.json"
+    if output.exists() and not force:
+        console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
+        raise typer.Exit(1)
+
+    log_path = _configure_logging(
+        "tariff_fetch_ni_arcadia",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or (output.parent / "logs"),
+        log_file=log_file,
+    )
+    console.print(f"Logging to [blue]{log_path}[/]")
+
+    try:
+        api = ArcadiaSignalAPI()
+        results = list(
+            api.tariffs.iter_pages(
+                fields="ext",
+                master_tariff_id=master_tariff_id,
+                effective_on=effective_on,
+                populate_properties=True,
+                populate_rates=True,
+            )
+        )
+    except typer.Exit as e:
+        _handle_expected_exit(e)
+    except Exception as e:
+        logging.getLogger(__name__).exception(e)
+        raise typer.Exit(code=1) from e
+    else:
+        _ = output.write_bytes(TypeAdapter(list[tariff.TariffExtended]).dump_json(results, indent=2))
+        console.print(f"Wrote [blue]{len(results)}[/] records to {output}")
 
 
 @cache_app.command("clear", help="Delete the cached EIA utility parquet file.")

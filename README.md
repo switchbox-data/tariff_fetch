@@ -81,6 +81,7 @@ With uv:
 
 ```bash
 uv run tariff-fetch [OPTIONS]
+uv run tariff-fetch ni arcadia MASTER_TARIFF_ID [EFFECTIVE_DATE] [OPTIONS]
 uv run tariff-fetch gas [OPTIONS]
 uv run tariff-fetch gas urdb [OPTIONS]
 uv run tariff-fetch urdb ni MASTER_TARIFF_ID YEAR [OPTIONS]
@@ -141,6 +142,24 @@ Useful options:
 - `--apply-percentages` / `--no-apply-percentages`
 - `--charge-class`: repeat to include multiple charge classes
 - `--force` / `-f`: overwrite an existing output file
+
+## Direct Arcadia Raw Fetch
+
+Fetch a single Arcadia master tariff as raw JSON without going through the interactive utility picker:
+
+```bash
+uv run tariff-fetch ni arcadia 522
+uv run tariff-fetch ni arcadia 522 2025-06-01
+```
+
+If `EFFECTIVE_DATE` is omitted, the command uses today.
+
+Useful options:
+
+- `--output` / `-o`: output file path
+- `--force` / `-f`: overwrite an existing output file
+- `--log-dir`: directory for log files
+- `--log-file`: exact log file path
 
 ## Cache Management
 

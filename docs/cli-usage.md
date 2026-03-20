@@ -13,6 +13,9 @@ uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch ta
 
 # arcadia to urdb
 uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch urdb ni 522 2025
+
+# raw arcadia tariff by master tariff id
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch ni arcadia 522 2025-06-01
 ```
 
 All environment variables (API keys, credentials, etc.) still need to be exported or added to your `.env` file beforehand.
@@ -67,6 +70,23 @@ Example:
 ```bash
 uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
 ```
+
+## Direct Fetch CLI (`tariff-fetch ni`)
+
+Use this command to fetch provider data directly by identifier.
+
+### Subcommands
+
+- `arcadia`: fetch one Arcadia master tariff as raw JSON.
+
+Examples:
+
+```bash
+uv run tariff-fetch ni arcadia 522
+uv run tariff-fetch ni arcadia 522 2025-06-01 --output ./outputs/arcadia_522_2025-06-01.json
+```
+
+If the effective date is omitted, the command uses today.
 
 ## Cache CLI (`tariff-fetch cache`)
 

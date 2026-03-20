@@ -208,3 +208,48 @@ def test_gas_urdb_command_runs_end_to_end(monkeypatch, tmp_path: Path):
         "state": "tx",
         "year": 2025,
     }
+
+
+def test_ni_arcadia_command_runs_end_to_end(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "arcadia.json"
+    captured: dict[str, object] = {}
+    fake_results = [{"master_tariff_id": 123, "tariff_name": "Example Tariff"}]
+
+    monkeypatch.setattr(cli, "load_dotenv", lambda: None)
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    class FakeTypeAdapter:
+        def __init__(self, _type):
+            pass
+
+        def dump_json(self, value, *, indent: int):
+            assert indent == 2
+            return json.dumps(value, indent=indent).encode()
+
+    class FakeTariffsAPI:
+        def iter_pages(self, **kwargs):
+            captured["iter_pages_kwargs"] = kwargs
+            return iter(fake_results)
+
+    class FakeArcadiaSignalAPI:
+        def __init__(self):
+            self.tariffs = FakeTariffsAPI()
+
+    monkeypatch.setattr(cli, "ArcadiaSignalAPI", FakeArcadiaSignalAPI)
+    monkeypatch.setattr(cli, "TypeAdapter", FakeTypeAdapter)
+
+    result = runner.invoke(
+        cli.app,
+        ["ni", "arcadia", "123", "2025-06-01", "--output", str(output_path)],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured["iter_pages_kwargs"] == {
+        "fields": "ext",
+        "master_tariff_id": 123,
+        "effective_on": date(2025, 6, 1),
+        "populate_properties": True,
+        "populate_rates": True,
+    }
+    assert output_path.exists()
+    assert json.loads(output_path.read_text()) == fake_results
