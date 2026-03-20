@@ -1,9 +1,10 @@
+import logging
 import os
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import date
 from json import JSONDecodeError
-from typing import Annotated, Any, Generic, Literal, Self, TypeVar, Unpack, overload
+from typing import Annotated, Any, Generic, Literal, Self, TypeVar, Unpack, cast, overload
 from urllib.parse import urljoin
 
 import requests
@@ -19,6 +20,7 @@ from .schema.tariff import TariffExtended, TariffStandard
 
 _BASE_URL = "https://api.genability.com/rest/public/"
 _comma_separated = PlainSerializer(",".join)
+logger = logging.getLogger(__name__)
 
 _T = TypeVar("_T")
 _C = TypeVar("_C")
@@ -144,11 +146,15 @@ class ArcadiaSignalAPI:
     session: requests.Session = field(default_factory=requests.Session)
 
     def _request(self, path: str, **params) -> dict[str, Any]:  # pyright: ignore[reportMissingParameterType, reportUnknownParameterType, reportExplicitAny]
+        url = urljoin(self.base_url, path)
+        logger.debug("Arcadia request: GET %s params=%s", url, repr(cast(object, params)))
         response = self.session.get(
-            urljoin(self.base_url, path),
+            url,
             params=params,  # pyright: ignore[reportUnknownArgumentType]
             auth=HTTPBasicAuth(self.auth.app_id, self.auth.app_key),
         )
+        if response.status_code != 200:
+            logger.debug("Arcadia response: GET %s status=%s", url, response.status_code)
         try:
             response.raise_for_status()
         except requests.HTTPError as e:
