@@ -291,11 +291,16 @@ def main_gas(
     console.print(f"Logging to [blue]{log_path}[/]")
     try:
         process_rateacuity_gas(output_folder_, state_)
+    except typer.Exit as e:
+        _handle_expected_exit(e)
     except AuthorizationError:
         console.print("Authorization failed")
         console.print(
             "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
         )
+    except Exception as e:
+        logging.getLogger(__name__).exception(e)
+        raise typer.Exit(1) from e
 
 
 @gas_app.command("urdb", help="Convert RateAcuity gas tariffs to URDB format.")
@@ -325,11 +330,16 @@ def main_gas_urdb(
     console.print(f"Logging to [blue]{log_path}[/]")
     try:
         process_rateacuity_gas_urdb(output_folder_, state_, year_)
+    except typer.Exit as e:
+        _handle_expected_exit(e)
     except AuthorizationError:
         console.print("Authorization failed")
         console.print(
             "Check if credentials provided via [b]RATEACUITY_USERNAME[/] and [b]RATEACUITY_PASSWORD[/] environment variables are correct"
         )
+    except Exception as e:
+        logging.getLogger(__name__).exception(e)
+        raise typer.Exit(1) from e
 
 
 @ni_app.command("arcadia", help="Fetch a specific Arcadia master tariff as raw JSON.")
