@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import date, datetime
+from enum import Enum
 from pathlib import Path
 from typing import Annotated, cast, get_args
 
@@ -51,6 +52,14 @@ LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
 ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
 
 
+class LogLevel(str, Enum):
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+    CRITICAL = "CRITICAL"
+
+
 @app.callback()
 def main_default(
     ctx: typer.Context,
@@ -64,12 +73,23 @@ def main_default(
     effective_date: Annotated[
         str | None, typer.Option("--effective-date", help="Effective date for provider queries in YYYY-MM-DD format")
     ] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
     if ctx.invoked_subcommand is not None:
         return
-    _run_raw(state, provider, output_folder, _parse_effective_date(effective_date), log_dir, log_file)
+    _run_raw(
+        state,
+        provider,
+        output_folder,
+        _parse_effective_date(effective_date),
+        _log_level_to_int(log_level),
+        log_dir,
+        log_file,
+    )
 
 
 @app.command("raw")
@@ -84,10 +104,21 @@ def main_raw(
     effective_date: Annotated[
         str | None, typer.Option("--effective-date", help="Effective date for provider queries in YYYY-MM-DD format")
     ] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
-    _run_raw(state, provider, output_folder, _parse_effective_date(effective_date), log_dir, log_file)
+    _run_raw(
+        state,
+        provider,
+        output_folder,
+        _parse_effective_date(effective_date),
+        _log_level_to_int(log_level),
+        log_dir,
+        log_file,
+    )
 
 
 @urdb_app.callback()
@@ -100,6 +131,9 @@ def main_urdb(
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
     year: Annotated[int | None, typer.Option("--year", "-y")] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
     fail_fast: Annotated[
@@ -111,7 +145,12 @@ def main_urdb(
         return
     state_ = state or prompt_state().value
     output_folder_ = Path(output_folder)
-    log_path = _configure_logging("tariff_fetch_urdb", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file)
+    log_path = _configure_logging(
+        "tariff_fetch_urdb",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or (output_folder_ / "logs"),
+        log_file=log_file,
+    )
     utility = prompt_utility(state_)
     year = prompt_year() if year is None else year
 
@@ -142,6 +181,9 @@ def urdb_direct(
         bool,
         typer.Option("--fail-fast", help="Raise conversion errors immediately instead of prompting to continue"),
     ] = False,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
     output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the converted URDB JSON")] = None,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
@@ -159,7 +201,12 @@ def urdb_direct(
     if output.exists() and not force:
         console.print(f"[red]Output file already exists: {output}. Pass --force to overwrite it.[/red]")
         raise typer.Exit(1)
-    log_path = _configure_logging("tariff_fetch_urdb", log_dir=log_dir or (output.parent / "logs"), log_file=log_file)
+    log_path = _configure_logging(
+        "tariff_fetch_urdb",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or (output.parent / "logs"),
+        log_file=log_file,
+    )
     console.print(f"Logging to [blue]{log_path}[/]")
     scenario_charge_classes = _parse_charge_classes(charge_classes)
     scenario = Scenario(
@@ -187,6 +234,9 @@ def main_gas(
     output_folder: Annotated[
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
@@ -195,7 +245,12 @@ def main_gas(
 
     state_ = (state or prompt_state()).value
     output_folder_ = Path(output_folder)
-    log_path = _configure_logging("tariff_fetch_gas", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file)
+    log_path = _configure_logging(
+        "tariff_fetch_gas",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or (output_folder_ / "logs"),
+        log_file=log_file,
+    )
     console.print(f"Logging to [blue]{log_path}[/]")
     try:
         process_rateacuity_gas(output_folder_, state_)
@@ -215,6 +270,9 @@ def main_gas_urdb(
         str, typer.Option("--output-folder", "-o", help="Folder to store outputs in")
     ] = "./outputs",
     year: Annotated[int | None, typer.Option("--year", "-y")] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
@@ -222,7 +280,10 @@ def main_gas_urdb(
     output_folder_ = Path(output_folder)
     year_ = prompt_year() if year is None else year
     log_path = _configure_logging(
-        "tariff_fetch_gas_urdb", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file
+        "tariff_fetch_gas_urdb",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or (output_folder_ / "logs"),
+        log_file=log_file,
     )
     console.print(f"Logging to [blue]{log_path}[/]")
     try:
@@ -243,13 +304,19 @@ def _run_raw(
     provider: Provider | None,
     output_folder: str,
     effective_date: date | None,
+    log_level: int,
     log_dir: Path | None,
     log_file: Path | None,
 ):
     state_ = state or prompt_state().value
     provider = provider or prompt_provider()
     output_folder_ = Path(output_folder)
-    log_path = _configure_logging("tariff_fetch", log_dir=log_dir or (output_folder_ / "logs"), log_file=log_file)
+    log_path = _configure_logging(
+        "tariff_fetch",
+        log_level=log_level,
+        log_dir=log_dir or (output_folder_ / "logs"),
+        log_file=log_file,
+    )
     console.print(f"Logging to [blue]{log_path}[/]")
     utility = prompt_utility(state_)
 
@@ -276,7 +343,13 @@ def _run_raw(
                 raise typer.Exit(1) from e
 
 
-def _configure_logging(suffix: str, log_dir: Path | None = None, log_file: Path | None = None) -> Path:
+def _configure_logging(
+    suffix: str,
+    *,
+    log_level: int,
+    log_dir: Path | None = None,
+    log_file: Path | None = None,
+) -> Path:
     if log_dir is not None and log_file is not None:
         raise typer.BadParameter("Use either --log-dir or --log-file, not both.")
 
@@ -290,14 +363,14 @@ def _configure_logging(suffix: str, log_dir: Path | None = None, log_file: Path 
         path = log_file
 
     rich_handler = RichHandler(rich_tracebacks=True)
-    rich_handler.setLevel(logging.DEBUG)
+    rich_handler.setLevel(log_level)
     rich_handler.setFormatter(logging.Formatter("%(message)s"))
 
     file_handler = logging.FileHandler(path, encoding="utf-8")
-    file_handler.setLevel(logging.DEBUG)
+    file_handler.setLevel(log_level)
     file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
-    logging.basicConfig(level=logging.DEBUG, handlers=[rich_handler, file_handler], force=True)
+    logging.basicConfig(level=log_level, handlers=[rich_handler, file_handler], force=True)
     return path
 
 
@@ -308,6 +381,13 @@ def _parse_effective_date(value: str | None) -> date | None:
         return date.fromisoformat(value)
     except ValueError as exc:
         raise typer.BadParameter("Effective date must be in YYYY-MM-DD format.") from exc
+
+
+def _log_level_to_int(value: LogLevel) -> int:
+    level = getattr(logging, value.value, None)
+    if not isinstance(level, int):
+        raise typer.BadParameter(f"Unsupported log level: {value.value}")
+    return level
 
 
 def prompt_provider() -> Provider:
