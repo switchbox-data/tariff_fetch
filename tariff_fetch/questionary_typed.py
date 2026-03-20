@@ -70,6 +70,7 @@ _checkbox_impl = cast(_CheckboxFactory, questionary.checkbox)
 _text_impl = cast(_TextFactory, questionary.text)
 _confirm_impl = cast(_ConfirmFactory, questionary.confirm)
 _path_impl = cast(_PathFactory, questionary.path)
+_no_input = False
 
 
 def _validate_str_always(_: str) -> bool | str:
@@ -78,6 +79,15 @@ def _validate_str_always(_: str) -> bool | str:
 
 def _validate_objects_always(_: list[object]) -> bool | str:
     return True
+
+
+def set_no_input(enabled: bool) -> None:
+    global _no_input
+    _no_input = enabled
+
+
+def is_no_input() -> bool:
+    return _no_input
 
 
 @dataclass(frozen=True)
@@ -97,11 +107,16 @@ class Separator:
 
 class Prompt(Generic[T]):
     _question: _Question
+    _message: str
 
-    def __init__(self, question: _Question) -> None:
+    def __init__(self, question: _Question, *, message: str) -> None:
         self._question = question
+        self._message = message
 
     def ask(self) -> T | None:
+        if _no_input:
+            typer.echo(f"Prompt requires interactive input but --no-input was set: {self._message}", err=True)
+            raise typer.Exit(code=1)
         return cast(T | None, self._question.ask())
 
     def ask_or_exit(self, code: int = 1) -> T:
@@ -175,7 +190,8 @@ def select(
             use_jk_keys=use_jk_keys,
             use_search_filter=use_search_filter,
             show_description=show_description,
-        )
+        ),
+        message=message,
     )
 
 
@@ -220,16 +236,17 @@ def checkbox(
             use_jk_keys=use_jk_keys,
             use_search_filter=use_search_filter,
             show_description=show_description,
-        )
+        ),
+        message=message,
     )
 
 
 def text(message: str, *, default: str = "", validate: _ValidateStr = _validate_str_always) -> Prompt[str]:
-    return Prompt(_text_impl(message=message, default=default, validate=validate))
+    return Prompt(_text_impl(message=message, default=default, validate=validate), message=message)
 
 
 def confirm(message: str, *, default: bool = True, auto_enter: bool = True) -> Prompt[bool]:
-    return Prompt(_confirm_impl(message=message, default=default, auto_enter=auto_enter))
+    return Prompt(_confirm_impl(message=message, default=default, auto_enter=auto_enter), message=message)
 
 
 def path(
@@ -239,4 +256,6 @@ def path(
     validate: _ValidateStr = _validate_str_always,
     file_filter: Callable[[str], bool] | None = None,
 ) -> Prompt[str]:
-    return Prompt(_path_impl(message=message, default=default, validate=validate, file_filter=file_filter))
+    return Prompt(
+        _path_impl(message=message, default=default, validate=validate, file_filter=file_filter), message=message
+    )

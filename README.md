@@ -99,10 +99,14 @@ Options:
 - `--provider` / `-p`: provider to fetch (`genability`, `openei`, `rateacuity`)
 - `--output-folder` / `-o`: directory for exports (default: `./outputs`)
 - `--effective-date`: provider query date in `YYYY-MM-DD` format
+- `--no-input`: fail instead of prompting for interactive input
 - `--log-dir`: directory for log files
 - `--log-file`: exact log file path
 
 Omitted options will trigger interactive prompts.
+
+Use `--no-input` for automation or CI runs when you want missing required inputs to fail fast instead of opening an
+interactive prompt.
 
 When the CLI reaches the utility selection step, it caches the EIA utility parquet for 1 hour in the platform-specific
 user cache directory so repeated runs do not re-download it every time. You can clear that cache with:

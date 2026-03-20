@@ -30,6 +30,7 @@ Run `uv run tariff-fetch` (or `python -m tariff_fetch.cli` / `just cli`) to laun
 - `--provider` / `-p`: provider to fetch (`genability`, `openei`, `rateacuity`). If omitted, the CLI prompts you.
 - `--output-folder` / `-o`: directory for exported JSON files. Defaults to `./outputs`.
 - `--effective-date`: provider query date in `YYYY-MM-DD` format.
+- `--no-input`: fail instead of prompting for interactive input.
 - `--log-dir`: directory for log files.
 - `--log-file`: exact file path for the log file.
 
@@ -47,6 +48,9 @@ Example:
 ```bash
 uv run tariff-fetch --state ca --provider genability --effective-date 2025-06-01
 ```
+
+Use `--no-input` in automation when every required value must come from flags or environment configuration. If the CLI
+would otherwise prompt, it exits with code `1` and names the missing prompt.
 
 ## URDB CLI (`tariff-fetch urdb`)
 

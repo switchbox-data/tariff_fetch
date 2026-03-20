@@ -99,11 +99,15 @@ def main_default(
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
     if ctx.invoked_subcommand is not None:
         return
+    _configure_interaction(no_input)
     _run_raw(
         state,
         provider,
@@ -130,9 +134,13 @@ def main_raw(
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
+    _configure_interaction(no_input)
     _run_raw(
         state,
         provider,
@@ -157,6 +165,9 @@ def main_urdb(
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
     fail_fast: Annotated[
@@ -170,6 +181,7 @@ def main_urdb(
 ):
     if ctx.invoked_subcommand is not None:
         return
+    _configure_interaction(no_input)
     state_ = state or prompt_state().value
     output_folder_ = Path(output_folder)
     _ = _configure_command_logging(
@@ -216,6 +228,9 @@ def urdb_direct(
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
     output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the converted URDB JSON")] = None,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
@@ -224,6 +239,7 @@ def urdb_direct(
         typer.Option("--force", "-f", help="Overwrite the output file if it already exists"),
     ] = False,
 ):
+    _configure_interaction(no_input)
     _ = load_dotenv()
     if output is None:
         output = Path("./outputs")
@@ -264,12 +280,16 @@ def main_gas(
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
     if ctx.invoked_subcommand is not None:
         return
 
+    _configure_interaction(no_input)
     state_ = (state or prompt_state()).value
     output_folder_ = Path(output_folder)
     _ = _configure_command_logging(
@@ -293,9 +313,13 @@ def main_gas_urdb(
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
+    _configure_interaction(no_input)
     state_ = (state or prompt_state()).value
     output_folder_ = Path(output_folder)
     year_ = prompt_year() if year is None else year
@@ -319,6 +343,9 @@ def ni_arcadia(
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
     force: Annotated[
@@ -326,6 +353,7 @@ def ni_arcadia(
         typer.Option("--force", "-f", help="Overwrite the output file if it already exists"),
     ] = False,
 ):
+    _configure_interaction(no_input)
     _ = load_dotenv()
     effective_on = _parse_effective_date(effective_date) or date.today()
     if output is None:
@@ -364,9 +392,13 @@ def show_properties(
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
     ] = LogLevel.INFO,
+    no_input: Annotated[
+        bool, typer.Option("--no-input", help="Fail instead of prompting for interactive input")
+    ] = False,
     log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
     log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
 ):
+    _configure_interaction(no_input)
     _ = load_dotenv()
     effective_on = _parse_effective_date(effective_date) or date.today()
     _ = _configure_command_logging(
@@ -479,6 +511,10 @@ def _configure_command_logging(
     log_path = _configure_logging(suffix, log_level=log_level, log_dir=log_dir, log_file=log_file)
     console.print(f"Logging to [blue]{log_path}[/]")
     return log_path
+
+
+def _configure_interaction(no_input: bool) -> None:
+    q.set_no_input(no_input)
 
 
 def _run_cli_command(command: Callable[[], _T]) -> _T:

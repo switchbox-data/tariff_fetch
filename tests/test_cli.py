@@ -68,6 +68,16 @@ def test_raw_command_uses_prompted_provider_when_flag_is_missing(monkeypatch, tm
     }
 
 
+def test_raw_command_no_input_fails_before_prompt(tmp_path: Path):
+    result = runner.invoke(
+        cli.app,
+        ["raw", "--no-input", "--output-folder", str(tmp_path)],
+    )
+
+    assert result.exit_code == 1
+    assert "Prompt requires interactive input but --no-input was set: Select state" in result.output
+
+
 def test_default_command_passes_effective_date_to_provider(monkeypatch, tmp_path: Path):
     utility = Utility(eia_id=303, name="Default Utility")
     captured: dict[str, object] = {}
