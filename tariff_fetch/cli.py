@@ -14,7 +14,6 @@ from dotenv import load_dotenv
 from platformdirs import user_cache_dir
 from pydantic import TypeAdapter
 from rich.logging import RichHandler
-from rich.prompt import Prompt
 
 from tariff_fetch._cli.arcadia_urdb import process_genability as process_genability_urdb
 from tariff_fetch._cli.genability import process_genability
@@ -611,13 +610,13 @@ def prompt_year() -> int:
 
 
 def prompt_state() -> StateCode:
-    choice = Prompt.ask(
-        "Enter two-letter state abbreviation",
-        choices=[state.value for state in StateCode],
-        show_choices=False,
-        case_sensitive=False,
-    )
-    return StateCode(choice.lower())
+    return q.select(
+        message="Select state",
+        choices=[q.Choice(title=state.value.upper(), value=state) for state in StateCode],
+        use_search_filter=True,
+        use_jk_keys=False,
+        use_shortcuts=False,
+    ).ask_or_exit()
 
 
 def _parse_charge_classes(charge_classes: list[str] | None) -> set[RateChargeClass]:
