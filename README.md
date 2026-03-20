@@ -173,6 +173,16 @@ Useful options:
 - `--log-dir`: directory for log files
 - `--log-file`: exact log file path
 
+## Show Arcadia Properties
+
+Inspect the Arcadia property keys, user-facing names, descriptions, and CHOICE aliases for a master tariff before
+running conversion:
+
+```bash
+uv run tariff-fetch show-properties 522
+uv run tariff-fetch show-properties 522 2025-06-01
+```
+
 ## Cache Management
 
 Clear the cached utility parquet used by the interactive utility picker:

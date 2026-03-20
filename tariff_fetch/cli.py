@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from platformdirs import user_cache_dir
 from pydantic import TypeAdapter
 from rich.logging import RichHandler
+from rich.table import Table
 
 from tariff_fetch._cli.arcadia_urdb import process_genability as process_genability_urdb
 from tariff_fetch._cli.genability import process_genability
@@ -380,15 +381,10 @@ def ni_arcadia(
     console.print(f"Logging to [blue]{log_path}[/]")
 
     try:
-        api = ArcadiaSignalAPI()
-        results = list(
-            api.tariffs.iter_pages(
-                fields="ext",
-                master_tariff_id=master_tariff_id,
-                effective_on=effective_on,
-                populate_properties=True,
-                populate_rates=True,
-            )
+        results = _fetch_arcadia_tariffs(
+            master_tariff_id=master_tariff_id,
+            effective_on=effective_on,
+            populate_rates=True,
         )
     except typer.Exit as e:
         _handle_expected_exit(e)
@@ -398,6 +394,44 @@ def ni_arcadia(
     else:
         _ = output.write_bytes(TypeAdapter(list[tariff.TariffExtended]).dump_json(results, indent=2))
         console.print(f"Wrote [blue]{len(results)}[/] records to {output}")
+
+
+@app.command("show-properties", help="Show Arcadia tariff properties for a master tariff.")
+def show_properties(
+    master_tariff_id: Annotated[int, typer.Argument(help="Arcadia master tariff id to inspect")],
+    effective_date: Annotated[
+        str | None,
+        typer.Argument(help="Effective date in YYYY-MM-DD format; defaults to today if omitted"),
+    ] = None,
+    log_level: Annotated[
+        LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
+    ] = LogLevel.INFO,
+    log_dir: Annotated[Path | None, typer.Option("--log-dir", help="Directory to write logs to")] = None,
+    log_file: Annotated[Path | None, typer.Option("--log-file", help="File path to write logs to")] = None,
+):
+    _ = load_dotenv()
+    effective_on = _parse_effective_date(effective_date) or date.today()
+    log_path = _configure_logging(
+        "tariff_fetch_show_properties_arcadia",
+        log_level=_log_level_to_int(log_level),
+        log_dir=log_dir or (Path("./outputs") / "logs"),
+        log_file=log_file,
+    )
+    console.print(f"Logging to [blue]{log_path}[/]")
+
+    try:
+        tariffs = _fetch_arcadia_tariffs(
+            master_tariff_id=master_tariff_id,
+            effective_on=effective_on,
+            populate_rates=True,
+        )
+    except typer.Exit as e:
+        _handle_expected_exit(e)
+    except Exception as e:
+        logging.getLogger(__name__).exception(e)
+        raise typer.Exit(code=1) from e
+    else:
+        _print_arcadia_properties(tariffs)
 
 
 @cache_app.command("clear", help="Delete the cached EIA utility parquet file.")
@@ -680,6 +714,77 @@ def _parse_property_assignments(values: list[str] | None) -> dict[str, ScenarioP
                 f"Property override for {key} was parsed into an unexpected type.", param_hint="--property"
             )
     return result
+
+
+def _fetch_arcadia_tariffs(
+    *,
+    master_tariff_id: int,
+    effective_on: date,
+    populate_rates: bool,
+) -> list[tariff.TariffExtended]:
+    api = ArcadiaSignalAPI()
+    return list(
+        api.tariffs.iter_pages(
+            fields="ext",
+            master_tariff_id=master_tariff_id,
+            effective_on=effective_on,
+            populate_properties=True,
+            populate_rates=populate_rates,
+        )
+    )
+
+
+def _print_arcadia_properties(tariffs: list[tariff.TariffExtended]) -> None:
+    property_rows = _collect_arcadia_property_rows(tariffs)
+
+    if not property_rows:
+        console.print("[yellow]No Arcadia properties found for this tariff.[/yellow]")
+        return
+
+    table = Table(title="Arcadia tariff properties")
+    table.add_column("Key")
+    table.add_column("Name")
+    table.add_column("Type")
+    table.add_column("Description")
+    table.add_column("Choices")
+    for key_name, (display_name, data_type, description, choices) in sorted(property_rows.items()):
+        table.add_row(key_name, display_name, data_type, description, choices)
+    console.print(table)
+
+
+def _collect_arcadia_property_rows(tariffs: list[tariff.TariffExtended]) -> dict[str, tuple[str, str, str, str]]:
+    property_rows: dict[str, dict[str, str | dict[str, str]]] = {}
+
+    for tariff_ in tariffs:
+        for prop in tariff_.get("properties", []):
+            key_name = prop["key_name"]
+            if key_name == "chargeClass":
+                continue
+            row = property_rows.setdefault(
+                key_name,
+                {
+                    "display_name": prop["display_name"],
+                    "data_type": prop["data_type"],
+                    "description": prop["description"],
+                    "choices_by_value": {},
+                },
+            )
+            choices_by_value = cast(dict[str, str], row["choices_by_value"])
+            for choice in prop.get("choices", []):
+                _ = choices_by_value.setdefault(choice["value"], choice["display_value"])
+
+    return {key_name: _format_arcadia_property_row(row) for key_name, row in property_rows.items()}
+
+
+def _format_arcadia_property_row(row: dict[str, str | dict[str, str]]) -> tuple[str, str, str, str]:
+    choices_by_value = cast(dict[str, str], row["choices_by_value"])
+    choices = ", ".join(f"{display_value}={value}" for value, display_value in sorted(choices_by_value.items()))
+    return (
+        cast(str, row["display_name"]),
+        cast(str, row["data_type"]),
+        cast(str, row["description"]),
+        choices,
+    )
 
 
 def _get_cached_utility_sales_parquet(now: datetime | None = None) -> Path:

@@ -18,6 +18,13 @@ Example:
 uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
 ```
 
+Before conversion, you can inspect the tariff's available Arcadia properties with:
+
+```bash
+uv run tariff-fetch show-properties 522
+uv run tariff-fetch show-properties 522 2025-06-01
+```
+
 You can also pre-fill Arcadia tariff properties from the command line:
 
 ```bash

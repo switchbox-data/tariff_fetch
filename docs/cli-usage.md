@@ -100,6 +100,20 @@ uv run tariff-fetch ni arcadia 522 2025-06-01 --output ./outputs/arcadia_522_202
 
 If the effective date is omitted, the command uses today.
 
+## Property Inspection CLI (`tariff-fetch show-properties`)
+
+Use this command to inspect Arcadia tariff property metadata before conversion.
+
+Examples:
+
+```bash
+uv run tariff-fetch show-properties 522
+uv run tariff-fetch show-properties 522 2025-06-01
+```
+
+The command prints the Arcadia property key, user-facing name, data type, description, and any CHOICE aliases that
+can be used with `--property`.
+
 ## Cache CLI (`tariff-fetch cache`)
 
 Use this command to clear the cached utility parquet used by the interactive utility picker.

@@ -279,3 +279,83 @@ def test_ni_arcadia_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     }
     assert output_path.exists()
     assert json.loads(output_path.read_text()) == fake_results
+
+
+def test_show_properties_command_runs_end_to_end(monkeypatch):
+    captured: dict[str, object] = {}
+    fake_results = [{"properties": [{"key_name": "territoryId"}]}]
+
+    monkeypatch.setattr(cli, "load_dotenv", lambda: None)
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_fetch_arcadia_tariffs(*, master_tariff_id: int, effective_on: date, populate_rates: bool):
+        captured["master_tariff_id"] = master_tariff_id
+        captured["effective_on"] = effective_on
+        captured["populate_rates"] = populate_rates
+        return fake_results
+
+    def fake_print_arcadia_properties(results):
+        captured["results"] = results
+
+    monkeypatch.setattr(cli, "_fetch_arcadia_tariffs", fake_fetch_arcadia_tariffs)
+    monkeypatch.setattr(cli, "_print_arcadia_properties", fake_print_arcadia_properties)
+
+    result = runner.invoke(
+        cli.app,
+        ["show-properties", "123", "2025-06-01"],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "master_tariff_id": 123,
+        "effective_on": date(2025, 6, 1),
+        "populate_rates": True,
+        "results": fake_results,
+    }
+
+
+def test_collect_arcadia_property_rows_merges_choices_across_tariffs():
+    tariffs = [
+        {
+            "properties": [
+                {
+                    "key_name": "chargeClass",
+                    "display_name": "Charge class",
+                    "data_type": "CHOICE",
+                    "description": "Handled separately",
+                    "choices": [
+                        {"value": "SUPPLY", "display_value": "Supply", "data_value": "SUPPLY"},
+                    ],
+                },
+                {
+                    "key_name": "territoryId",
+                    "display_name": "Territory",
+                    "data_type": "CHOICE",
+                    "description": "Select the service territory",
+                },
+            ]
+        },
+        {
+            "properties": [
+                {
+                    "key_name": "territoryId",
+                    "display_name": "Territory",
+                    "data_type": "CHOICE",
+                    "description": "Select the service territory",
+                    "choices": [
+                        {"value": "1", "display_value": "Primary Territory", "data_value": "1"},
+                        {"value": "2", "display_value": "Secondary Territory", "data_value": "2"},
+                    ],
+                }
+            ]
+        },
+    ]
+
+    assert cli._collect_arcadia_property_rows(tariffs) == {
+        "territoryId": (
+            "Territory",
+            "CHOICE",
+            "Select the service territory",
+            "Primary Territory=1, Secondary Territory=2",
+        )
+    }
