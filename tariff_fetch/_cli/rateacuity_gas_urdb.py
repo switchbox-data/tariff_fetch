@@ -1,5 +1,6 @@
 import json
 import os
+import shlex
 from collections.abc import Collection
 from datetime import date
 from pathlib import Path
@@ -39,6 +40,7 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
     selected_utility = None
     tariffs_to_include = None
     result: list[URDBRate] = []
+    replay_commands: list[str] = []
     for attempt in tenacity.Retrying(
         stop=tenacity.stop_after_attempt(3), retry=tenacity.retry_if_exception_type(WebDriverException)
     ):
@@ -139,6 +141,18 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
                         urdb["minchargeunits"] = "$/month"
                         urdb["country"] = "USA"
                         result.append(urdb)
+                        replay_commands.append(
+                            _format_gas_urdb_replay_command(
+                                state=state,
+                                utility=selected_utility,
+                                year=year,
+                                tariff=tariff,
+                                apply_percentages=apply_percentages,
+                                label=label,
+                                sector=cast(RateSector, sector),
+                                servicetype=cast(ServiceType, servicetype),
+                            )
+                        )
 
                 scraping_state = (
                     scraping_state.back_to_selections()
@@ -152,6 +166,10 @@ def process_rateacuity_gas_urdb(output_folder: Path, state: str, year: int):
     filename.parent.mkdir(exist_ok=True)
     wrapped_result = {"items": result}
     _ = filename.write_text(json.dumps(wrapped_result, indent=2))
+    if replay_commands:
+        console.print("Replay with `tariff-fetch gas urdb ni`:")
+        for command in replay_commands:
+            console.print(command)
 
 
 def fetch_rateacuity_gas_urdb_rates(
@@ -247,6 +265,30 @@ def _utility_name_to_label(utility_name: str) -> str:
     if not utility_name:
         return ""
     return "".join(w[0].lower() for w in utility_name.split() if w)
+
+
+def _format_gas_urdb_replay_command(
+    *,
+    state: str,
+    utility: str,
+    year: int,
+    tariff: str,
+    apply_percentages: bool,
+    label: str,
+    sector: RateSector,
+    servicetype: ServiceType,
+) -> str:
+    parts = ["tariff-fetch", "gas", "urdb", "ni", state, utility, "--year", str(year), "--tariff", tariff]
+    if apply_percentages:
+        parts.append("--apply-percentages")
+    default_label = _utility_name_to_label(utility)
+    if label != default_label:
+        parts.extend(["--label", label])
+    if sector != "Residential":
+        parts.extend(["--sector", sector])
+    if servicetype != "Bundled":
+        parts.extend(["--servicetype", servicetype])
+    return shlex.join(parts)
 
 
 def _get_percentage_columns(rows: Collection[Row]) -> list[tuple[str, str | None, float]]:
