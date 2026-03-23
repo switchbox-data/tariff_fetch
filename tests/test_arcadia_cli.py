@@ -16,14 +16,18 @@ def test_process_genability_prints_replay_command(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(genability, "_select_customer_classes", lambda: ["RESIDENTIAL"])
     monkeypatch.setattr(genability, "_select_tariff_types", lambda: ["DEFAULT"])
     monkeypatch.setattr(
-        genability, "_select_tariffs", lambda api, lse_id, customer_classes, tariff_types, effective_on: [("Tariff", 123)]
+        genability,
+        "_select_tariffs",
+        lambda api, lse_id, customer_classes, tariff_types, effective_on: [("Tariff", 123)],
     )
     monkeypatch.setattr(
         genability,
         "_fetch_tariffs",
         lambda api, tariffs, effective_on: [{"master_tariff_id": 123, "tariff_name": "Tariff"}],
     )
-    monkeypatch.setattr(genability, "prompt_filename", lambda output_folder, suggested_filename, ext: tmp_path / "out.json")
+    monkeypatch.setattr(
+        genability, "prompt_filename", lambda output_folder, suggested_filename, ext: tmp_path / "out.json"
+    )
     monkeypatch.setattr(genability.console, "print", lambda message, *args, **kwargs: printed.append(str(message)))
 
     genability.process_genability(
@@ -58,7 +62,9 @@ def test_process_genability_prints_multiple_replay_commands(monkeypatch, tmp_pat
             {"master_tariff_id": 456, "tariff_name": "Tariff B"},
         ],
     )
-    monkeypatch.setattr(genability, "prompt_filename", lambda output_folder, suggested_filename, ext: tmp_path / "out.json")
+    monkeypatch.setattr(
+        genability, "prompt_filename", lambda output_folder, suggested_filename, ext: tmp_path / "out.json"
+    )
     monkeypatch.setattr(genability.console, "print", lambda message, *args, **kwargs: printed.append(str(message)))
 
     genability.process_genability(

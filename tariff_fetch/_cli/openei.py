@@ -1,5 +1,6 @@
 import json
 import os
+import shlex
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Literal, cast
@@ -92,3 +93,33 @@ def process_openei(utility: Utility, output_folder: Path, effective_on: date | N
     wrapped_items = {"items": tariffs}
     _ = filepath.write_text(json.dumps(wrapped_items, indent=2))
     console.print(f"Wrote [blue]{len(tariffs)}[/] items to {filepath}")
+    console.print("Replay with `tariff-fetch ni openei`:")
+    for replay_command in _format_replay_commands(utility.eia_id, sector, detail_level, effective_on, tariffs):
+        console.print(replay_command)
+
+
+def _format_replay_commands(
+    eia_id: int,
+    sector: UtilityRateSector,
+    detail: Literal["full", "minimal"],
+    effective_on: date | None,
+    tariffs: list[UtilityRatesResponseItem],
+) -> list[str]:
+    effective_date = (effective_on or datetime.now(UTC).date()).isoformat()
+    return [
+        shlex.join(
+            [
+                "tariff-fetch",
+                "ni",
+                "openei",
+                str(eia_id),
+                sector,
+                effective_date,
+                "--detail",
+                detail,
+                "--label",
+                tariff["label"],
+            ]
+        )
+        for tariff in tariffs
+    ]

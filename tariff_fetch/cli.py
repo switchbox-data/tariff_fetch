@@ -540,6 +540,10 @@ def ni_openei(
     detail: Annotated[
         Literal["full", "minimal"], typer.Option("--detail", help="OpenEI response detail level")
     ] = "full",
+    labels: Annotated[
+        list[str] | None,
+        typer.Option("--label", help="OpenEI tariff label to include; repeat to include multiple"),
+    ] = None,
     output: Annotated[Path | None, typer.Option("--output", "-o", help="Path to write the fetched tariff JSON")] = None,
     log_level: Annotated[
         LogLevel, typer.Option("--log-level", help="Logging level", case_sensitive=False)
@@ -573,7 +577,13 @@ def ni_openei(
         log_file=log_file,
     )
     results = _run_cli_command(
-        lambda: _fetch_openei_tariffs(eia_id=eia_id, sector=sector, detail=detail, effective_on=effective_on)
+        lambda: _fetch_openei_tariffs(
+            eia_id=eia_id,
+            sector=sector,
+            detail=detail,
+            effective_on=effective_on,
+            labels=labels,
+        )
     )
     _ = output.write_text(json.dumps({"items": results}, indent=2))
     console.print(f"Wrote [blue]{len(results)}[/] items to {output}")
@@ -1206,12 +1216,13 @@ def _fetch_openei_tariffs(
     sector: UtilityRateSector,
     detail: str,
     effective_on: date,
+    labels: list[str] | None = None,
 ) -> list[UtilityRatesResponseItem]:
     api_key = os.getenv("OPENEI_API_KEY")
     if not api_key:
         raise ValueError("API Key is not set (via OPENEI_API_KEY variable)")
     with console.status("Fetching rates..."):
-        return list(
+        results = list(
             iter_utility_rates(
                 api_key,
                 effective_on_date=datetime.combine(effective_on, datetime.min.time(), tzinfo=UTC),
@@ -1220,6 +1231,10 @@ def _fetch_openei_tariffs(
                 eia=eia_id,
             )
         )
+    if labels is None:
+        return results
+    allowed = set(labels)
+    return [item for item in results if item["label"] in allowed]
 
 
 def _print_arcadia_properties(tariffs: list[tariff.TariffExtended]) -> None:

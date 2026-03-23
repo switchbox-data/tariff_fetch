@@ -559,11 +559,14 @@ def test_ni_openei_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(cli, "load_dotenv", lambda: None)
     monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
 
-    def fake_fetch_openei_tariffs(*, eia_id: int, sector: str, detail: str, effective_on: date):
+    def fake_fetch_openei_tariffs(
+        *, eia_id: int, sector: str, detail: str, effective_on: date, labels: list[str] | None
+    ):
         captured["eia_id"] = eia_id
         captured["sector"] = sector
         captured["detail"] = detail
         captured["effective_on"] = effective_on
+        captured["labels"] = labels
         return fake_results
 
     monkeypatch.setattr(cli, "_fetch_openei_tariffs", fake_fetch_openei_tariffs)
@@ -589,6 +592,55 @@ def test_ni_openei_command_runs_end_to_end(monkeypatch, tmp_path: Path):
         "sector": "Residential",
         "detail": "minimal",
         "effective_on": date(2025, 6, 1),
+        "labels": None,
+    }
+    assert json.loads(output_path.read_text()) == {"items": fake_results}
+
+
+def test_ni_openei_command_filters_by_label(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "openei.json"
+    captured: dict[str, object] = {}
+    fake_results = [{"name": "Residential Tariff", "label": "abc"}]
+
+    monkeypatch.setattr(cli, "load_dotenv", lambda: None)
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_fetch_openei_tariffs(
+        *, eia_id: int, sector: str, detail: str, effective_on: date, labels: list[str] | None
+    ):
+        captured["eia_id"] = eia_id
+        captured["sector"] = sector
+        captured["detail"] = detail
+        captured["effective_on"] = effective_on
+        captured["labels"] = labels
+        return fake_results
+
+    monkeypatch.setattr(cli, "_fetch_openei_tariffs", fake_fetch_openei_tariffs)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "ni",
+            "openei",
+            "123",
+            "Residential",
+            "2025-06-01",
+            "--label",
+            "abc",
+            "--label",
+            "def",
+            "--output",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert captured == {
+        "eia_id": 123,
+        "sector": "Residential",
+        "detail": "full",
+        "effective_on": date(2025, 6, 1),
+        "labels": ["abc", "def"],
     }
     assert json.loads(output_path.read_text()) == {"items": fake_results}
 
