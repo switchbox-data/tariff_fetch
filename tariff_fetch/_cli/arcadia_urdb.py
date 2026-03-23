@@ -1,6 +1,8 @@
 import json
+import shlex
 from datetime import date
 from pathlib import Path
+from typing import cast, get_args
 
 from dotenv import load_dotenv
 
@@ -9,8 +11,9 @@ from tariff_fetch import questionary_typed as q
 # from tariff_fetch.genability.lse import get_lses_page
 # from tariff_fetch.genability.tariffs import CustomerClass, TariffType, tariffs_paginate
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
-from tariff_fetch.arcadia.schema.common import CustomerClass, TariffType
+from tariff_fetch.arcadia.schema.common import CustomerClass, RateChargeClass, TariffType
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
+from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyStandard
 from tariff_fetch.urdb.arcadia.build import build_urdb
 from tariff_fetch.urdb.arcadia.prompts import prompt_charge_classes
 from tariff_fetch.urdb.arcadia.scenario import Scenario, ScenarioPropertyValue
@@ -18,6 +21,20 @@ from tariff_fetch.urdb.schema import URDBRate
 
 from . import console, prompt_filename
 from .types import Utility
+
+_ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
+_CHARGE_CLASS_CODES: tuple[tuple[str, RateChargeClass], ...] = (
+    ("S", "SUPPLY"),
+    ("T", "TRANSMISSION"),
+    ("D", "DISTRIBUTION"),
+    ("t", "TAX"),
+    ("C", "CONTRACTED"),
+    ("U", "USER_ADJUSTED"),
+    ("A", "AFTER_TAX"),
+    ("O", "OTHER"),
+    ("N", "NON_BYPASSABLE"),
+    ("n", "NET_EXCESS"),
+)
 
 
 def process_genability(
@@ -47,6 +64,7 @@ def process_genability(
 
     api_results = _fetch_tariffs(api, tariffs, year)
     results: list[URDBRate] = []
+    replay_commands: list[str] = []
 
     # tariff_ids = {id_ for _, id_ in tariffs}
 
@@ -69,6 +87,7 @@ def process_genability(
         urdb_tariff["name"] = _prompt_tariff_name(urdb_tariff.get("name", ""))
 
         results.append(urdb_tariff)
+        replay_commands.append(_format_replay_command(scenario, tariff))
         # results.append(build_urdb(tariff, api, scenario))
 
     suggested_filename = f"arcadia_{utility.name}.urdb.{year}."
@@ -79,6 +98,10 @@ def process_genability(
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_text(json.dumps({"items": results}, indent=2))
     console.print(f"Wrote [blue]{len(results)}[/] records to {filename}")
+    if replay_commands:
+        console.print("Replay with `tariff-fetch urdb ni`:")
+        for command in replay_commands:
+            console.print(command)
 
 
 def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
@@ -193,3 +216,74 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], year: 
 
 def _prompt_tariff_name(default: str) -> str:
     return q.text("Tariff name", default=default).ask_or_exit()
+
+
+def _format_replay_command(scenario: Scenario, tariff: TariffExtended) -> str:
+    parts = ["tariff-fetch", "urdb", "ni", str(scenario.master_tariff_id), str(scenario.year)]
+    if not scenario.apply_percentages:
+        parts.append("--no-apply-percentages")
+
+    charge_class_flags = _format_charge_class_flags(scenario.charge_classes)
+    parts.extend(charge_class_flags)
+
+    for key, value in sorted(_canonicalize_properties(scenario.properties, tariff).items()):
+        values = value if isinstance(value, list) else [value]
+        for item in values:
+            parts.extend(["--property", f"{key}={_format_property_value(item)}"])
+
+    return shlex.join(parts)
+
+
+def _format_charge_class_flags(charge_classes: set[RateChargeClass]) -> list[str]:
+    if charge_classes == set(_ALL_CHARGE_CLASSES):
+        return []
+
+    shortcut = "".join(code for code, charge_class in _CHARGE_CLASS_CODES if charge_class in charge_classes)
+    return ["-cc", shortcut]
+
+
+def _canonicalize_properties(
+    properties: dict[str, ScenarioPropertyValue], tariff: TariffExtended
+) -> dict[str, ScenarioPropertyValue]:
+    canonical: dict[str, ScenarioPropertyValue] = {}
+    consumed_keys: set[str] = set()
+    property_defs = tariff.get("properties", [])
+
+    for tariff_property in property_defs:
+        matches = _find_matching_property_keys(properties, tariff_property)
+        key_name = tariff_property["key_name"]
+        if key_name in properties:
+            canonical[key_name] = properties[key_name]
+            consumed_keys.add(key_name)
+            continue
+        if matches:
+            canonical[key_name] = properties[matches[0]]
+            consumed_keys.update(matches)
+
+    for key, value in properties.items():
+        if key not in consumed_keys and key not in canonical:
+            canonical[key] = value
+    return canonical
+
+
+def _find_matching_property_keys(
+    properties: dict[str, ScenarioPropertyValue], tariff_property: TariffPropertyStandard
+) -> list[str]:
+    key_name = tariff_property["key_name"]
+    display_name = tariff_property["display_name"]
+    aliases = {_normalize_property_alias(key_name), _normalize_property_alias(display_name)}
+    return [candidate for candidate in properties if _normalize_property_alias(candidate) in aliases]
+
+
+def _normalize_property_alias(value: str) -> str:
+    return "".join(char for char in value.lower() if char.isalnum())
+
+
+def _format_property_value(value: ScenarioPropertyValue) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)

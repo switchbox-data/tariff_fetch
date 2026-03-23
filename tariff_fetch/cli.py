@@ -252,6 +252,7 @@ def urdb_direct(
     charge_class_shortcuts: Annotated[
         list[str] | None,
         typer.Option(
+            "-cc",
             "--cc",
             help=(
                 "Compact Arcadia charge-class selector. "

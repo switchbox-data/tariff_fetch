@@ -53,3 +53,14 @@ def test_library_accepts_property_and_choice_display_aliases():
     )
 
     assert library.get_property("territoryId", "CHOICE") == ["1", "2"]
+
+
+def test_library_preserves_passed_empty_property_dict_for_prompted_values():
+    properties: dict[str, object] = {}
+
+    library = Library(
+        api=object(),  # type: ignore[arg-type]
+        properties=properties,
+    )
+
+    assert properties is library._properies

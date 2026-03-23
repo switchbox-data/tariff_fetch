@@ -241,7 +241,7 @@ class Library:
         self.debug_store = LibraryDebugStore(debug_root)
         self.tariffs = TariffLibrary(api, self.debug_store)
         self.variables = VariablePropertyLibrary(api, self.debug_store)
-        self._properies: dict[str, PropertyValue] = properties or {}
+        self._properies: dict[str, PropertyValue] = properties if properties is not None else {}
         self._issues: dict[tuple[object, ...], str] = {}
 
     def has_property(self, key: str) -> bool:

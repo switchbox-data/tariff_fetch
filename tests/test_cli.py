@@ -224,6 +224,38 @@ def test_urdb_ni_command_supports_charge_class_shortcuts(monkeypatch, tmp_path: 
     assert cast(Scenario, captured["scenario"]).charge_classes == {"SUPPLY", "TAX", "NET_EXCESS"}
 
 
+def test_urdb_ni_command_supports_dash_cc_alias(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "out.json"
+    captured: dict[str, object] = {}
+
+    monkeypatch.setattr(cli, "load_dotenv", lambda: None)
+    monkeypatch.setattr(cli, "ArcadiaSignalAPI", lambda: object())
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_build_urdb(api, scenario: Scenario, *, interactive_errors: bool):
+        captured["scenario"] = scenario
+        return {"label": "UTIL", "utility": "Utility", "name": "Tariff", "country": "USA"}
+
+    monkeypatch.setattr(cli, "build_urdb", fake_build_urdb)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "urdb",
+            "ni",
+            "123",
+            "2025",
+            "--output",
+            str(output_path),
+            "-cc",
+            "St",
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert cast(Scenario, captured["scenario"]).charge_classes == {"SUPPLY", "TAX"}
+
+
 def test_urdb_ni_command_merges_charge_class_flags(monkeypatch, tmp_path: Path):
     output_path = tmp_path / "out.json"
     captured: dict[str, object] = {}
