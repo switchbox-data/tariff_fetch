@@ -101,6 +101,11 @@ def process_rateacuity_gas(output_folder: Path, state: str):
                 _ = console.input("Press enter to proceed...")
                 return
 
+            console.print("Replay with `tariff-fetch gas ni`:")
+            console.print(_format_gas_replay_command(state, selected_utility, tariffs_to_include))
+            if not q.confirm("Proceed?").ask_or_exit():
+                return
+
             with console.status("Fetching tariffs..."):
                 while tariffs_to_include:
                     tariff = tariffs_to_include.pop(0)
@@ -116,8 +121,6 @@ def process_rateacuity_gas(output_folder: Path, state: str):
         return
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_text(json.dumps(results, indent=2))
-    console.print("Replay with `tariff-fetch gas ni`:")
-    console.print(_format_gas_replay_command(state, selected_utility, [result["schedule"] for result in results]))
 
 
 def process_rateacuity(output_folder: Path, state: str, utility: Utility):
@@ -179,6 +182,11 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
                 _ = console.input("Press enter to proceed...")
                 return
 
+            console.print("Replay with `tariff-fetch ni rateacuity`:")
+            console.print(_format_replay_command(utility.eia_id, tariffs_to_include))
+            if not q.confirm("Proceed?").ask_or_exit():
+                return
+
             with console.status("Fetching tariffs..."):
                 while tariffs_to_include:
                     tariff = tariffs_to_include.pop(0)
@@ -194,8 +202,6 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
         return
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_text(json.dumps(results, indent=2))
-    console.print("Replay with `tariff-fetch ni rateacuity`:")
-    console.print(_format_replay_command(utility.eia_id, [result["schedule"] for result in results]))
 
 
 def fetch_rateacuity_tariffs(

@@ -160,6 +160,14 @@ def process_genability(utility: Utility, output_folder: Path, effective_on: date
         _ = console.input("Press enter to proceed...")
         return
 
+    console.print("Replay with `tariff-fetch ni arcadia`:")
+    for replay_command in _format_replay_commands_from_ids(
+        [master_tariff_id for _, master_tariff_id in tariffs], effective_on
+    ):
+        console.print(replay_command)
+    if not q.confirm("Proceed?").ask_or_exit():
+        return
+
     results = _fetch_tariffs(api, tariffs, effective_on)
     suggested_filename = f"arcadia_{utility.name}"
 
@@ -169,13 +177,10 @@ def process_genability(utility: Utility, output_folder: Path, effective_on: date
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_bytes(TypeAdapter(list[tariff.TariffExtended]).dump_json(results, indent=2))
     console.print(f"Wrote [blue]{len(results)}[/] records to {filename}")
-    console.print("Replay with `tariff-fetch ni arcadia`:")
-    for replay_command in _format_replay_commands(results, effective_on):
-        console.print(replay_command)
 
 
-def _format_replay_commands(results: list[tariff.TariffExtended], effective_on: date) -> list[str]:
+def _format_replay_commands_from_ids(master_tariff_ids: list[int], effective_on: date) -> list[str]:
     return [
-        shlex.join(["tariff-fetch", "ni", "arcadia", str(tariff_["master_tariff_id"]), effective_on.isoformat()])
-        for tariff_ in results
+        shlex.join(["tariff-fetch", "ni", "arcadia", str(master_tariff_id), effective_on.isoformat()])
+        for master_tariff_id in master_tariff_ids
     ]
