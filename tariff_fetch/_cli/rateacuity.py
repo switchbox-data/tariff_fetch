@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import shlex
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -191,6 +192,8 @@ def process_rateacuity(output_folder: Path, state: str, utility: Utility):
         return
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_text(json.dumps(results, indent=2))
+    console.print("Replay with `tariff-fetch ni rateacuity`:")
+    console.print(_format_replay_command(utility.eia_id, [result["schedule"] for result in results]))
 
 
 def fetch_rateacuity_tariffs(
@@ -241,6 +244,13 @@ def fetch_rateacuity_tariffs(
                     scraping_state = scraping_state.back_to_selections()
 
     return selected_utility, results
+
+
+def _format_replay_command(eia_id: int, tariffs: Sequence[str]) -> str:
+    parts = ["tariff-fetch", "ni", "rateacuity", "eia-id", str(eia_id)]
+    for tariff in tariffs:
+        parts.extend(["--tariff", tariff])
+    return shlex.join(parts)
 
 
 def fetch_rateacuity_gas_tariffs(
