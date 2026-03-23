@@ -116,6 +116,8 @@ def process_rateacuity_gas(output_folder: Path, state: str):
         return
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_text(json.dumps(results, indent=2))
+    console.print("Replay with `tariff-fetch gas ni`:")
+    console.print(_format_gas_replay_command(state, selected_utility, [result["schedule"] for result in results]))
 
 
 def process_rateacuity(output_folder: Path, state: str, utility: Utility):
@@ -248,6 +250,14 @@ def fetch_rateacuity_tariffs(
 
 def _format_replay_command(eia_id: int, tariffs: Sequence[str]) -> str:
     parts = ["tariff-fetch", "ni", "rateacuity", "eia-id", str(eia_id)]
+    for tariff in tariffs:
+        parts.extend(["--tariff", tariff])
+    return shlex.join(parts)
+
+
+def _format_gas_replay_command(state: str, utility: str, tariffs: Sequence[str]) -> str:
+    parts = ["tariff-fetch", "gas", "ni", state]
+    parts.append(utility)
     for tariff in tariffs:
         parts.extend(["--tariff", tariff])
     return shlex.join(parts)
