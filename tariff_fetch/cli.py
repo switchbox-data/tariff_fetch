@@ -1001,7 +1001,9 @@ def _parse_charge_classes(
 
     normalized = [charge_class.strip().upper() for charge_class in (charge_classes or [])]
     invalid = sorted(set(normalized) - set(ALL_CHARGE_CLASSES))
-    shortcut_invalid = sorted({code for shortcut in charge_class_shortcuts or [] for code in shortcut if code not in CHARGE_CLASS_SHORTCUTS})
+    shortcut_invalid = sorted(
+        {code for shortcut in charge_class_shortcuts or [] for code in shortcut if code not in CHARGE_CLASS_SHORTCUTS}
+    )
     if shortcut_invalid:
         allowed = "".join(CHARGE_CLASS_SHORTCUTS)
         console.print(f"[red]Invalid --cc codes:[/] {', '.join(shortcut_invalid)}")
