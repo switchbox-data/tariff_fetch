@@ -1,4 +1,5 @@
 import os
+import shlex
 from datetime import date
 from pathlib import Path
 
@@ -168,3 +169,13 @@ def process_genability(utility: Utility, output_folder: Path, effective_on: date
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_bytes(TypeAdapter(list[tariff.TariffExtended]).dump_json(results, indent=2))
     console.print(f"Wrote [blue]{len(results)}[/] records to {filename}")
+    console.print("Replay with `tariff-fetch ni arcadia`:")
+    for replay_command in _format_replay_commands(results, effective_on):
+        console.print(replay_command)
+
+
+def _format_replay_commands(results: list[tariff.TariffExtended], effective_on: date) -> list[str]:
+    return [
+        shlex.join(["tariff-fetch", "ni", "arcadia", str(tariff_["master_tariff_id"]), effective_on.isoformat()])
+        for tariff_ in results
+    ]
