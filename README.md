@@ -149,6 +149,7 @@ Useful options:
 - `--output` / `-o`: output file path
 - `--apply-percentages` / `--no-apply-percentages`
 - `--charge-class`: repeat to include multiple charge classes
+- `--cc`: compact charge-class selector using `S T D t C U A O N n`
 - `--property`: repeat `key=value` to pre-fill Arcadia tariff properties
 - `--force` / `-f`: overwrite an existing output file
 

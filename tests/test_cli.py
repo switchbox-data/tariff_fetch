@@ -192,6 +192,95 @@ def test_urdb_ni_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     }
 
 
+def test_urdb_ni_command_supports_charge_class_shortcuts(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "out.json"
+    captured: dict[str, object] = {}
+
+    monkeypatch.setattr(cli, "load_dotenv", lambda: None)
+    monkeypatch.setattr(cli, "ArcadiaSignalAPI", lambda: object())
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_build_urdb(api, scenario: Scenario, *, interactive_errors: bool):
+        captured["scenario"] = scenario
+        return {"label": "UTIL", "utility": "Utility", "name": "Tariff", "country": "USA"}
+
+    monkeypatch.setattr(cli, "build_urdb", fake_build_urdb)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "urdb",
+            "ni",
+            "123",
+            "2025",
+            "--output",
+            str(output_path),
+            "--cc",
+            "Stn",
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert cast(Scenario, captured["scenario"]).charge_classes == {"SUPPLY", "TAX", "NET_EXCESS"}
+
+
+def test_urdb_ni_command_merges_charge_class_flags(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "out.json"
+    captured: dict[str, object] = {}
+
+    monkeypatch.setattr(cli, "load_dotenv", lambda: None)
+    monkeypatch.setattr(cli, "ArcadiaSignalAPI", lambda: object())
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    def fake_build_urdb(api, scenario: Scenario, *, interactive_errors: bool):
+        captured["scenario"] = scenario
+        return {"label": "UTIL", "utility": "Utility", "name": "Tariff", "country": "USA"}
+
+    monkeypatch.setattr(cli, "build_urdb", fake_build_urdb)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "urdb",
+            "ni",
+            "123",
+            "2025",
+            "--output",
+            str(output_path),
+            "--charge-class",
+            "SUPPLY",
+            "--cc",
+            "Dn",
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    assert cast(Scenario, captured["scenario"]).charge_classes == {"SUPPLY", "DISTRIBUTION", "NET_EXCESS"}
+
+
+def test_urdb_ni_command_rejects_invalid_charge_class_shortcuts(monkeypatch, tmp_path: Path):
+    output_path = tmp_path / "out.json"
+
+    monkeypatch.setattr(cli, "load_dotenv", lambda: None)
+    monkeypatch.setattr(console, "print", lambda *args, **kwargs: None)
+
+    result = runner.invoke(
+        cli.app,
+        [
+            "urdb",
+            "ni",
+            "123",
+            "2025",
+            "--output",
+            str(output_path),
+            "--cc",
+            "Sz",
+        ],
+    )
+
+    assert result.exit_code == 1
+
+
 def test_gas_command_runs_end_to_end(monkeypatch, tmp_path: Path):
     captured: dict[str, object] = {}
 

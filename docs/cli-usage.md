@@ -74,6 +74,8 @@ Example:
 
 ```bash
 uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
+
+uv run tariff-fetch urdb ni 522 2025 --cc STDtCUAONn
 ```
 
 Arcadia property overrides accept either the canonical property key or the user-facing property name. For CHOICE

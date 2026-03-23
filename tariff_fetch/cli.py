@@ -96,6 +96,18 @@ UTILITY_CACHE_DIR = Path(user_cache_dir("tariff_fetch"))
 UTILITY_CACHE_PATH = UTILITY_CACHE_DIR / "core_eia861__yearly_sales.parquet"
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
 ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
+CHARGE_CLASS_SHORTCUTS: dict[str, RateChargeClass] = {
+    "S": "SUPPLY",
+    "T": "TRANSMISSION",
+    "D": "DISTRIBUTION",
+    "t": "TAX",
+    "C": "CONTRACTED",
+    "U": "USER_ADJUSTED",
+    "A": "AFTER_TAX",
+    "O": "OTHER",
+    "N": "NON_BYPASSABLE",
+    "n": "NET_EXCESS",
+}
 _T = TypeVar("_T")
 
 
@@ -237,6 +249,18 @@ def urdb_direct(
         list[str] | None,
         typer.Option("--charge-class", help="Arcadia charge class to include; repeat to include multiple"),
     ] = None,
+    charge_class_shortcuts: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--cc",
+            help=(
+                "Compact Arcadia charge-class selector. "
+                "Codes: S=SUPPLY T=TRANSMISSION D=DISTRIBUTION t=TAX "
+                "C=CONTRACTED U=USER_ADJUSTED A=AFTER_TAX O=OTHER "
+                "N=NON_BYPASSABLE n=NET_EXCESS"
+            ),
+        ),
+    ] = None,
     apply_percentages: Annotated[
         bool,
         typer.Option("--apply-percentages/--no-apply-percentages", help="Apply supported percentage rates"),
@@ -279,7 +303,7 @@ def urdb_direct(
         log_dir=log_dir or (output.parent / "logs"),
         log_file=log_file,
     )
-    scenario_charge_classes = _parse_charge_classes(charge_classes)
+    scenario_charge_classes = _parse_charge_classes(charge_classes, charge_class_shortcuts)
     scenario = Scenario(
         master_tariff_id=master_tariff_id,
         year=year,
@@ -969,12 +993,21 @@ def prompt_state() -> StateCode:
     ).ask_or_exit()
 
 
-def _parse_charge_classes(charge_classes: list[str] | None) -> set[RateChargeClass]:
-    if charge_classes is None:
+def _parse_charge_classes(
+    charge_classes: list[str] | None, charge_class_shortcuts: list[str] | None = None
+) -> set[RateChargeClass]:
+    if charge_classes is None and charge_class_shortcuts is None:
         return set(ALL_CHARGE_CLASSES)
 
-    normalized = [charge_class.strip().upper() for charge_class in charge_classes]
+    normalized = [charge_class.strip().upper() for charge_class in (charge_classes or [])]
     invalid = sorted(set(normalized) - set(ALL_CHARGE_CLASSES))
+    shortcut_invalid = sorted({code for shortcut in charge_class_shortcuts or [] for code in shortcut if code not in CHARGE_CLASS_SHORTCUTS})
+    if shortcut_invalid:
+        allowed = "".join(CHARGE_CLASS_SHORTCUTS)
+        console.print(f"[red]Invalid --cc codes:[/] {', '.join(shortcut_invalid)}")
+        console.print(f"Allowed values: {allowed}")
+        raise typer.Exit(code=1)
+    normalized.extend(CHARGE_CLASS_SHORTCUTS[code] for shortcut in charge_class_shortcuts or [] for code in shortcut)
     if invalid:
         allowed = ", ".join(ALL_CHARGE_CLASSES)
         console.print(f"[red]Invalid charge classes:[/] {', '.join(invalid)}")
