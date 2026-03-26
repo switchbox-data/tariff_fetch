@@ -4,6 +4,45 @@ This page explains what the Arcadia-to-URDB converter does, what it asks for, an
 
 The goal of the converter is to turn Arcadia electricity tariffs into a URDB-style rate record that is useful for downstream analysis. It is intentionally conservative: if the tariff uses features that are not yet handled safely, the converter should stop instead of silently producing a misleading result.
 
+## CLI entrypoint
+
+Run the direct converter with:
+
+```bash
+uv run tariff-fetch urdb ni MASTER_TARIFF_ID YEAR [OPTIONS]
+```
+
+Example:
+
+```bash
+uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
+```
+
+Before conversion, you can inspect the tariff's available Arcadia properties with:
+
+```bash
+uv run tariff-fetch show-properties 522
+uv run tariff-fetch show-properties 522 2025-06-01
+```
+
+You can also pre-fill Arcadia tariff properties from the command line:
+
+```bash
+uv run tariff-fetch urdb ni 522 2025 \
+  --property territoryId=123 \
+  --property "Territory=Primary Territory"
+```
+
+Property overrides accept either:
+
+- the canonical Arcadia property key such as `territoryId`
+- the user-facing property name such as `Territory`
+
+For CHOICE properties, values can be either:
+
+- the Arcadia machine value
+- the user-facing choice label shown in interactive prompts
+
 ## What it converts
 
 The converter is designed for Arcadia electricity tariffs with:

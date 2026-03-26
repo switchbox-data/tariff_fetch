@@ -1,6 +1,7 @@
 """Arcadia data access, caching, prompting, and debug persistence for conversion."""
 
 import json
+import re
 from datetime import date, datetime
 from pathlib import Path
 from typing import Literal, final, overload
@@ -240,7 +241,7 @@ class Library:
         self.debug_store = LibraryDebugStore(debug_root)
         self.tariffs = TariffLibrary(api, self.debug_store)
         self.variables = VariablePropertyLibrary(api, self.debug_store)
-        self._properies: dict[str, PropertyValue] = properties or {}
+        self._properies: dict[str, PropertyValue] = properties if properties is not None else {}
         self._issues: dict[tuple[object, ...], str] = {}
 
     def has_property(self, key: str) -> bool:
@@ -287,71 +288,49 @@ class Library:
     def get_property(self, key: str, data_type: TariffPropertyPrunedDataType) -> PropertyValue:
         """Return a property value, prompting and caching it if needed."""
 
-        if (found := self._get_property(key, data_type)) is not None:
-            return found
         tariff_property = self.tariffs.get_property(key)
+        if (found := self._get_property(tariff_property, data_type)) is not None:
+            return found
         result = _prompt_property(tariff_property)
         if result is None:
             raise ConversionError("Property not set")
-        self._properies[key] = result
+        self._properies[tariff_property["key_name"]] = result
         self.debug_store.save_property_value(key, result)
         return result
 
     @overload
-    def _get_property(self, key: str, data_type: Literal["STRING"]) -> str | None: ...
+    def _get_property(self, tariff_property: TariffPropertyStandard, data_type: Literal["STRING"]) -> str | None: ...
 
     @overload
-    def _get_property(self, key: str, data_type: Literal["CHOICE"]) -> list[str] | None: ...
+    def _get_property(
+        self, tariff_property: TariffPropertyStandard, data_type: Literal["CHOICE"]
+    ) -> list[str] | None: ...
 
     @overload
-    def _get_property(self, key: str, data_type: Literal["BOOLEAN"]) -> bool | None: ...
+    def _get_property(self, tariff_property: TariffPropertyStandard, data_type: Literal["BOOLEAN"]) -> bool | None: ...
     @overload
-    def _get_property(self, key: str, data_type: Literal["DATE"]) -> date | None: ...
+    def _get_property(self, tariff_property: TariffPropertyStandard, data_type: Literal["DATE"]) -> date | None: ...
     @overload
-    def _get_property(self, key: str, data_type: Literal["DECIMAL"]) -> float | None: ...
+    def _get_property(self, tariff_property: TariffPropertyStandard, data_type: Literal["DECIMAL"]) -> float | None: ...
     @overload
-    def _get_property(self, key: str, data_type: Literal["INTEGER"]) -> int | None: ...
+    def _get_property(self, tariff_property: TariffPropertyStandard, data_type: Literal["INTEGER"]) -> int | None: ...
     @overload
-    def _get_property(self, key: str, data_type: Literal["DEMAND"]) -> float | None: ...
+    def _get_property(self, tariff_property: TariffPropertyStandard, data_type: Literal["DEMAND"]) -> float | None: ...
 
-    def _get_property(self, key: str, data_type: TariffPropertyPrunedDataType) -> PropertyValue | None:
+    def _get_property(
+        self, tariff_property: TariffPropertyStandard, data_type: TariffPropertyPrunedDataType
+    ) -> PropertyValue | None:
         """Return a cached property value after validating its expected data type."""
 
+        key = tariff_property["key_name"]
+        override_key = _find_property_override_key(self._properies, tariff_property)
         try:
-            value = self._properies[key]
+            value = self._properies[override_key]
         except KeyError:
             return None
-        value_type = type(value)
-        match data_type:
-            case "STRING":
-                if not isinstance(value, str):
-                    raise ConversionError(f"Value for property {key} is expected to be `str`, not {value_type}")
-                return value
-            case "CHOICE":
-                if not isinstance(value, list):
-                    raise ConversionError(f"Value for property {key} is expected to be a list, not {value_type}")
-                return value
-            case "BOOLEAN":
-                if not isinstance(value, bool):
-                    raise ConversionError(f"Value for property {key} is expected to be `bool`, not {value_type}")
-                return value
-            case "DATE":
-                if not isinstance(value, date):
-                    raise ConversionError(f"Value for property {key} is expected to be `bool`, not {value_type}")
-                return value
-            case "DECIMAL":
-                if not isinstance(value, float):
-                    raise ConversionError(f"Value for property {key} is expected to be `float`, not {value_type}")
-                return value
-            case "INTEGER":
-                if not isinstance(value, int):
-                    raise ConversionError(f"Value for property {key} is expected to be `int`, not {value_type}")
-                return value
-
-            case "DEMAND":
-                if not isinstance(value, float):
-                    raise ConversionError(f"Value for property {key} is expected to be `float`, not {value_type}")
-                return value
+        coerced = _coerce_property_value(key, value, data_type, tariff_property)
+        self._properies[key] = coerced
+        return coerced
 
 
 def _is_tariff_effective_on(tariff: TariffExtended, dt: date) -> bool:
@@ -360,6 +339,131 @@ def _is_tariff_effective_on(tariff: TariffExtended, dt: date) -> bool:
     effective_date = tariff["effective_date"]
     end_date = tariff["end_date"] or date.max
     return effective_date <= dt < end_date
+
+
+def _normalize_alias(value: str) -> str:
+    """Normalize user-facing property aliases for forgiving CLI matching."""
+
+    return re.sub(r"[^a-z0-9]+", "", value.lower())
+
+
+def _find_property_override_key(properties: dict[str, PropertyValue], tariff_property: TariffPropertyStandard) -> str:
+    """Resolve a CLI-supplied property override key to the canonical Arcadia property key."""
+
+    key_name = tariff_property["key_name"]
+    display_name = tariff_property["display_name"]
+    if key_name in properties:
+        return key_name
+    if display_name in properties:
+        return display_name
+
+    aliases = {_normalize_alias(key_name), _normalize_alias(display_name)}
+    matches = [candidate for candidate in properties if _normalize_alias(candidate) in aliases]
+    if not matches:
+        return key_name
+    if len(matches) > 1:
+        raise ConversionError(
+            f"Multiple property overrides matched {key_name}: {', '.join(sorted(matches))}. "
+            + "Use the canonical Arcadia property key to disambiguate."
+        )
+    return matches[0]
+
+
+def _coerce_choice_aliases(_key: str, values: list[str], tariff_property: TariffPropertyStandard) -> list[str]:
+    """Map CHOICE property display values back to their Arcadia machine values."""
+
+    choices = tariff_property.get("choices") or []
+    if not choices:
+        return values
+
+    by_value = {choice["value"]: choice["value"] for choice in choices}
+    by_display = {choice["display_value"]: choice["value"] for choice in choices}
+    by_normalized = {_normalize_alias(choice["display_value"]): choice["value"] for choice in choices}
+
+    resolved: list[str] = []
+    for value in values:
+        if value in by_value:
+            resolved.append(by_value[value])
+            continue
+        if value in by_display:
+            resolved.append(by_display[value])
+            continue
+        normalized = _normalize_alias(value)
+        if normalized in by_normalized:
+            resolved.append(by_normalized[normalized])
+            continue
+        resolved.append(value)
+    return resolved
+
+
+def _coerce_property_value(
+    key: str,
+    value: PropertyValue,
+    data_type: TariffPropertyPrunedDataType,
+    tariff_property: TariffPropertyStandard,
+) -> PropertyValue:
+    """Convert CLI-supplied property overrides into the expected Arcadia property type."""
+
+    match data_type:
+        case "STRING":
+            if isinstance(value, str):
+                return value
+            raise ConversionError(f"Value for property {key} is expected to be `str`, not {type(value)}")
+        case "CHOICE":
+            if isinstance(value, list):
+                return _coerce_choice_aliases(key, value, tariff_property)
+            if isinstance(value, str):
+                return _coerce_choice_aliases(
+                    key, [item.strip() for item in value.split(",") if item.strip()], tariff_property
+                )
+            raise ConversionError(f"Value for property {key} is expected to be `list[str]`, not {type(value)}")
+        case "BOOLEAN":
+            if isinstance(value, bool):
+                return value
+            if isinstance(value, str):
+                normalized = value.strip().lower()
+                if normalized in {"true", "1", "yes", "y", "on"}:
+                    return True
+                if normalized in {"false", "0", "no", "n", "off"}:
+                    return False
+            raise ConversionError(f"Value for property {key} is expected to be `bool`, not {type(value)}")
+        case "DATE":
+            if isinstance(value, date):
+                return value
+            if isinstance(value, str):
+                try:
+                    return date.fromisoformat(value)
+                except ValueError as e:
+                    raise ConversionError(f"Value for property {key} is not a valid ISO date: {value}") from e
+            raise ConversionError(f"Value for property {key} is expected to be `date`, not {type(value)}")
+        case "DECIMAL" | "DEMAND":
+            if isinstance(value, bool):
+                raise ConversionError(f"Value for property {key} is expected to be `float`, not {type(value)}")
+            if isinstance(value, float):
+                return value
+            if isinstance(value, int):
+                return float(value)
+            if isinstance(value, str):
+                try:
+                    return float(value)
+                except ValueError as e:
+                    raise ConversionError(f"Value for property {key} is not a valid decimal: {value}") from e
+            raise ConversionError(f"Value for property {key} is expected to be `float`, not {type(value)}")
+        case "INTEGER":
+            if isinstance(value, bool):
+                raise ConversionError(f"Value for property {key} is expected to be `int`, not {type(value)}")
+            if isinstance(value, int):
+                return value
+            if isinstance(value, float):
+                if value.is_integer():
+                    return int(value)
+                raise ConversionError(f"Value for property {key} is not a whole number: {value}")
+            if isinstance(value, str):
+                try:
+                    return int(value)
+                except ValueError as e:
+                    raise ConversionError(f"Value for property {key} is not a valid integer: {value}") from e
+            raise ConversionError(f"Value for property {key} is expected to be `int`, not {type(value)}")
 
 
 def _prompt_property(tariff_property: TariffPropertyStandard) -> PropertyValue | None:

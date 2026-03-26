@@ -1,36 +1,50 @@
 import json
-import os
+import shlex
 from datetime import date
 from pathlib import Path
-from typing import cast
+from typing import cast, get_args
 
-import questionary
 from dotenv import load_dotenv
+
+from tariff_fetch import questionary_typed as q
 
 # from tariff_fetch.genability.lse import get_lses_page
 # from tariff_fetch.genability.tariffs import CustomerClass, TariffType, tariffs_paginate
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
-from tariff_fetch.arcadia.schema.common import CustomerClass, TariffType
+from tariff_fetch.arcadia.schema.common import CustomerClass, RateChargeClass, TariffType
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
+from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyStandard
 from tariff_fetch.urdb.arcadia.build import build_urdb
 from tariff_fetch.urdb.arcadia.prompts import prompt_charge_classes
-from tariff_fetch.urdb.arcadia.scenario import Scenario
+from tariff_fetch.urdb.arcadia.scenario import Scenario, ScenarioPropertyValue
 from tariff_fetch.urdb.schema import URDBRate
 
 from . import console, prompt_filename
 from .types import Utility
 
+_ALL_CHARGE_CLASSES = cast(tuple[RateChargeClass, ...], get_args(RateChargeClass))
+_CHARGE_CLASS_CODES: tuple[tuple[str, RateChargeClass], ...] = (
+    ("S", "SUPPLY"),
+    ("T", "TRANSMISSION"),
+    ("D", "DISTRIBUTION"),
+    ("t", "TAX"),
+    ("C", "CONTRACTED"),
+    ("U", "USER_ADJUSTED"),
+    ("A", "AFTER_TAX"),
+    ("O", "OTHER"),
+    ("N", "NON_BYPASSABLE"),
+    ("n", "NET_EXCESS"),
+)
 
-def process_genability(utility: Utility, output_folder: Path, year: int):
+
+def process_genability(
+    utility: Utility,
+    output_folder: Path,
+    year: int,
+    interactive_errors: bool,
+    properties: dict[str, ScenarioPropertyValue] | None = None,
+):
     _ = load_dotenv()
-    if not os.getenv("ARCADIA_APP_ID"):
-        console.print("[b]ARCADIA_APP_ID[/] environment variable is not set.")
-    if not os.getenv("ARCADIA_APP_KEY"):
-        console.print("[b]ARCADIA_APP_KEY[/] environment variable is not set.")
-    if not (os.getenv("ARCADIA_APP_ID") and os.getenv("ARCADIA_APP_KEY")):
-        console.print("Cannot use Arcadia API due to missing credentials")
-        _ = console.input("Press enter to proceed...")
-        return
     api = ArcadiaSignalAPI()
 
     lse_id = _find_utility_lse_id(api, utility)
@@ -50,12 +64,11 @@ def process_genability(utility: Utility, output_folder: Path, year: int):
 
     api_results = _fetch_tariffs(api, tariffs, year)
     results: list[URDBRate] = []
+    replay_commands: list[str] = []
 
     # tariff_ids = {id_ for _, id_ in tariffs}
 
-    apply_percentages = cast(bool | None, questionary.confirm("Apply percentage rates?").ask())
-    if apply_percentages is None:
-        return
+    apply_percentages = q.confirm("Apply percentage rates?").ask_or_exit()
 
     for tariff in api_results:
         tariff_name = tariff["tariff_name"]
@@ -68,11 +81,13 @@ def process_genability(utility: Utility, output_folder: Path, year: int):
             year=year,
             apply_percentages=apply_percentages,
             charge_classes=charge_classes,
+            properties=properties or {},
         )
-        urdb_tariff = build_urdb(api, scenario)
+        urdb_tariff = build_urdb(api, scenario, interactive_errors=interactive_errors)
         urdb_tariff["name"] = _prompt_tariff_name(urdb_tariff.get("name", ""))
 
         results.append(urdb_tariff)
+        replay_commands.append(_format_replay_command(scenario, tariff))
         # results.append(build_urdb(tariff, api, scenario))
 
     suggested_filename = f"arcadia_{utility.name}.urdb.{year}."
@@ -83,6 +98,10 @@ def process_genability(utility: Utility, output_folder: Path, year: int):
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_text(json.dumps({"items": results}, indent=2))
     console.print(f"Wrote [blue]{len(results)}[/] records to {filename}")
+    if replay_commands:
+        console.print("Replay with `tariff-fetch urdb ni`:")
+        for command in replay_commands:
+            console.print(command)
 
 
 def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
@@ -106,15 +125,14 @@ def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
         return utility_lse_id
     else:
         # Nothing found; this should *theoretically* never happen but let's keep it just in case
-        choices = [questionary.Choice(title=_["name"], value=_["lse_id"]) for _ in lses]
-        choices.append(questionary.Separator())
-        choices.append(questionary.Choice(title="None of these", value=None))
-        utility_lse_id = cast(
-            int | None,
-            questionary.select(
-                message=f"Found multiple utilities with lse id = {utility.eia_id}. Select one.", choices=choices
-            ).ask(),
-        )
+        choices: list[q.Choice[int | None] | q.Separator] = [
+            q.Choice(title=lse["name"], value=lse["lse_id"]) for lse in lses
+        ]
+        choices.append(q.Separator())
+        choices.append(q.Choice(title="None of these", value=None))
+        utility_lse_id = q.select(
+            message=f"Found multiple utilities with lse id = {utility.eia_id}. Select one.", choices=choices
+        ).ask()
         if utility_lse_id is None:
             console.print("No utility chosen")
             return None
@@ -135,60 +153,56 @@ def _select_tariffs(
         )
     if not tariffs:
         return []
-    return cast(
-        list[tuple[str, int]],
-        questionary.checkbox(
-            message="Select tariffs",
-            choices=[
-                questionary.Choice(
-                    title=f"{_['tariff_name']} ({_['tariff_id']})",
-                    value=(_["tariff_name"], _["master_tariff_id"]),  # pyright: ignore[reportAny]
-                    checked=True,
-                )
-                for _ in tariffs
-            ],
-            use_search_filter=True,
-            use_jk_keys=False,
-        ).ask(),
-    )
+    result = q.checkbox(
+        message="Select tariffs",
+        choices=[
+            q.Choice(
+                title=f"{tariff_['tariff_name']} ({tariff_['master_tariff_id']})",
+                value=(tariff_["tariff_name"], tariff_["master_tariff_id"]),
+                checked=True,
+            )
+            for tariff_ in tariffs
+        ],
+        use_search_filter=True,
+        use_jk_keys=False,
+    ).ask_or_exit()
+    return result
 
 
 def _select_customer_classes() -> list[CustomerClass]:
-    return cast(
-        list[CustomerClass],
-        questionary.checkbox(
-            message="Select customer classes",
-            choices=[
-                questionary.Choice(title="Residential", value="RESIDENTIAL"),
-                questionary.Choice(title="General", value="GENERAL"),
-                questionary.Choice(title="Special Use", value="SPECIAL_USE"),
-            ],
-            validate=lambda _: True if _ else "Select at least one customer class",
-        ).ask(),
-    )
+    choices: list[q.Choice[CustomerClass]] = [
+        q.Choice(title="Residential", value="RESIDENTIAL"),
+        q.Choice(title="General", value="GENERAL"),
+        q.Choice(title="Special Use", value="SPECIAL_USE"),
+    ]
+    result = q.checkbox(
+        message="Select customer classes",
+        choices=choices,
+        validate=lambda items: True if items else "Select at least one customer class",
+    ).ask_or_exit()
+    return result
 
 
 def _select_tariff_types() -> list[TariffType]:
-    return cast(
-        list[TariffType],
-        questionary.checkbox(
-            message="Select tariff types",
-            choices=[
-                questionary.Choice(title="Default", value="DEFAULT"),
-                questionary.Choice(title="Alternative", value="ALTERNATIVE"),
-                questionary.Choice(title="Optional extra", value="OPTIONAL_EXTRA"),
-                questionary.Choice(title="Rider", value="RIDER"),
-            ],
-            validate=lambda _: bool(_) or "Select at least one tariff type",
-        ).ask(),
-    )
+    choices: list[q.Choice[TariffType]] = [
+        q.Choice(title="Default", value="DEFAULT"),
+        q.Choice(title="Alternative", value="ALTERNATIVE"),
+        q.Choice(title="Optional extra", value="OPTIONAL_EXTRA"),
+        q.Choice(title="Rider", value="RIDER"),
+    ]
+    result = q.checkbox(
+        message="Select tariff types",
+        choices=choices,
+        validate=lambda items: bool(items) or "Select at least one tariff type",
+    ).ask_or_exit()
+    return result
 
 
 def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], year: int):
     result: list[TariffExtended] = []
     with console.status("Fetching tariffs..."):
         for name, id_ in tariffs:
-            console.print(f"Tariff id: {name}")
+            console.print(f"Master tariff id: {id_} ({name})")
             page = api.tariffs.iter_pages(
                 fields="ext",
                 master_tariff_id=id_,
@@ -201,7 +215,75 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], year: 
 
 
 def _prompt_tariff_name(default: str) -> str:
-    result = cast(str | None, questionary.text("Tariff name", default=default).ask())
-    if result is None:
-        exit()
-    return result
+    return q.text("Tariff name", default=default).ask_or_exit()
+
+
+def _format_replay_command(scenario: Scenario, tariff: TariffExtended) -> str:
+    parts = ["tariff-fetch", "urdb", "ni", str(scenario.master_tariff_id), str(scenario.year)]
+    if not scenario.apply_percentages:
+        parts.append("--no-apply-percentages")
+
+    charge_class_flags = _format_charge_class_flags(scenario.charge_classes)
+    parts.extend(charge_class_flags)
+
+    for key, value in sorted(_canonicalize_properties(scenario.properties, tariff).items()):
+        values = value if isinstance(value, list) else [value]
+        for item in values:
+            parts.extend(["--property", f"{key}={_format_property_value(item)}"])
+
+    return shlex.join(parts)
+
+
+def _format_charge_class_flags(charge_classes: set[RateChargeClass]) -> list[str]:
+    if charge_classes == set(_ALL_CHARGE_CLASSES):
+        return []
+
+    shortcut = "".join(code for code, charge_class in _CHARGE_CLASS_CODES if charge_class in charge_classes)
+    return ["-cc", shortcut]
+
+
+def _canonicalize_properties(
+    properties: dict[str, ScenarioPropertyValue], tariff: TariffExtended
+) -> dict[str, ScenarioPropertyValue]:
+    canonical: dict[str, ScenarioPropertyValue] = {}
+    consumed_keys: set[str] = set()
+    property_defs = tariff.get("properties", [])
+
+    for tariff_property in property_defs:
+        matches = _find_matching_property_keys(properties, tariff_property)
+        key_name = tariff_property["key_name"]
+        if key_name in properties:
+            canonical[key_name] = properties[key_name]
+            consumed_keys.add(key_name)
+            continue
+        if matches:
+            canonical[key_name] = properties[matches[0]]
+            consumed_keys.update(matches)
+
+    for key, value in properties.items():
+        if key not in consumed_keys and key not in canonical:
+            canonical[key] = value
+    return canonical
+
+
+def _find_matching_property_keys(
+    properties: dict[str, ScenarioPropertyValue], tariff_property: TariffPropertyStandard
+) -> list[str]:
+    key_name = tariff_property["key_name"]
+    display_name = tariff_property["display_name"]
+    aliases = {_normalize_property_alias(key_name), _normalize_property_alias(display_name)}
+    return [candidate for candidate in properties if _normalize_property_alias(candidate) in aliases]
+
+
+def _normalize_property_alias(value: str) -> str:
+    return "".join(char for char in value.lower() if char.isalnum())
+
+
+def _format_property_value(value: ScenarioPropertyValue) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)

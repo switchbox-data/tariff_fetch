@@ -1,11 +1,12 @@
 import os
+import shlex
 from datetime import date
 from pathlib import Path
-from typing import cast
 
-import questionary
 from dotenv import load_dotenv
 from pydantic import TypeAdapter
+
+from tariff_fetch import questionary_typed as q
 
 # from tariff_fetch.genability.lse import get_lses_page
 # from tariff_fetch.genability.tariffs import CustomerClass, TariffType, tariffs_paginate
@@ -38,15 +39,14 @@ def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
         return utility_lse_id
     else:
         # Nothing found; this should *theoretically* never happen but let's keep it just in case
-        choices = [questionary.Choice(title=_["name"], value=_["lse_id"]) for _ in lses]
-        choices.append(questionary.Separator())
-        choices.append(questionary.Choice(title="None of these", value=None))
-        utility_lse_id = cast(
-            int | None,
-            questionary.select(
-                message=f"Found multiple utilities with lse id = {utility.eia_id}. Select one.", choices=choices
-            ).ask(),
-        )
+        choices: list[q.Choice[int | None] | q.Separator] = [
+            q.Choice(title=lse["name"], value=lse["lse_id"]) for lse in lses
+        ]
+        choices.append(q.Separator())
+        choices.append(q.Choice(title="None of these", value=None))
+        utility_lse_id = q.select(
+            message=f"Found multiple utilities with lse id = {utility.eia_id}. Select one.", choices=choices
+        ).ask()
         if utility_lse_id is None:
             console.print("No utility chosen")
             return None
@@ -54,78 +54,77 @@ def _find_utility_lse_id(api: ArcadiaSignalAPI, utility: Utility) -> int | None:
 
 
 def _select_tariffs(
-    api: ArcadiaSignalAPI, lse_id: int, customer_classes: list[CustomerClass], tariff_types: list[TariffType]
+    api: ArcadiaSignalAPI,
+    lse_id: int,
+    customer_classes: list[CustomerClass],
+    tariff_types: list[TariffType],
+    effective_on: date,
 ) -> list[tuple[str, int]]:
     with console.status("Fetching tariffs..."):
         tariffs = list(
             api.tariffs.iter_pages(
                 lse_id=lse_id,
-                effective_on=date.today(),
+                effective_on=effective_on,
                 customer_classes=customer_classes,
                 tariff_types=tariff_types,
             )
         )
     if not tariffs:
         return []
-    return cast(
-        list[tuple[str, int]],
-        questionary.checkbox(
-            message="Select tariffs",
-            choices=[
-                questionary.Choice(
-                    title=f"{_['tariff_name']} ({_['tariff_id']})",
-                    value=(_["tariff_name"], _["master_tariff_id"]),  # pyright: ignore[reportAny]
-                    checked=True,
-                )
-                for _ in tariffs
-            ],
-            use_search_filter=True,
-            use_jk_keys=False,
-        ).ask(),
-    )
+    result = q.checkbox(
+        message="Select tariffs",
+        choices=[
+            q.Choice(
+                title=f"{tariff_['tariff_name']} ({tariff_['master_tariff_id']})",
+                value=(tariff_["tariff_name"], tariff_["master_tariff_id"]),
+                checked=True,
+            )
+            for tariff_ in tariffs
+        ],
+        use_search_filter=True,
+        use_jk_keys=False,
+    ).ask_or_exit()
+    return result
 
 
 def _select_customer_classes() -> list[CustomerClass]:
-    return cast(
-        list[CustomerClass],
-        questionary.checkbox(
-            message="Select customer classes",
-            choices=[
-                questionary.Choice(title="Residential", value="RESIDENTIAL"),
-                questionary.Choice(title="General", value="GENERAL"),
-                questionary.Choice(title="Special Use", value="SPECIAL_USE"),
-            ],
-            validate=lambda _: True if _ else "Select at least one customer class",
-        ).ask(),
-    )
+    choices: list[q.Choice[CustomerClass]] = [
+        q.Choice(title="Residential", value="RESIDENTIAL"),
+        q.Choice(title="General", value="GENERAL"),
+        q.Choice(title="Special Use", value="SPECIAL_USE"),
+    ]
+    result = q.checkbox(
+        message="Select customer classes",
+        choices=choices,
+        validate=lambda items: True if items else "Select at least one customer class",
+    ).ask_or_exit()
+    return result
 
 
 def _select_tariff_types() -> list[TariffType]:
-    return cast(
-        list[TariffType],
-        questionary.checkbox(
-            message="Select tariff types",
-            choices=[
-                questionary.Choice(title="Default", value="DEFAULT"),
-                questionary.Choice(title="Alternative", value="ALTERNATIVE"),
-                questionary.Choice(title="Optional extra", value="OPTIONAL_EXTRA"),
-                questionary.Choice(title="Rider", value="RIDER"),
-            ],
-            validate=lambda _: bool(_) or "Select at least one tariff type",
-        ).ask(),
-    )
+    choices: list[q.Choice[TariffType]] = [
+        q.Choice(title="Default", value="DEFAULT"),
+        q.Choice(title="Alternative", value="ALTERNATIVE"),
+        q.Choice(title="Optional extra", value="OPTIONAL_EXTRA"),
+        q.Choice(title="Rider", value="RIDER"),
+    ]
+    result = q.checkbox(
+        message="Select tariff types",
+        choices=choices,
+        validate=lambda items: bool(items) or "Select at least one tariff type",
+    ).ask_or_exit()
+    return result
 
 
-def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]]):
+def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]], effective_on: date):
     result: list[tariff.TariffExtended] = []
     with console.status("Fetching tariffs..."):
         for name, id_ in tariffs:
-            console.print(f"Tariff id: {name}")
+            console.print(f"Master tariff id: {id_} ({name})")
             page = api.tariffs.iter_pages(
                 fields="ext",
                 master_tariff_id=id_,
-                # effective_on=date.today(),
-                effective_on=date(2025, 6, 1),
+                effective_on=effective_on,
                 populate_properties=True,
                 populate_rates=True,
             )
@@ -133,7 +132,7 @@ def _fetch_tariffs(api: ArcadiaSignalAPI, tariffs: list[tuple[str, int]]):
     return result
 
 
-def process_genability(utility: Utility, output_folder: Path):
+def process_genability(utility: Utility, output_folder: Path, effective_on: date | None = None):
     _ = load_dotenv()
     if not os.getenv("ARCADIA_APP_ID"):
         console.print("[b]ARCADIA_APP_ID[/] environment variable is not set.")
@@ -144,6 +143,7 @@ def process_genability(utility: Utility, output_folder: Path):
         _ = console.input("Press enter to proceed...")
         return
     api = ArcadiaSignalAPI()
+    effective_on = effective_on or date.today()
 
     lse_id = _find_utility_lse_id(api, utility)
     if lse_id is None:
@@ -155,12 +155,20 @@ def process_genability(utility: Utility, output_folder: Path):
     if not (tariff_types := _select_tariff_types()):
         return
 
-    if not (tariffs := _select_tariffs(api, lse_id, customer_classes, tariff_types)):
+    if not (tariffs := _select_tariffs(api, lse_id, customer_classes, tariff_types, effective_on)):
         console.print("[red]No tariffs found[/]")
         _ = console.input("Press enter to proceed...")
         return
 
-    results = _fetch_tariffs(api, tariffs)
+    console.print("Replay with `tariff-fetch ni arcadia`:")
+    for replay_command in _format_replay_commands_from_ids(
+        [master_tariff_id for _, master_tariff_id in tariffs], effective_on
+    ):
+        console.print(replay_command)
+    if not q.confirm("Proceed?").ask_or_exit():
+        return
+
+    results = _fetch_tariffs(api, tariffs, effective_on)
     suggested_filename = f"arcadia_{utility.name}"
 
     if not (filename := prompt_filename(output_folder, suggested_filename, "json")):
@@ -169,3 +177,10 @@ def process_genability(utility: Utility, output_folder: Path):
     filename.parent.mkdir(exist_ok=True)
     _ = filename.write_bytes(TypeAdapter(list[tariff.TariffExtended]).dump_json(results, indent=2))
     console.print(f"Wrote [blue]{len(results)}[/] records to {filename}")
+
+
+def _format_replay_commands_from_ids(master_tariff_ids: list[int], effective_on: date) -> list[str]:
+    return [
+        shlex.join(["tariff-fetch", "ni", "arcadia", str(master_tariff_id), effective_on.isoformat()])
+        for master_tariff_id in master_tariff_ids
+    ]

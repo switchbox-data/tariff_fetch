@@ -307,7 +307,7 @@ def test_tariff_iter_rates_for_dt_records_ignored_calendar_issues_once():
 def test_build_urdb_merges_converter_chunks(monkeypatch):
     scenario = Scenario(123, 2025, apply_percentages=True, charge_classes={"SUPPLY"})
 
-    monkeypatch.setattr(build_mod, "Library", lambda api: SimpleNamespace())
+    monkeypatch.setattr(build_mod, "Library", lambda api, properties=None: SimpleNamespace())
     monkeypatch.setattr(
         build_mod,
         "build_energy_schedule",

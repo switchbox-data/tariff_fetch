@@ -9,7 +9,13 @@ If you prefer not to clone the repository or manage a local virtual environment,
 uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch
 
 # gas
-uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch-gas
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch gas
+
+# arcadia to urdb
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch urdb ni 522 2025
+
+# raw arcadia tariff by master tariff id
+uvx --env-file=.env --from git+https://github.com/switchbox-data/tariff_fetch tariff-fetch ni arcadia 522 2025-06-01
 ```
 
 All environment variables (API keys, credentials, etc.) still need to be exported or added to your `.env` file beforehand.
@@ -21,28 +27,204 @@ Run `uv run tariff-fetch` (or `python -m tariff_fetch.cli` / `just cli`) to laun
 ### Options
 
 - `--state` / `-s`: two-letter state abbreviation (case-insensitive). If omitted, the CLI prompts you.
-- `--providers` / `-p`: repeatable flag for each provider (`genability`, `openei`, `rateacuity`). Leaving it out opens a checkbox prompt so you can select multiple providers at once.
+- `--provider` / `-p`: provider to fetch (`genability`, `openei`, `rateacuity`). If omitted, the CLI prompts you.
 - `--output-folder` / `-o`: directory for exported JSON files. Defaults to `./outputs`.
+- `--effective-date`: provider query date in `YYYY-MM-DD` format.
+- `--no-input`: fail instead of prompting for interactive input.
+- `--log-dir`: directory for log files.
+- `--log-file`: exact file path for the log file.
 
 ### Workflow Overview
 
 1. Pick a state (option or prompt).
-2. Choose which providers to fetch (option or interactive checkbox).
+2. Choose which provider to fetch (option or prompt).
 3. Select a utility from the structured EIA list. The CLI fetches the latest CORE_EIA861 data to help you pick based on name, entity type, sales, revenue, and customer counts.
-4. For each provider selected, `tariff_fetch` runs the corresponding workflow (`process_genability`, `process_openei`, or `process_rateacuity`) and writes exports to the chosen output folder. Authentication failures print guidance about the relevant environment variables.
+4. `tariff_fetch` runs the selected workflow (`process_genability`, `process_openei`, or `process_rateacuity`) and writes exports to the chosen output folder. Authentication failures print guidance about the relevant environment variables.
 
-## Gas CLI (`tariff-fetch-gas`)
+The utility picker caches the CORE_EIA861 parquet for 1 hour in the platform-specific user cache directory, so repeated runs usually reuse the local copy instead of downloading it again.
 
-Run `uv run tariff-fetch-gas` (or `python -m tariff_fetch.cli_gas` / `just cligas`).
+Example:
+
+```bash
+uv run tariff-fetch --state ca --provider genability --effective-date 2025-06-01
+```
+
+Use `--no-input` in automation when every required value must come from flags or environment configuration. If the CLI
+would otherwise prompt, it exits with code `1` and names the missing prompt.
+
+## URDB CLI (`tariff-fetch urdb`)
+
+Run `uv run tariff-fetch urdb` for the interactive Genability-to-URDB flow.
+
+### Options
+
+- `--state` / `-s`: two-letter state abbreviation (case-insensitive). If omitted, the CLI prompts you.
+- `--output-folder` / `-o`: directory for exported files. Defaults to `./outputs`.
+- `--year` / `-y`: year to convert. If omitted, the CLI prompts you.
+- `--log-dir`: directory for log files.
+- `--log-file`: exact file path for the log file.
+- `--fail-fast`: stop immediately on conversion errors instead of prompting to continue.
+- `--property`: tariff property override in `key=value` form; repeat to provide multiple values.
+
+### Subcommands
+
+- `ni`: convert one Arcadia master tariff directly to URDB JSON.
+
+Example:
+
+```bash
+uv run tariff-fetch urdb ni 522 2025 --output ./outputs/arcadia_urdb_522_2025.json
+
+uv run tariff-fetch urdb ni 522 2025 --cc STDtCUAONn
+```
+
+Arcadia property overrides accept either the canonical property key or the user-facing property name. For CHOICE
+properties, values can be either Arcadia option values or user-facing choice labels.
+
+Example:
+
+```bash
+uv run tariff-fetch urdb ni 522 2025 \
+  --property territoryId=123 \
+  --property "Territory=Primary Territory"
+```
+
+## Direct Fetch CLI (`tariff-fetch ni`)
+
+Use this command to fetch provider data directly by identifier.
+
+### Subcommands
+
+- `arcadia`: fetch one Arcadia master tariff as raw JSON.
+- `rateacuity fuzzy`: fetch one or more electric RateAcuity tariffs by fuzzy-matched state, utility, and tariff names.
+- `rateacuity eia-id`: resolve an electric utility from the cached utility parquet by EIA ID, then fuzzy-match tariff names.
+
+Examples:
+
+```bash
+uv run tariff-fetch ni arcadia 522
+uv run tariff-fetch ni arcadia 522 2025-06-01 --output ./outputs/arcadia_522_2025-06-01.json
+uv run tariff-fetch ni rateacuity fuzzy ny "con ed" --tariff "residential service"
+uv run tariff-fetch ni rateacuity eia-id 123 --tariff "small commercial"
+```
+
+If the effective date is omitted, the command uses today.
+
+### RateAcuity Fuzzy Matching
+
+RateAcuity does not offer a stable tariff identifier through this CLI, so the non-interactive commands match against
+the live dropdown labels returned by the RateAcuity web portal.
+
+The matching rules are:
+
+1. The CLI loads the available utility or tariff strings from RateAcuity at runtime.
+2. Your query and each available choice are both lowercased before comparison.
+3. The CLI computes a fuzzy score and picks the highest-scoring match.
+4. For repeated `--tariff` flags, each query is matched independently and duplicate resolved tariffs are removed.
+
+That means these inputs are treated similarly:
+
+```bash
+uv run tariff-fetch ni rateacuity fuzzy ny "con ed" --tariff "residential service"
+uv run tariff-fetch ni rateacuity fuzzy ny "CON ED" --tariff "RESIDENTIAL SERVICE"
+uv run tariff-fetch ni rateacuity fuzzy ny "consolidated edison" --tariff "residential"
+```
+
+The first two are typically safe because they are distinctive and close to the portal text. The third may still work,
+but broader queries are inherently riskier because the command will choose the best-scoring match without pausing for
+confirmation.
+
+Practical guidance:
+
+- Prefer distinctive phrases over generic fragments.
+- Use the interactive RateAcuity flow once if you need to learn the exact utility and tariff naming used in the portal.
+- Treat `--tariff "service"` or `--tariff "residential"` as ambiguous unless you know the target list is small.
+
+Examples:
+
+```bash
+# Electric raw fetch with state + utility query
+uv run tariff-fetch ni rateacuity fuzzy ny "con ed" \
+  --tariff "residential service" \
+  --tariff "time of use"
+
+# Electric raw fetch with utility resolved from cached parquet by EIA id
+uv run tariff-fetch ni rateacuity eia-id 123 \
+  --tariff "small commercial"
+```
+
+## Property Inspection CLI (`tariff-fetch show-properties`)
+
+Use this command to inspect Arcadia tariff property metadata before conversion.
+
+Examples:
+
+```bash
+uv run tariff-fetch show-properties 522
+uv run tariff-fetch show-properties 522 2025-06-01
+```
+
+The command prints the Arcadia property key, user-facing name, data type, description, and any CHOICE aliases that
+can be used with `--property`.
+
+## Cache CLI (`tariff-fetch cache`)
+
+Use this command to clear the cached utility parquet used by the interactive utility picker.
+
+### Subcommands
+
+- `clear`: remove the cached CORE_EIA861 parquet file.
+
+Example:
+
+```bash
+uv run tariff-fetch cache clear
+```
+
+## Gas CLI (`tariff-fetch gas`)
+
+Run `uv run tariff-fetch gas` (or `python -m tariff_fetch.cli gas` / `just cli`).
 
 ### Options
 
 - `--state` / `-s`: gas benchmark state (prompts if omitted).
 - `--output-folder` / `-o`: output directory (defaults to `./outputs`).
-- `--urdb`: use this flag to convert to URDB format
+
+### Subcommands
+
+- `ni`: fetch gas tariffs non-interactively by fuzzy-matched state, utility, and tariff names.
+- `urdb`: convert gas tariffs to URDB format.
+
+Examples:
+
+```bash
+uv run tariff-fetch gas --state tx --output-folder outputs
+uv run tariff-fetch gas ni ny "con ed gas" --tariff "firm gas service"
+uv run tariff-fetch gas urdb --state tx --year 2025 --output-folder outputs
+uv run tariff-fetch gas urdb ni ny "con ed gas" --year 2025 --tariff "firm gas service"
+```
 
 ### Workflow Overview
 
 This command only targets RateAcuity’s gas workflow. After you confirm the state, the CLI launches the Selenium flow via `process_rateacuity_gas`, exporting the selected schedules. Failures typically mean the `RATEACUITY_USERNAME`/`RATEACUITY_PASSWORD` credentials or local Chrome/Chromium installation need attention.
 
-You may be presented with additional questions when converting to URDB format.
+`tariff-fetch gas urdb` runs the RateAcuity gas-to-URDB flow and may prompt for a year if `--year` is omitted.
+
+`tariff-fetch gas ni` uses the same lowercase fuzzy-matching behavior as `tariff-fetch ni rateacuity fuzzy`, but targets
+the gas benchmark workflow instead of electric rates.
+
+`tariff-fetch gas urdb ni` applies the same fuzzy utility/tariff matching to the gas history-to-URDB conversion flow.
+Because this mode is non-interactive, you must provide the conversion year explicitly, and you can optionally control
+URDB metadata with flags like `--label`, `--sector`, `--servicetype`, and `--apply-percentages`.
+
+Example:
+
+```bash
+uv run tariff-fetch gas urdb ni ny "con ed gas" \
+  --year 2025 \
+  --tariff "firm gas service" \
+  --label ceg \
+  --sector Commercial \
+  --servicetype Delivery \
+  --apply-percentages
+```
