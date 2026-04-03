@@ -1,10 +1,8 @@
 """Convert Arcadia energy rates into URDB schedule and tier structures."""
 
-import itertools
 from collections.abc import Collection
 from datetime import datetime
 from math import inf
-from statistics import mean
 
 from tariff_fetch.arcadia.schema.common import RateChargeClass
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateExtended
@@ -14,14 +12,11 @@ from tariff_fetch.urdb.schema import EnergyTier, URDBRate
 from . import rateutils as ru
 from .exception import RateConversionError
 from .scenario import Scenario
-from .shared import is_weekday, is_weekend, iter_sampled_datetimes
-from .types import ConsumptionBand, ConsumptionBandSet, DayPredicate
+from .shared import average_aligned_bands, is_weekday, is_weekend, iter_sampled_datetimes, sum_piecewise_bands
+from .types import Band, BandSet, DayPredicate
 
 PercentageModifiers = list[tuple[set[RateChargeClass], float]]
 _ALLOWED_CHARGE_CLASSES: set[RateChargeClass] = {"DISTRIBUTION", "SUPPLY", "TRANSMISSION", "OTHER", "CONTRACTED"}
-
-
-_RATE_PRECISION = 6
 
 
 def build_energy_schedule(scenario: Scenario, library: Library) -> URDBRate:
@@ -37,8 +32,8 @@ def build_energy_schedule(scenario: Scenario, library: Library) -> URDBRate:
     ]
 
     # Order-preserving unique band sets
-    band_sets: list[tuple[ConsumptionBand, ...]] = []
-    band_index: dict[tuple[ConsumptionBand, ...], int] = {}
+    band_sets: list[tuple[Band, ...]] = []
+    band_index: dict[tuple[Band, ...], int] = {}
 
     for schedule in (weekday_schedule_raw, weekend_schedule_raw):
         for month in schedule:
@@ -66,7 +61,7 @@ def get_month_hour_bands(
     month: int,
     hour: int,
     day_filter: DayPredicate,
-) -> ConsumptionBandSet:
+) -> BandSet:
     """Average the sampled energy bands for one month, hour, and day type."""
 
     bands = [
@@ -76,13 +71,13 @@ def get_month_hour_bands(
     return average_aligned_bands(bands)
 
 
-def get_raw_bands_at_datetime(scenario: Scenario, library: Library, dt: datetime) -> ConsumptionBandSet:
+def get_raw_bands_at_datetime(scenario: Scenario, library: Library, dt: datetime) -> BandSet:
     """Return the combined consumption bands that apply at one instant."""
 
     tariff = library.tariffs.get_tariff_at_date(scenario.master_tariff_id, dt)
     rates = list(ru.tariff_iter_rates_for_dt(tariff, scenario, library, dt))
     percentage_modifiers = get_percentage_rates_at_datetime(rates, scenario, library, dt)
-    piecewise_bands: list[ConsumptionBandSet] = []
+    piecewise_bands: list[BandSet] = []
     for rate in rates:
         rate_bands = get_rate_consumption_bands_at_datetime(rate, scenario, library, dt)
         if rate_bands is None:
@@ -102,7 +97,7 @@ def get_rate_consumption_bands_at_datetime(
     scenario: Scenario,
     library: Library,
     dt: datetime,
-) -> ConsumptionBandSet | None:
+) -> BandSet | None:
     """Convert one applicable consumption rate into URDB-style piecewise bands."""
 
     if rate.get("charge_type") != "CONSUMPTION_BASED":
@@ -165,55 +160,7 @@ def get_percentage_rates_at_datetime(
     return result
 
 
-def sum_piecewise_bands(inputs: Collection[ConsumptionBandSet]) -> ConsumptionBandSet:
-    """Sum multiple piecewise band sets over their combined breakpoints."""
-
-    if not inputs:
-        return []
-
-    normalized = [sorted(bands, key=lambda b: b[0]) for bands in inputs]
-    limits = sorted({limit for bands in normalized for limit, _ in bands})
-
-    def value_at(bands: ConsumptionBandSet, limit: float) -> float:
-        for band_limit, value in bands:
-            if limit <= band_limit:
-                return value
-        return 0.0
-
-    summed = [(limit, sum(value_at(bands, limit) for bands in normalized)) for limit in limits]
-
-    return [a for a, b in itertools.pairwise(summed) if a[1] != b[1]] + [summed[-1]]
-
-
-def average_aligned_bands(inputs: list[ConsumptionBandSet]) -> ConsumptionBandSet:
-    """Average multiple band sets after aligning them to common tier limits."""
-
-    if not inputs:
-        return []
-
-    normalized = [sorted(bands, key=lambda b: b[0]) for bands in inputs]
-    limits = sorted({limit for bands in normalized for limit, _ in bands})
-
-    def value_at(bands: ConsumptionBandSet, limit: float) -> float:
-        for band_limit, value in bands:
-            if limit <= band_limit:
-                return value
-        return 0.0
-
-    averaged = [
-        (limit, round(mean(value_at(bands, limit) for bands in normalized), _RATE_PRECISION)) for limit in limits
-    ]
-
-    # Collapse consecutive identical values
-    result = [averaged[0]]
-    for limit, value in averaged[1:]:
-        if value != result[-1][1]:
-            result.append((limit, value))
-
-    return result
-
-
-def _energy_band_to_tier(band: ConsumptionBand) -> EnergyTier:
+def _energy_band_to_tier(band: Band) -> EnergyTier:
     """Convert one internal band tuple into a URDB energy tier entry."""
 
     if band[0] == inf:

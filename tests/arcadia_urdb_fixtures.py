@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import date
 from math import inf
 from types import SimpleNamespace
 from typing import Any
@@ -35,6 +36,70 @@ def make_rate(**overrides: Any) -> dict[str, Any]:
     }
     rate.update(overrides)
     return rate
+
+
+def make_tariff(**overrides: Any) -> dict[str, Any]:
+    tariff = {
+        "is_active": True,
+        "tariff_id": 1,
+        "master_tariff_id": 1,
+        "tariff_code": "R-1",
+        "tariff_name": "Residential Service",
+        "lse_id": 1,
+        "lse_name": "Example Utility",
+        "service_type": "ELECTRICITY",
+        "tariff_type": "DEFAULT",
+        "customer_class": "RESIDENTIAL",
+        "territory_id": 1,
+        "effective_date": date(2025, 1, 1),
+        "end_date": None,
+        "time_zone": "UTC",
+        "billing_period": "MONTHLY",
+        "currency": "USD",
+        "charge_types": ["FIXED_PRICE"],
+        "charge_period": "MONTHLY",
+        "has_time_of_use_rates": False,
+        "has_tiered_rates": False,
+        "has_contracted_rates": False,
+        "has_rate_applicability": False,
+        "tariff_book_name": "Residential Service",
+        "lse_code": "EXAMPLE",
+        "closed_date": None,
+        "min_monthly_consumption": None,
+        "max_monthly_consumption": None,
+        "min_monthly_demand": None,
+        "max_monthly_demand": None,
+        "has_tariff_applicability": False,
+        "has_net_metering": False,
+        "privacy": "PUBLIC",
+        "properties": [],
+        "rates": [],
+    }
+    tariff.update(overrides)
+    return tariff
+
+
+def make_property(**overrides: Any) -> dict[str, Any]:
+    tariff_property = {
+        "key_name": "territoryId",
+        "display_name": "Territory",
+        "keyspace": "tariff",
+        "family": "service",
+        "description": "Example tariff property",
+        "data_type": "CHOICE",
+        "property_types": "APPLICABILITY",
+        "operator": "=",
+        "choices": [
+            {
+                "value": "1",
+                "display_value": "Primary Territory",
+                "data_value": "1",
+            }
+        ],
+        "is_default": False,
+    }
+    tariff_property.update(overrides)
+    return tariff_property
 
 
 def make_fixed_rate(**overrides: Any) -> dict[str, Any]:
