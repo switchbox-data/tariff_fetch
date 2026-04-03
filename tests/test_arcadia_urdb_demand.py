@@ -1,22 +1,17 @@
 from datetime import datetime
 from math import inf
 from types import SimpleNamespace
-from typing import Final, get_args
+from typing import get_args
 
 import pytest
-from tariff_fetch.urdb.arcadia.library import TariffLibrary
-from typing_extensions import override
 
 from tariff_fetch.arcadia.schema.common import TariffChargeType
-from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExtended
 from tariff_fetch.urdb.arcadia.demandschedule import (
-    get_quantity_unit,
     get_rate_demand_bands_at_datetime,
     get_raw_bands_at_datetime,
 )
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
-from tests.arcadia_urdb_fixtures import make_band, make_rate, make_tariff, make_property
-from unittest.mock import Mock
+from tests.arcadia_urdb_fixtures import make_band, make_property, make_rate, make_tariff
 
 DEFAULT_QUANTITY_KEY = "SomeQuantityKey"
 DEMAND_RATE_KW = {
@@ -25,28 +20,18 @@ DEMAND_RATE_KW = {
 }
 
 
-class _NotSetType:
-    @override
-    def __repr__(self) -> str:
-        return "_NOT_SET"
+def make_library_with_quantity_unit(quantity_unit: str = "kW") -> SimpleNamespace:
+    class StubTariffLibrary:
+        def get_property(self, key: str):
+            assert key == DEFAULT_QUANTITY_KEY
+            return make_property(key_name=key, quantity_unit=quantity_unit)
+
+    return SimpleNamespace(tariffs=StubTariffLibrary(), variables=None)
 
 
-_NOT_SET: Final[_NotSetType] = _NotSetType()
-
-
-@pytest.fixture
-def kw_quantity_unit(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setattr("tariff_fetch.urdb.arcadia.demandschedule.get_quantity_unit", lambda *_: "kW")
-
-
-@pytest.fixture
-def kva_quantity_unit(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setattr("tariff_fetch.urdb.arcadia.demandschedule.get_quantity_unit", lambda *_: "kVA")
-
-
-@pytest.mark.usefixtures("kw_quantity_unit")
 def test_rate_demand_bands_at_datetime_simpliest_case():
     # rate = default_rate(rate_bands=[default_band(rate_amount=10.0)])
+    library = make_library_with_quantity_unit()
     rate = make_rate(
         charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[make_band(rate_amount=10.0)]
     )
@@ -54,15 +39,15 @@ def test_rate_demand_bands_at_datetime_simpliest_case():
     result = get_rate_demand_bands_at_datetime(
         rate,
         scenario,
-        None,
+        library,
         None,
     )
     expected = [(inf, 10.0)]
     assert result == expected
 
 
-@pytest.mark.usefixtures("kw_quantity_unit")
 def test_rate_demand_bands_at_datetime_multiple_bands():
+    library = make_library_with_quantity_unit()
     rate = make_rate(
         charge_type="DEMAND_BASED",
         quantity_key=DEFAULT_QUANTITY_KEY,
@@ -76,18 +61,22 @@ def test_rate_demand_bands_at_datetime_multiple_bands():
     result = get_rate_demand_bands_at_datetime(
         rate,
         scenario,
-        None,
+        library,
         None,
     )
     expected = [(250.0, 10.0), (inf, 20)]
     assert result == expected
 
 
-@pytest.mark.usefixtures("kw_quantity_unit")
 def test_rate_demand_bands_at_datetime_variable_rate_key():
     variable_rate_key = "TestVariableRateKey"
     dt_ = datetime(2025, 6, 1, 8, 30)
     variable_rate_value = 321.25
+
+    class StubTariffLibrary:
+        def get_property(self, key: str):
+            assert key == DEFAULT_QUANTITY_KEY
+            return make_property(key_name=key, quantity_unit="kW")
 
     class FakeVariableLibrary:
         def lookup(self, key: str, dt: datetime) -> float:
@@ -95,7 +84,7 @@ def test_rate_demand_bands_at_datetime_variable_rate_key():
             assert dt == dt_
             return variable_rate_value
 
-    library = SimpleNamespace(variables=FakeVariableLibrary())
+    library = SimpleNamespace(tariffs=StubTariffLibrary(), variables=FakeVariableLibrary())
     band = make_band()
     rate = make_rate(
         quantity_key=DEFAULT_QUANTITY_KEY,
@@ -120,20 +109,20 @@ def test_rate_demand_bands_at_datetime_variable_rate_key():
     assert result == expected
 
 
-@pytest.mark.usefixtures("kva_quantity_unit")
 def test_rate_demand_bands_at_datetime_accepts_only_kw():
+    library = make_library_with_quantity_unit("kVA")
     rate = make_rate(charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[])
     match = "Unsupported demand quantity unit: kVA"
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, None, None)
+        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
 
 
-@pytest.mark.usefixtures("kw_quantity_unit")
 def test_rate_demand_bands_at_datetime_must_have_bands():
+    library = make_library_with_quantity_unit()
     rate = make_rate(charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[])
     match = "Demand-based rates must have non-empty bands"
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, None, None)
+        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
 
 
 @pytest.mark.parametrize("charge_type", [_ for _ in get_args(TariffChargeType) if _ != "DEMAND_BASED"])
@@ -143,46 +132,33 @@ def test_rate_demand_bands_must_be_demand_based(charge_type: TariffChargeType):
     assert _ is None
 
 
-@pytest.mark.usefixtures("kw_quantity_unit")
 def test_rate_demand_bands_must_not_have_consumption_limit():
+    library = make_library_with_quantity_unit()
     band = make_band(consumption_upper_limit=10)
     rate = make_rate(charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[band])
     match = "Demand bands with consumption limits are not supported"
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, None, None)
+        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
     del band["consumption_upper_limit"]
     band["has_consumption_limit"] = True
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, None, None)
+        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
 
 
-@pytest.mark.usefixtures("kw_quantity_unit")
 def test_rate_demand_bands_must_not_have_property_limit():
+    library = make_library_with_quantity_unit()
     band = make_band(property_upper_limit=10)
     rate = make_rate(charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[band])
     match = "Bands with property limits are not supported"
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, None, None)
+        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
 
     del band["property_upper_limit"]
     band["has_property_limit"] = True
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, None, None)
+        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
 
 
-def test_rate_get_quantity_unit():
-    class StubTariffLibrary:
-        def get_property(self, key: str):
-            assert key == "billingDemand_kW"
-            return make_property(quantity_unit="kW")
-
-    library = SimpleNamespace(tariffs=StubTariffLibrary())
-    result = get_quantity_unit(library, "billingDemand_kW")
-    expected = "kW"
-    assert result == expected
-
-
-@pytest.mark.usefixtures("kw_quantity_unit")
 def test_get_raw_bands_at_datetime(monkeypatch: pytest.MonkeyPatch):
     dt_value = datetime(2025, 5, 1, 6, 30)
     rates = [
@@ -201,7 +177,11 @@ def test_get_raw_bands_at_datetime(monkeypatch: pytest.MonkeyPatch):
             assert master_tariff_id == 1
             return make_tariff()
 
-    library = SimpleNamespace(tariffs=StubTariffLibrary())
+        def get_property(self, key: str):
+            assert key == DEFAULT_QUANTITY_KEY
+            return make_property(key_name=key, quantity_unit="kW")
+
+    library = SimpleNamespace(tariffs=StubTariffLibrary(), variables=None)
 
     def tariff_iter_rates_for_dt(tariff, scenario, library, dt):
         assert dt == dt_value

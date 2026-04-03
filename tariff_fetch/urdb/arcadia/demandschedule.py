@@ -42,7 +42,7 @@ def get_rate_demand_bands_at_datetime(
     quantity_key = rate.get("quantity_key")
     if quantity_key is None:
         raise RateConversionError(rate, "Demand-based rates must include quantity_key")
-    quantity_unit = get_quantity_unit(library, quantity_key)
+    quantity_unit = _get_quantity_unit(library, quantity_key)
     if quantity_unit != _SUPPORTED_QUANTITY_KEY:
         raise RateConversionError(rate, f"Unsupported demand quantity unit: {quantity_unit}")
     bands = list(_filter_demand_bands(rate))
@@ -76,5 +76,5 @@ def _filter_demand_bands(rate: TariffRateExtended) -> Iterator[TariffRateBand]:
         yield band
 
 
-def get_quantity_unit(library: Library, property_key: str) -> str | None:
+def _get_quantity_unit(library: Library, property_key: str) -> str | None:
     return library.tariffs.get_property(property_key).get("quantity_unit")
