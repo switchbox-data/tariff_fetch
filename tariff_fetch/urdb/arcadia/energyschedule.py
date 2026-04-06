@@ -100,10 +100,10 @@ def get_rate_consumption_bands_at_datetime(
 ) -> BandSet | None:
     """Convert one applicable consumption rate into URDB-style piecewise bands."""
 
-    if rate.get("variable_factor_key") is not None:
-        raise RateConversionError(rate, "Consumption-based rates cannot have variable factor")
     if rate.get("charge_type") != "CONSUMPTION_BASED":
         return None
+    if rate.get("variable_factor_key") is not None:
+        raise RateConversionError(rate, "Consumption-based rates cannot have variable factor")
     if rate.get("quantity_key") is not None:
         raise RateConversionError(rate, "Rates with quantity_key are not supported for consumption conversion")
     if (transaction_type := rate["transaction_type"]) not in {"BUY", "NET", "BUY_IMPORT"}:

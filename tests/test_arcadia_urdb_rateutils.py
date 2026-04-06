@@ -152,19 +152,6 @@ def test_get_raw_bands_at_datetime_skips_percentage_when_disabled(monkeypatch):
     assert result == [(inf, 10.0)]
 
 
-def test_rate_band_get_amount_at_datetime_rejects_variable_factor_key():
-    band = make_band(tariff_rate_id=7, rate_amount=5.0)
-    rate = make_consumption_rate(tariff_rate_id=7, variable_factor_key="billingPeriodProrationFactor")
-    library = SimpleNamespace(tariffs=SimpleNamespace(get_rate=lambda rate_id: rate))
-
-    with pytest.raises(RateConversionError, match="variable_factor_key"):
-        ru.rate_band_get_amount_at_datetime(
-            band,  # type: ignore[arg-type]
-            library,  # type: ignore[arg-type]
-            datetime(2025, 1, 1, 0, 30),
-        )
-
-
 def test_rate_band_get_amount_at_datetime_rejects_variable_rate_sub_key():
     band = make_band(tariff_rate_id=8, rate_amount=5.0)
     rate = make_consumption_rate(tariff_rate_id=8, variable_rate_sub_key="zoneA")

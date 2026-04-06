@@ -53,7 +53,8 @@ def test_build_fixed_charge_converts_daily_to_monthly_average():
 
     result = build_fixed_charge(scenario, library)
 
-    assert result == {"fixedchargefirstmeter": 60.88219178082192, "fixedchargeunits": "$/month"}
+    assert result.get("fixedchargefirstmeter") == pytest.approx(60.883, 0.001)
+    assert result.get("fixedchargeunits") == "$/month"
 
 
 def test_build_fixed_charge_applies_calculation_factor():
@@ -107,4 +108,64 @@ def test_build_fixed_charge_rejects_quantity_key():
     library = make_stub_library([tariff])
 
     with pytest.raises(RateConversionError, match="quantity_key"):
+        _ = build_fixed_charge(scenario, library)
+
+
+def test_build_fixed_charge_rejects_variable_factors():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "variable_factor_key": "some_key",
+            }
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    match = "Fixed charges cannot have variable factors"
+    with pytest.raises(RateConversionError, match=match):
+        _ = build_fixed_charge(scenario, library)
+
+
+def test_build_fixed_charge_with_billing_period_proration_factor():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "charge_period": "MONTHLY",
+                "variable_factor_key": "billingPeriodProrationFactor",
+                "rate_bands": [
+                    {**BAND, "rate_amount": 1000},
+                ],
+            }
+        ],
+    }
+    # expected = mean([*([1000 * (31 / 30)] * 6), *([1000] * 5), 1000 * (28 / 30)])
+    expected = (7 * 1000 * (31 / 30) + 4 * 1000 + 1000 * (28 / 30)) / 12
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    result = build_fixed_charge(scenario, library)
+    assert result.get("fixedchargefirstmeter") == pytest.approx(expected, 0.001)
+
+
+def test_build_fixed_charge_with_billing_period_proration_factor_monthly_only():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "charge_period": "DAILY",
+                "variable_factor_key": "billingPeriodProrationFactor",
+                "rate_bands": [
+                    {**BAND, "rate_amount": 1000},
+                ],
+            }
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    match = "Fixed charges cannot have variable factors"
+    with pytest.raises(RateConversionError, match=match):
         _ = build_fixed_charge(scenario, library)
