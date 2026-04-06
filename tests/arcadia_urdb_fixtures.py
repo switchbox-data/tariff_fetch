@@ -1,11 +1,17 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import UTC, date, datetime, timezone
 from math import inf
 from types import SimpleNamespace
 from typing import Any
 
+from tariff_fetch.arcadia.schema.lookup import Lookup
+from tariff_fetch.arcadia.schema.season import SeasonExtended
+from tariff_fetch.arcadia.schema.tariff import TariffExtended
+from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyStandard
+from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExtended
 
-def make_band(**overrides: Any) -> dict[str, Any]:
+
+def make_band(**overrides: Any) -> TariffRateBand:
     band = {
         "tariff_rate_id": 1,
         "rate_unit": "COST_PER_UNIT",
@@ -21,10 +27,10 @@ def make_band(**overrides: Any) -> dict[str, Any]:
         "applicability_formula": None,
     }
     band.update(overrides)
-    return band
+    return band  # pyright: ignore[reportReturnType]
 
 
-def make_rate(**overrides: Any) -> dict[str, Any]:
+def make_rate(**overrides: Any) -> TariffRateExtended:
     rate = {
         "charge_type": "FIXED_PRICE",
         "transaction_type": "BUY",
@@ -35,10 +41,10 @@ def make_rate(**overrides: Any) -> dict[str, Any]:
         "rate_bands": [make_band()],
     }
     rate.update(overrides)
-    return rate
+    return rate  # pyright: ignore[reportReturnType]
 
 
-def make_tariff(**overrides: Any) -> dict[str, Any]:
+def make_tariff(**overrides: Any) -> TariffExtended:
     tariff = {
         "is_active": True,
         "tariff_id": 1,
@@ -76,10 +82,10 @@ def make_tariff(**overrides: Any) -> dict[str, Any]:
         "rates": [],
     }
     tariff.update(overrides)
-    return tariff
+    return tariff  # pyright: ignore[reportReturnType]
 
 
-def make_property(**overrides: Any) -> dict[str, Any]:
+def make_property(**overrides: Any) -> TariffPropertyStandard:
     tariff_property = {
         "key_name": "territoryId",
         "display_name": "Territory",
@@ -99,30 +105,51 @@ def make_property(**overrides: Any) -> dict[str, Any]:
         "is_default": False,
     }
     tariff_property.update(overrides)
-    return tariff_property
+    return tariff_property  # pyright: ignore[reportReturnType]
 
 
-def make_fixed_rate(**overrides: Any) -> dict[str, Any]:
+def make_season(
+    *, season_from_month: int, season_from_day: int, season_to_month: int, season_to_day: int, **overrides: Any
+) -> SeasonExtended:
+    result = {
+        "season_id": 0,
+        "lse_id": 0,
+        "season_group_id": 0,
+        "season_name": "season",
+        "season_from_month": season_from_month,
+        "season_from_day": season_from_day,
+        "season_to_month": season_to_month,
+        "season_to_day": season_to_day,
+    }
+    result.update(overrides)
+    return result  # pyright: ignore[reportReturnType]
+
+
+def make_fixed_rate(**overrides: Any) -> TariffRateExtended:
     return make_rate(**overrides)
 
 
-def make_consumption_rate(**overrides: Any) -> dict[str, Any]:
+def make_consumption_rate(**overrides: Any) -> TariffRateExtended:
     rate = make_rate(
-        charge_type="CONSUMPTION_BASED",
-        rate_name="Energy Charge",
-        rate_bands=[make_band(consumption_upper_limit=inf)],
+        **{
+            "charge_type": "CONSUMPTION_BASED",
+            "rate_name": "Energy Charge",
+            "rate_bands": [make_band(consumption_upper_limit=inf)],
+            **overrides,
+        }
     )
-    rate.update(overrides)
     return rate
 
 
-def make_percentage_rate(**overrides: Any) -> dict[str, Any]:
+def make_percentage_rate(**overrides: Any) -> TariffRateExtended:
     rate = make_rate(
-        charge_type="FIXED_PRICE",
-        rate_name="Percentage Charge",
-        rate_bands=[make_band(rate_unit="PERCENTAGE")],
+        **{
+            "charge_type": "FIXED_PRICE",
+            "rate_name": "Percentage Charge",
+            "rate_bands": [make_band(rate_unit="PERCENTAGE")],
+            **overrides,
+        }
     )
-    rate.update(overrides)
     return rate
 
 
@@ -159,3 +186,22 @@ class StubLibrary:
         values = self._properties[key]
         assert isinstance(values, list)
         return [int(value) for value in values]
+
+
+RATE = make_rate()
+TARIFF = make_tariff()
+PROPERTY = make_property()
+BAND = make_band()
+LOOKUP: Lookup = {
+    "lookup_id": 0,
+    "property_key": "TestKey",
+    "from_date_time": datetime.fromtimestamp(0, tz=UTC),
+    "to_date_time": datetime.max,
+    "best_value": None,
+    "actual_value": None,
+    "forecast_value": None,
+    "best_accuracy": None,
+    "forecast_accuracy": None,
+    "lse_forecast_accuracy": None,
+    "lse_forecast_value": None,
+}

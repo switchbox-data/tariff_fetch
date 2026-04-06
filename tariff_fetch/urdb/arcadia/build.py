@@ -7,6 +7,7 @@ import typer
 
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 from tariff_fetch.questionary_typed import confirm
+from tariff_fetch.urdb.arcadia.demandschedule import build_demand_schedule
 from tariff_fetch.urdb.arcadia.library import Library
 from tariff_fetch.urdb.schema import URDBRate
 
@@ -27,6 +28,11 @@ def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario, *, interactive_errors:
         "energy rate strucutre",
         interactive_errors=interactive_errors,
     )
+    demand_schedule = _build_chunk(
+        lambda: build_demand_schedule(scenario, library),
+        "demand rate structure",
+        interactive_errors=interactive_errors,
+    )
     fixed_charge = _build_chunk(
         lambda: build_fixed_charge(scenario, library),
         "fixed charges",
@@ -42,7 +48,7 @@ def build_urdb(api: ArcadiaSignalAPI, scenario: Scenario, *, interactive_errors:
         for issue in library.iter_issues():
             logger.warning(issue)
 
-    return {**energy_schedule, **fixed_charge, **metadata}
+    return {**energy_schedule, **demand_schedule, **fixed_charge, **metadata}
 
 
 def _build_chunk(

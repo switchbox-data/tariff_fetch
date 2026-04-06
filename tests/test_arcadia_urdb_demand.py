@@ -1,196 +1,235 @@
-from datetime import datetime
-from math import inf
-from types import SimpleNamespace
-from typing import get_args
+from datetime import date
 
 import pytest
 
-from tariff_fetch.arcadia.schema.common import TariffChargeType
+from tariff_fetch.arcadia.schema.lookup import Lookup
+from tariff_fetch.arcadia.schema.tariff import TariffExtended
+from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExtended
 from tariff_fetch.urdb.arcadia.demandschedule import (
-    get_rate_demand_bands_at_datetime,
-    get_raw_bands_at_datetime,
+    build_demand_schedule,
 )
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
-from tests.arcadia_urdb_fixtures import make_band, make_property, make_rate, make_tariff
+from tariff_fetch.urdb.arcadia.library import Library, PropertyTimeSeries, TariffLibrary, VariablePropertyLibrary
+from tariff_fetch.urdb.arcadia.scenario import Scenario
+from tariff_fetch.urdb.schema import URDBRate
+from tests.arcadia_urdb_fixtures import (
+    BAND,
+    LOOKUP,
+    PROPERTY,
+    RATE,
+    TARIFF,
+)
 
 DEFAULT_QUANTITY_KEY = "SomeQuantityKey"
-DEMAND_RATE_KW = {
+DEMAND_RATE: TariffRateExtended = {
+    **RATE,
     "quantity_key": DEFAULT_QUANTITY_KEY,
     "charge_type": "DEMAND_BASED",
 }
+KW_TARIFF: TariffExtended = {
+    **TARIFF,
+    "properties": [{**PROPERTY, "quantity_key": DEFAULT_QUANTITY_KEY, "quantity_unit": "kW"}],
+}
 
 
-def make_library_with_quantity_unit(quantity_unit: str = "kW") -> SimpleNamespace:
-    class StubTariffLibrary:
-        def get_property(self, key: str):
-            assert key == DEFAULT_QUANTITY_KEY
-            return make_property(key_name=key, quantity_unit=quantity_unit)
-
-    return SimpleNamespace(tariffs=StubTariffLibrary(), variables=None)
+def make_stub_library(tariffs: list[TariffExtended], property_timeseries: PropertyTimeSeries | None = None) -> Library:
+    tariff_library = TariffLibrary(None, None, tariffs)
+    variables_library = VariablePropertyLibrary(None, None, property_timeseries)
+    return Library(None, None, None, tariff_library=tariff_library, variables_library=variables_library)
 
 
-def test_rate_demand_bands_at_datetime_simpliest_case():
-    # rate = default_rate(rate_bands=[default_band(rate_amount=10.0)])
-    library = make_library_with_quantity_unit()
-    rate = make_rate(
-        charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[make_band(rate_amount=10.0)]
-    )
-    scenario = SimpleNamespace(apply_percentages=False)
-    result = get_rate_demand_bands_at_datetime(
-        rate,
-        scenario,
-        library,
-        None,
-    )
-    expected = [(inf, 10.0)]
-    assert result == expected
+def make_stub_scenario(tariff: TariffExtended, apply_percentages: bool = False):
+    return Scenario(tariff["master_tariff_id"], 2025, apply_percentages)
 
 
-def test_rate_demand_bands_at_datetime_multiple_bands():
-    library = make_library_with_quantity_unit()
-    rate = make_rate(
-        charge_type="DEMAND_BASED",
-        quantity_key=DEFAULT_QUANTITY_KEY,
-        rate_bands=[
-            make_band(rate_amount=10.0, has_demand_limit=True, demand_upper_limit=250),
-            make_band(rate_amount=20.0),
+def schedule_lists_to_tuples(src: list[list[int]]) -> tuple[tuple[int, ...], ...]:
+    return tuple(tuple(item) for item in src)
+
+
+ZERO_SCHEDULES = schedule_lists_to_tuples([[0] * 24] * 12)
+
+
+def assert_zero_schedules(result: URDBRate):
+    schedule = ZERO_SCHEDULES
+    assert result.get("demandweekdayschedule") == schedule
+    assert result.get("demandweekendschedule") == schedule
+
+
+def test_build_demand_schedule_simpliest_case():
+    tariff: TariffExtended = {**KW_TARIFF, "rates": [{**DEMAND_RATE, "rate_bands": [{**BAND, "rate_amount": 10.0}]}]}
+    tariffs = [tariff]
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library(tariffs)
+    result = build_demand_schedule(scenario, library)
+    assert result.get("demandratestructure") == [[{"rate": 10.0}]]
+    assert_zero_schedules(result)
+
+
+def test_build_demand_schedule_multiple_bands():
+    tariff: TariffExtended = {
+        **KW_TARIFF,
+        "rates": [
+            {
+                **DEMAND_RATE,
+                "rate_bands": [
+                    {**BAND, "rate_amount": 10.0, "has_demand_limit": True, "demand_upper_limit": 250},
+                    {**BAND, "rate_amount": 20.0},
+                ],
+            }
         ],
-    )
-
-    scenario = SimpleNamespace(apply_percentages=False)
-    result = get_rate_demand_bands_at_datetime(
-        rate,
-        scenario,
-        library,
-        None,
-    )
-    expected = [(250.0, 10.0), (inf, 20)]
-    assert result == expected
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    result = build_demand_schedule(scenario, library)
+    expected = [[{"max": 250.0, "rate": 10.0}, {"rate": 20}]]
+    assert result.get("demandratestructure") == expected
+    assert_zero_schedules(result)
 
 
-def test_rate_demand_bands_at_datetime_variable_rate_key():
-    variable_rate_key = "TestVariableRateKey"
-    dt_ = datetime(2025, 6, 1, 8, 30)
-    variable_rate_value = 321.25
-
-    class StubTariffLibrary:
-        def get_property(self, key: str):
-            assert key == DEFAULT_QUANTITY_KEY
-            return make_property(key_name=key, quantity_unit="kW")
-
-    class FakeVariableLibrary:
-        def lookup(self, key: str, dt: datetime) -> float:
-            assert key == variable_rate_key
-            assert dt == dt_
-            return variable_rate_value
-
-    library = SimpleNamespace(tariffs=StubTariffLibrary(), variables=FakeVariableLibrary())
-    band = make_band()
-    rate = make_rate(
-        quantity_key=DEFAULT_QUANTITY_KEY,
-        variable_rate_key=variable_rate_key,
-    )
-    band = make_band(rate_amount=0.0)
-    rate = make_rate(
-        charge_type="DEMAND_BASED",
-        quantity_key=DEFAULT_QUANTITY_KEY,
-        variable_rate_key=variable_rate_key,
-        rate_bands=[band],
-    )
-    scenario = SimpleNamespace(apply_percentages=False)
-    result = get_rate_demand_bands_at_datetime(rate, scenario, library, dt_)
-    expected = [(inf, variable_rate_value)]
-    assert result == expected
-
-    # If rate_amount is not 0, do not use variable rate
-    band["rate_amount"] = 50.0
-    result = get_rate_demand_bands_at_datetime(rate, scenario, library, dt_)
-    expected = [(inf, 50.0)]
-    assert result == expected
+def test_build_schedule_variable_rate_key():
+    key = LOOKUP["property_key"]
+    lookup: Lookup = {**LOOKUP, "actual_value": 321.25}
+    lookups: PropertyTimeSeries = {(key, 2025): [lookup]}
+    tariff: TariffExtended = {
+        **KW_TARIFF,
+        "rates": [{**DEMAND_RATE, "variable_rate_key": key, "rate_bands": [{**BAND, "rate_amount": 0.0}]}],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff], lookups)
+    result = build_demand_schedule(scenario, library)
+    expected = [[{"rate": 321.25}]]
+    assert result.get("demandratestructure") == expected
+    assert_zero_schedules(result)
 
 
-def test_rate_demand_bands_at_datetime_accepts_only_kw():
-    library = make_library_with_quantity_unit("kVA")
-    rate = make_rate(charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[])
+def test_build_schedule_variable_rate_key_ignore_if_nonzero():
+    key = LOOKUP["property_key"]
+    lookup: Lookup = {**LOOKUP, "actual_value": 321.25}
+    lookups: PropertyTimeSeries = {(key, 2025): [lookup]}
+    tariff: TariffExtended = {
+        **KW_TARIFF,
+        "rates": [{**DEMAND_RATE, "variable_rate_key": key, "rate_bands": [{**BAND, "rate_amount": 10.0}]}],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff], lookups)
+    result = build_demand_schedule(scenario, library)
+    expected = [[{"rate": 10.0}]]
+    assert result.get("demandratestructure") == expected
+    assert_zero_schedules(result)
+
+
+def test_build_schedule_accepts_only_kw():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "properties": [{**PROPERTY, "quantity_key": DEFAULT_QUANTITY_KEY, "quantity_unit": "kVA"}],
+        "rates": [{**DEMAND_RATE, "rate_bands": [{**BAND}]}],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
     match = "Unsupported demand quantity unit: kVA"
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
+        _ = build_demand_schedule(scenario, library)
 
 
-def test_rate_demand_bands_at_datetime_must_have_bands():
-    library = make_library_with_quantity_unit()
-    rate = make_rate(charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[])
-    match = "Demand-based rates must have non-empty bands"
-    with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
+def test_build_schedule_must_be_demand_based():
+    tariff: TariffExtended = {
+        **KW_TARIFF,
+        "rates": [
+            {**RATE, "rate_bands": [{**BAND, "rate_amount": 15.0}]},
+            {**DEMAND_RATE, "rate_bands": [{**BAND, "rate_amount": 10.0}]},
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    result = build_demand_schedule(scenario, library)
+    expected = [[{"rate": 10.0}]]
+    assert result.get("demandratestructure") == expected
+    assert_zero_schedules(result)
 
 
-@pytest.mark.parametrize("charge_type", [_ for _ in get_args(TariffChargeType) if _ != "DEMAND_BASED"])
-def test_rate_demand_bands_must_be_demand_based(charge_type: TariffChargeType):
-    rate = make_rate(charge_type=charge_type)
-    _ = get_rate_demand_bands_at_datetime(rate, None, None, None)
-    assert _ is None
-
-
-def test_rate_demand_bands_must_not_have_consumption_limit():
-    library = make_library_with_quantity_unit()
-    band = make_band(consumption_upper_limit=10)
-    rate = make_rate(charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[band])
+def test_build_schedule_rate_must_not_have_consumption_limit():
+    band: TariffRateBand = {**BAND, "consumption_upper_limit": 10.0}
+    tariff: TariffExtended = {**KW_TARIFF, "rates": [{**DEMAND_RATE, "rate_bands": [band]}]}
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
     match = "Demand bands with consumption limits are not supported"
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
+        _ = build_demand_schedule(scenario, library)
+
     del band["consumption_upper_limit"]
     band["has_consumption_limit"] = True
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
+        _ = build_demand_schedule(scenario, library)
 
 
-def test_rate_demand_bands_must_not_have_property_limit():
-    library = make_library_with_quantity_unit()
-    band = make_band(property_upper_limit=10)
-    rate = make_rate(charge_type="DEMAND_BASED", quantity_key=DEFAULT_QUANTITY_KEY, rate_bands=[band])
+def test_build_schedule_rate_must_not_have_property_limit():
+    band: TariffRateBand = {**BAND, "property_upper_limit": 10.0}
+    tariff: TariffExtended = {**KW_TARIFF, "rates": [{**DEMAND_RATE, "rate_bands": [band]}]}
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
     match = "Bands with property limits are not supported"
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
+        _ = build_demand_schedule(scenario, library)
 
     del band["property_upper_limit"]
     band["has_property_limit"] = True
     with pytest.raises(RateConversionError, match=match):
-        _ = get_rate_demand_bands_at_datetime(rate, None, library, None)
+        _ = build_demand_schedule(scenario, library)
 
 
-def test_get_raw_bands_at_datetime(monkeypatch: pytest.MonkeyPatch):
-    dt_value = datetime(2025, 5, 1, 6, 30)
-    rates = [
-        make_rate(charge_type="CONSUMPTION_BASED"),
-        make_rate(**DEMAND_RATE_KW, rate_bands=[make_band(rate_amount=5.0)]),
-        make_rate(
-            **DEMAND_RATE_KW,
-            rate_bands=[make_band(rate_amount=7.0, demand_upper_limit=10), make_band(rate_amount=12.0)],
-        ),
+def test_build_demand_schedule_averages_sampled_datetimes():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "master_tariff_id": 1,
+        "tariff_id": 2,
+        "effective_date": date(2024, 6, 6),
+        "end_date": date(2026, 6, 6),
+        "properties": [
+            {**PROPERTY, "quantity_key": "base_kw", "quantity_unit": "kW"},
+            {**PROPERTY, "quantity_key": "seasonal_kw", "quantity_unit": "kW"},
+        ],
+        "rates": [
+            {
+                **RATE,
+                "charge_type": "DEMAND_BASED",
+                "quantity_key": "base_kw",
+                "rate_bands": [{**BAND, "rate_amount": 5.0}],
+            },
+            {
+                **RATE,
+                "charge_type": "DEMAND_BASED",
+                "quantity_key": "seasonal_kw",
+                "rate_bands": [{**BAND, "rate_amount": 10.0}],
+                "season": {
+                    "season_id": 0,
+                    "lse_id": 0,
+                    "season_group_id": 0,
+                    "season_name": "season",
+                    "season_from_month": 5,
+                    "season_from_day": 1,
+                    "season_to_month": 5,
+                    "season_to_day": 16,
+                },
+            },
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+
+    result = build_demand_schedule(scenario, library)
+
+    base_schedule = [0] * 24
+    may_weekday_schedule = [1] * 24
+    may_weekend_schedule = [2] * 24
+
+    assert result.get("demandratestructure") == [
+        [{"rate": 5.0}],
+        [{"rate": 10.0}],
+        [{"rate": 9.444444}],
     ]
-    scenario = SimpleNamespace(master_tariff_id=1)
-
-    class StubTariffLibrary:
-        def get_tariff_at_date(self, master_tariff_id: int, dt: datetime):
-            assert dt.date() == dt_value.date()
-            assert master_tariff_id == 1
-            return make_tariff()
-
-        def get_property(self, key: str):
-            assert key == DEFAULT_QUANTITY_KEY
-            return make_property(key_name=key, quantity_unit="kW")
-
-    library = SimpleNamespace(tariffs=StubTariffLibrary(), variables=None)
-
-    def tariff_iter_rates_for_dt(tariff, scenario, library, dt):
-        assert dt == dt_value
-        assert tariff["master_tariff_id"] == 1
-        return rates
-
-    monkeypatch.setattr(
-        "tariff_fetch.urdb.arcadia.demandschedule.ru.tariff_iter_rates_for_dt", tariff_iter_rates_for_dt
+    assert result.get("demandweekdayschedule") == schedule_lists_to_tuples(
+        [base_schedule] * 4 + [may_weekday_schedule] + [base_schedule] * 7
     )
-    result = get_raw_bands_at_datetime(scenario, library, dt_value)
-    expected = [(10, 12), (inf, 17)]
-    assert result == expected
+    assert result.get("demandweekendschedule") == schedule_lists_to_tuples(
+        [base_schedule] * 4 + [may_weekend_schedule] + [base_schedule] * 7
+    )

@@ -4,18 +4,60 @@ from math import inf
 
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExtended
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
-from tariff_fetch.urdb.schema import URDBRate
+from tariff_fetch.urdb.schema import DemandTier, URDBRate
 
 from . import rateutils as ru
 from .library import Library
 from .scenario import Scenario
-from .shared import sum_piecewise_bands
-from .types import Band, BandSet
+from .shared import average_aligned_bands, is_weekday, is_weekend, iter_sampled_datetimes, sum_piecewise_bands
+from .types import Band, BandSet, DayPredicate
 
 _SUPPORTED_QUANTITY_KEY = "kW"
 
 
-def build_demand_schedule(scenario: Scenario, library: Library) -> URDBRate: ...
+def build_demand_schedule(scenario: Scenario, library: Library) -> URDBRate:
+
+    weekday_schedule_raw = [
+        [get_month_hour_bands(scenario, library, month, hour, is_weekday) for hour in range(24)]
+        for month in range(1, 13)
+    ]
+    weekend_schedule_raw = [
+        [get_month_hour_bands(scenario, library, month, hour, is_weekend) for hour in range(24)]
+        for month in range(1, 13)
+    ]
+
+    # Order-preserving unique band sets
+    band_sets: list[tuple[Band, ...]] = []
+    band_index: dict[tuple[Band, ...], int] = {}
+
+    for schedule in (weekday_schedule_raw, weekend_schedule_raw):
+        for month in schedule:
+            for bands in month:
+                key = tuple(bands)
+                if key not in band_index:
+                    band_index[key] = len(band_sets)
+                    band_sets.append(key)
+
+    demand_weekday_schedule = tuple(tuple(band_index[tuple(hour)] for hour in month) for month in weekday_schedule_raw)
+    demand_weekend_schedule = tuple(tuple(band_index[tuple(hour)] for hour in month) for month in weekend_schedule_raw)
+
+    demand_rates_structure = [[_demand_band_to_tier(band) for band in bands] for bands in band_sets]
+
+    return {
+        "demandratestructure": demand_rates_structure,
+        "demandweekdayschedule": demand_weekday_schedule,
+        "demandweekendschedule": demand_weekend_schedule,
+    }
+
+
+def get_month_hour_bands(
+    scenario: Scenario, library: Library, month: int, hour: int, day_filter: DayPredicate
+) -> BandSet:
+    bands = [
+        get_raw_bands_at_datetime(scenario, library, dt)
+        for dt in iter_sampled_datetimes(scenario.year, month, hour, day_filter)
+    ]
+    return average_aligned_bands(bands)
 
 
 def get_raw_bands_at_datetime(scenario: Scenario, library: Library, dt: datetime) -> BandSet:
@@ -76,5 +118,18 @@ def _filter_demand_bands(rate: TariffRateExtended) -> Iterator[TariffRateBand]:
         yield band
 
 
-def _get_quantity_unit(library: Library, property_key: str) -> str | None:
-    return library.tariffs.get_property(property_key).get("quantity_unit")
+def _get_quantity_unit(library: Library, quantity_key: str) -> str | None:
+    return next(
+        p.get("quantity_unit")
+        for tariff in library.tariffs.tariffs
+        for p in tariff.get("properties", [])
+        if p.get("quantity_key") == quantity_key
+    )
+
+
+def _demand_band_to_tier(band: Band) -> DemandTier:
+    """Convert one internal band tuple into a URDB energy tier entry."""
+
+    if band[0] == inf:
+        return {"rate": band[1]}
+    return {"rate": band[1], "max": band[0]}
