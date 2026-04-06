@@ -110,22 +110,9 @@ def normalize_fixed_charge_amount(rate_amount: float, charge_period: str, dt: da
     raise ValueError(f"Unsupported fixed charge period: {charge_period}")
 
 
-def _iter_year(year: int, delta: timedelta) -> Iterator[datetime]:
-    """Yield evenly spaced sample datetimes across a calendar year."""
-
-    dt = datetime(year, 1, 1, 0, 30, 0)
-    max_dt = datetime(year + 1, 1, 1, 0, 0, 0)
-    while dt < max_dt:
-        yield dt
-        dt += delta
-
-
 def _iter_month(year: int, month: int, delta: timedelta) -> Iterator[datetime]:
     dt = datetime(year, month, 1, hour=0, minute=30, second=0)
-    if month == 12:
-        max_dt = datetime(year + 1, 1, 1, 0, 0, 0)
-    else:
-        max_dt = datetime(year, month + 1, 1, 0, 0, 0)
+    max_dt = datetime(year + 1, 1, 1, 0, 0, 0) if month == 12 else datetime(year, month + 1, 1, 0, 0, 0)
     while dt < max_dt:
         yield dt
         dt += delta
