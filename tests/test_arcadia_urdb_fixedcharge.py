@@ -1,86 +1,110 @@
-from datetime import datetime
-
 import pytest
 
+from tariff_fetch.arcadia.schema.tariff import TariffExtended
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
-from tariff_fetch.urdb.arcadia.fixedcharge import get_rate_fixed_charge_at_dt, normalize_fixed_charge_amount
-from tests.arcadia_urdb_fixtures import make_band, make_fixed_rate
+from tariff_fetch.urdb.arcadia.fixedcharge import build_fixed_charge
+from tariff_fetch.urdb.arcadia.library import Library, TariffLibrary, VariablePropertyLibrary
+from tariff_fetch.urdb.arcadia.scenario import Scenario
+from tests.arcadia_urdb_fixtures import BAND, RATE, TARIFF
 
 
-def test_get_rate_fixed_charge_returns_zero_when_no_bands_apply(monkeypatch):
-    rate = make_fixed_rate(rate_bands=[])
-
-    monkeypatch.setattr(
-        "tariff_fetch.urdb.arcadia.fixedcharge.ru.rate_filter_bands",
-        lambda rate, scenario, library: [],
-    )
-
-    result = get_rate_fixed_charge_at_dt(
-        scenario=None,  # pyright: ignore[reportArgumentType]
-        library=None,  # pyright: ignore[reportArgumentType]
-        rate=rate,  # pyright: ignore[reportArgumentType]
-        dt=datetime(2025, 1, 1, 0, 30),
-    )
-
-    assert result == 0
+def make_stub_library(tariffs: list[TariffExtended]) -> Library:
+    tariff_library = TariffLibrary(None, None, tariffs)
+    variables_library = VariablePropertyLibrary(None, None, None)
+    return Library(None, None, None, tariff_library=tariff_library, variables_library=variables_library)
 
 
-def test_get_rate_fixed_charge_converts_daily_to_monthly(monkeypatch):
-    rate = make_fixed_rate(charge_period="DAILY", rate_bands=[make_band(rate_amount=2.0)])
-
-    monkeypatch.setattr(
-        "tariff_fetch.urdb.arcadia.fixedcharge.ru.rate_filter_bands",
-        lambda rate, scenario, library: list(rate["rate_bands"]),
-    )
-    monkeypatch.setattr(
-        "tariff_fetch.urdb.arcadia.fixedcharge.ru.rate_band_get_amount_at_datetime",
-        lambda band, library, dt: band["rate_amount"],
-    )
-
-    result = get_rate_fixed_charge_at_dt(
-        scenario=None,  # pyright: ignore[reportArgumentType]
-        library=None,  # pyright: ignore[reportArgumentType]
-        rate=rate,  # pyright: ignore[reportArgumentType]
-        dt=datetime(2025, 2, 1, 0, 30),
-    )
-
-    assert result == 56.0
+def make_stub_scenario(tariff: TariffExtended) -> Scenario:
+    return Scenario(tariff["master_tariff_id"], 2025, False)
 
 
-def test_get_rate_fixed_charge_applies_calculation_factor(monkeypatch):
-    rate = make_fixed_rate(rate_bands=[make_band(rate_amount=2.0, calculation_factor=1.5)])
+def test_build_fixed_charge_returns_zero_when_no_fixed_rates_apply():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "charge_type": "CONSUMPTION_BASED",
+                "rate_bands": [{**BAND, "rate_amount": 2.0, "calculation_factor": 1.0}],
+            }
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
 
-    monkeypatch.setattr(
-        "tariff_fetch.urdb.arcadia.fixedcharge.ru.rate_filter_bands",
-        lambda rate, scenario, library: list(rate["rate_bands"]),
-    )
-    monkeypatch.setattr(
-        "tariff_fetch.urdb.arcadia.fixedcharge.ru.rate_band_get_amount_at_datetime",
-        lambda band, library, dt: band["rate_amount"] * band["calculation_factor"],
-    )
+    result = build_fixed_charge(scenario, library)
 
-    result = get_rate_fixed_charge_at_dt(
-        scenario=None,  # pyright: ignore[reportArgumentType]
-        library=None,  # pyright: ignore[reportArgumentType]
-        rate=rate,  # pyright: ignore[reportArgumentType]
-        dt=datetime(2025, 2, 1, 0, 30),
-    )
-
-    assert result == 3.0
+    assert result == {"fixedchargefirstmeter": 0, "fixedchargeunits": "$/month"}
 
 
-def test_normalize_fixed_charge_amount_rejects_unsupported_period():
-    with pytest.raises(ValueError, match="Unsupported fixed charge period"):
-        normalize_fixed_charge_amount(1.0, "YEARLY", datetime(2025, 1, 1, 0, 30))
+def test_build_fixed_charge_converts_daily_to_monthly_average():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "charge_period": "DAILY",
+                "rate_bands": [{**BAND, "rate_amount": 2.0, "calculation_factor": 1.0}],
+            }
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+
+    result = build_fixed_charge(scenario, library)
+
+    assert result == {"fixedchargefirstmeter": 60.88219178082192, "fixedchargeunits": "$/month"}
 
 
-def test_get_rate_fixed_charge_rejects_quantity_key():
-    rate = make_fixed_rate(quantity_key="billingMeter")
+def test_build_fixed_charge_applies_calculation_factor():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "rate_bands": [{**BAND, "rate_amount": 2.0, "calculation_factor": 1.5}],
+            }
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+
+    result = build_fixed_charge(scenario, library)
+
+    assert result == {"fixedchargefirstmeter": 3.0, "fixedchargeunits": "$/month"}
+
+
+def test_build_fixed_charge_rejects_unsupported_period():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "charge_period": "ANNUALLY",
+                "rate_bands": [{**BAND, "rate_amount": 1.0, "calculation_factor": 1.0}],
+            }
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+
+    with pytest.raises(RateConversionError, match="Fixed charges should be monthly or daily"):
+        _ = build_fixed_charge(scenario, library)
+
+
+def test_build_fixed_charge_rejects_quantity_key():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "quantity_key": "billingMeter",
+                "rate_bands": [{**BAND, "calculation_factor": 1.0}],
+            }
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
 
     with pytest.raises(RateConversionError, match="quantity_key"):
-        get_rate_fixed_charge_at_dt(
-            scenario=None,  # pyright: ignore[reportArgumentType]
-            library=None,  # pyright: ignore[reportArgumentType]
-            rate=rate,  # pyright: ignore[reportArgumentType]
-            dt=datetime(2025, 1, 1, 0, 30),
-        )
+        _ = build_fixed_charge(scenario, library)
