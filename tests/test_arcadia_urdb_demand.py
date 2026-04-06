@@ -131,6 +131,15 @@ def test_build_schedule_accepts_only_kw():
         _ = build_demand_schedule(scenario, library)
 
 
+def test_build_schedule_rejects_variable_rate_key():
+    tariff: TariffExtended = {**KW_TARIFF, "rates": [{**DEMAND_RATE, "variable_factor_key": "some_key"}]}
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    match = "Demand-based rates cannot have variable factors"
+    with pytest.raises(RateConversionError, match=match):
+        _ = build_demand_schedule(scenario, library)
+
+
 def test_build_schedule_must_be_demand_based():
     tariff: TariffExtended = {
         **KW_TARIFF,

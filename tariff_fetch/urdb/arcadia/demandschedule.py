@@ -79,6 +79,9 @@ def get_rate_demand_bands_at_datetime(
     library: Library,
     dt: datetime,
 ) -> BandSet | None:
+    if rate.get("variable_factor_key") is not None:
+        raise RateConversionError(rate, "Demand-based rates cannot have variable factors")
+
     if rate["charge_type"] != "DEMAND_BASED":
         return None
     quantity_key = rate.get("quantity_key")

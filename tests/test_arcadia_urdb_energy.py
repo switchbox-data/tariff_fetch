@@ -50,6 +50,24 @@ def test_average_aligned_bands_averages_inputs_and_collapses_duplicates():
     assert result == [(100.0, 2.0), (inf, 3.0)]
 
 
+def test_consumption_rate_rejects_variable_factor_key():
+    rate = {
+        "charge_type": "CONSUMPTION_BASED",
+        "transaction_type": "BUY",
+        "charge_class": ["SUPPLY"],
+        "charge_period": "MONTHLY",
+        "variable_factor_key": "some_key",
+        "rate_bands": [],
+    }
+    with pytest.raises(RateConversionError, match="Consumption-based rates cannot have variable factor"):
+        es.get_rate_consumption_bands_at_datetime(
+            rate=rate,  # pyright: ignore[reportArgumentType]
+            scenario=None,  # pyright: ignore[reportArgumentType]
+            library=None,  # pyright: ignore[reportArgumentType]
+            dt=datetime(2025, 1, 1, 0, 30),
+        )
+
+
 def test_consumption_rate_rejects_unsupported_transaction_type():
     rate = {
         "charge_type": "CONSUMPTION_BASED",
