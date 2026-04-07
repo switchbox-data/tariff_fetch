@@ -1,0 +1,3882 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="This is a repository for modern data science projects.">
+      
+      
+        <meta name="author" content="Switchbox">
+      
+      
+      
+        <link rel="prev" href="../supply-charges/">
+      
+      
+        <link rel="next" href="../variable-rates-api/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+    
+    
+      
+        <title>Riders - tariff_fetch</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#coned-rider-charges-a-complete-explainer" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="tariff_fetch" class="md-header__button md-logo" aria-label="tariff_fetch" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tariff_fetch
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Riders
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/switchbox-data/tariff_fetch" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    switchbox-data/tariff_fetch
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="tariff_fetch" class="md-nav__button md-logo" aria-label="tariff_fetch" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    tariff_fetch
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/switchbox-data/tariff_fetch" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    switchbox-data/tariff_fetch
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cli-usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CLI Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../providers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Data Providers
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Data Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../providers/arcadia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Arcadia (Genability)
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Arcadia (Genability)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../providers/arcadia/access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Access & Credentials
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../providers/arcadia/urdb-converter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Arcadia to URDB Converter
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../providers/arcadia/tariff-json-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tariff JSON Structure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../providers/nrel/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    NREL / OpenEI
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            NREL / OpenEI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../providers/nrel/access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Access & Credentials
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../providers/nrel/urdb-json-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    URDB JSON Structure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../providers/rateacuity/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Rate Acuity
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Rate Acuity
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../providers/rateacuity/access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Access & Runtime Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Tariff Wiki
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Tariff Wiki
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Utilities
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            Utilities
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    ConEd
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2_2" id="__nav_4_2_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            ConEd
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../delivery-adjustments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Delivery Adjustments
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../supply-charges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Supply Charges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Riders
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Riders
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-are-riders" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Are Riders?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Are Riders?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-riders-appear-in-the-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Riders Appear in the JSON
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-query-the-rider-tariff-separately" class="md-nav__link">
+    <span class="md-ellipsis">
+      When to Query the Rider Tariff Separately
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview-of-coned-riders" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview of ConEd Riders
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tax-sur-credit" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tax Sur-Credit
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tax Sur-Credit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-rate-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      Variable Rate Key
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamic-load-management-dlm-surcharge" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dynamic Load Management (DLM) Surcharge
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dynamic Load Management (DLM) Surcharge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-the-surcharge-funds" class="md-nav__link">
+    <span class="md-ellipsis">
+      What the Surcharge Funds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-why-this-makes-economic-sense" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Why This Makes Economic Sense
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-typical-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Typical Value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-rate-key_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Variable Rate Key
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customer-benefit-contribution-cbc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customer Benefit Contribution (CBC)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customer Benefit Contribution (CBC)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#who-pays" class="md-nav__link">
+    <span class="md-ellipsis">
+      Who Pays
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-intuition" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Intuition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-its-based-on-system-size-kw-not-usage-kwh" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why It's Based on System Size (kW), Not Usage (kWh)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed-rate-not-variable" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed Rate (Not Variable)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#electric-vehicle-make-ready-surcharge" class="md-nav__link">
+    <span class="md-ellipsis">
+      Electric Vehicle Make Ready Surcharge
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Electric Vehicle Make Ready Surcharge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-funds" class="md-nav__link">
+    <span class="md-ellipsis">
+      What It Funds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-why-socializing-costs-makes-sense" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Why Socializing Costs Makes Sense
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Rate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-all-customers-pay" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why All Customers Pay
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arrears-management-program-recovery-surcharge" class="md-nav__link">
+    <span class="md-ellipsis">
+      Arrears Management Program Recovery Surcharge
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Arrears Management Program Recovery Surcharge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-funds_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      What It Funds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Scale
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-rate_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Rate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-its-separate-from-uncollectible-bill-expense" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why It's Separate from Uncollectible Bill Expense
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gross-receipts-tax-grt" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gross Receipts Tax (GRT)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gross Receipts Tax (GRT)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-rates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Rates
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-separate-distribution-and-supply" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Separate Distribution and Supply?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-quantity-charge-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      The QUANTITY Charge Type
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#value-of-distributed-energy-resources-vder-cost-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Value of Distributed Energy Resources (VDER) Cost Recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Value of Distributed Energy Resources (VDER) Cost Recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-vder-costs-arise" class="md-nav__link">
+    <span class="md-ellipsis">
+      How VDER Costs Arise
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-the-surcharge-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How the Surcharge Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-system-wide-math" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: System-Wide Math
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-all-customers-pay_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why All Customers Pay
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relationship-to-cbc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Relationship to CBC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-rate_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Rate
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-the-policy-story-behind-each-rider" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary: The Policy Story Behind Each Rider
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-riders-appear-in-the-json_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Riders Appear in the JSON
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-rider-calculation-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Reference: Rider Calculation Methods
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variable-rates-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Variable Rates API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_2_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../residential-el1/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    SC1 Residential (Default)
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_2_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            SC1 Residential (Default)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_2_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../residential-el1-tou/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    SC3 Residential TOU
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_2_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            SC3 Residential TOU
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_2_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../residential-el1-demand/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    SC4 Residential Demand
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_2_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            SC4 Residential Demand
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../psegli/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    PSEG Long Island
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2_3" id="__nav_4_2_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            PSEG Long Island
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../psegli/residential-194/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Rate 194 Residential (Default)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../rge/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    RG&E
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2_4" id="__nav_4_2_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            RG&E
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rge/residential-1-rss/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    1-RSS Residential (Default)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../nyseg/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    NYSEG
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2_5" id="__nav_4_2_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            NYSEG
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../nyseg/residential-sc1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SC1 Residential (Default)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../nimo/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    National Grid (NY)
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2_6" id="__nav_4_2_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            National Grid (NY)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../nimo/residential-sc1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SC1 Residential (Default)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../or/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Orange & Rockland
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2_7" id="__nav_4_2_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            Orange & Rockland
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../or/residential-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Rate 1 Residential (Default)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../cenhud/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Central Hudson
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2_8" id="__nav_4_2_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            Central Hudson
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cenhud/residential-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Rate 1 Residential (Default)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../rie/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Rhode Island Energy
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2_9" id="__nav_4_2_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            Rhode Island Energy
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rie/residential-a16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    A-16 Residential (Default)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-are-riders" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Are Riders?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Are Riders?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-riders-appear-in-the-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Riders Appear in the JSON
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-query-the-rider-tariff-separately" class="md-nav__link">
+    <span class="md-ellipsis">
+      When to Query the Rider Tariff Separately
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview-of-coned-riders" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview of ConEd Riders
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tax-sur-credit" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tax Sur-Credit
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tax Sur-Credit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-rate-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      Variable Rate Key
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamic-load-management-dlm-surcharge" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dynamic Load Management (DLM) Surcharge
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dynamic Load Management (DLM) Surcharge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-the-surcharge-funds" class="md-nav__link">
+    <span class="md-ellipsis">
+      What the Surcharge Funds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-why-this-makes-economic-sense" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Why This Makes Economic Sense
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-typical-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Typical Value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-rate-key_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Variable Rate Key
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customer-benefit-contribution-cbc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customer Benefit Contribution (CBC)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customer Benefit Contribution (CBC)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#who-pays" class="md-nav__link">
+    <span class="md-ellipsis">
+      Who Pays
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-intuition" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Intuition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-its-based-on-system-size-kw-not-usage-kwh" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why It's Based on System Size (kW), Not Usage (kWh)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed-rate-not-variable" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed Rate (Not Variable)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#electric-vehicle-make-ready-surcharge" class="md-nav__link">
+    <span class="md-ellipsis">
+      Electric Vehicle Make Ready Surcharge
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Electric Vehicle Make Ready Surcharge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-funds" class="md-nav__link">
+    <span class="md-ellipsis">
+      What It Funds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-why-socializing-costs-makes-sense" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Why Socializing Costs Makes Sense
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Rate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-all-customers-pay" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why All Customers Pay
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arrears-management-program-recovery-surcharge" class="md-nav__link">
+    <span class="md-ellipsis">
+      Arrears Management Program Recovery Surcharge
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Arrears Management Program Recovery Surcharge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-funds_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      What It Funds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Scale
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-rate_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Rate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-its-separate-from-uncollectible-bill-expense" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why It's Separate from Uncollectible Bill Expense
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gross-receipts-tax-grt" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gross Receipts Tax (GRT)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gross Receipts Tax (GRT)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-rates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Rates
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-separate-distribution-and-supply" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Separate Distribution and Supply?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-quantity-charge-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      The QUANTITY Charge Type
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#value-of-distributed-energy-resources-vder-cost-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Value of Distributed Energy Resources (VDER) Cost Recovery
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Value of Distributed Energy Resources (VDER) Cost Recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-it-solves_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Problem It Solves
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin-story_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Origin Story
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-vder-costs-arise" class="md-nav__link">
+    <span class="md-ellipsis">
+      How VDER Costs Arise
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-the-surcharge-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How the Surcharge Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-system-wide-math" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: System-Wide Math
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-all-customers-pay_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why All Customers Pay
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relationship-to-cbc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Relationship to CBC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#current-rate_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Rate
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-the-policy-story-behind-each-rider" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary: The Policy Story Behind Each Rider
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-riders-appear-in-the-json_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Riders Appear in the JSON
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-rider-calculation-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Reference: Rider Calculation Methods
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="coned-rider-charges-a-complete-explainer">ConEd Rider Charges: A Complete Explainer</h1>
+<blockquote>
+<p>⚠️ <strong>Disclaimer</strong>: This guide was generated by an LLM (Claude Opus 4.5) based on the tariff JSON plus the model's background knowledge of NY energy policy, VDER proceedings, and utility programs. The content looks reasonable but <strong>has not been verified by domain experts</strong>. Please verify any claims before relying on them for business or regulatory purposes.</p>
+</blockquote>
+<h2 id="what-are-riders">What Are Riders?</h2>
+<p>Riders are <strong>modular tariff components</strong> that can be attached to multiple base tariffs. Instead of updating every residential, commercial, and industrial tariff when a new program launches, ConEd creates a single rider that applies across rate classes.</p>
+<h3 id="how-riders-appear-in-the-json">How Riders Appear in the JSON</h3>
+<p>Riders have a <strong>two-part structure</strong> in the tariff:</p>
+<p><strong>1. Rider Reference</strong> (placeholder with <code>riderId</code>):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;rateName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CBC Rider&quot;</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;riderId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3399165</span><span class="p">,</span><span class="w">  </span><span class="c1">// ← Links to rider tariff</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;chargeType&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">  </span><span class="c1">// ← No charge info here</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;rateBands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>2. Rider Implementation</strong> (actual rate with <code>riderTariffId</code>):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;rateName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Customer Benefit Contribution&quot;</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;riderTariffId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3495063</span><span class="p">,</span><span class="w">  </span><span class="c1">// ← This IS the rider</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;chargeType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;QUANTITY&quot;</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;rateBands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;rateAmount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.84</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}]</span><span class="w">  </span><span class="c1">// ← Actual rate</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>For bill calculation, use the rates with <code>riderTariffId</code></strong> — they have all the charge details already resolved.</p>
+<h3 id="when-to-query-the-rider-tariff-separately">When to Query the Rider Tariff Separately</h3>
+<p>You typically don't need to. The main tariff includes resolved rider rates. However, you might query <code>GET /tariffs/{riderId}</code> to:</p>
+<ul>
+<li>See which other base tariffs reference this rider</li>
+<li>Check the rider's own effective dates or applicability rules</li>
+<li>Audit or document the rider structure independently</li>
+</ul>
+<hr />
+<h2 id="overview-of-coned-riders">Overview of ConEd Riders</h2>
+<table>
+<thead>
+<tr>
+<th>Rider</th>
+<th>What It Funds</th>
+<th>Who Pays</th>
+<th>Typical Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tax Sur-Credit</td>
+<td>Tax over/under-collection</td>
+<td>All customers</td>
+<td>±$0-2/month</td>
+</tr>
+<tr>
+<td>DLM Surcharge</td>
+<td>Demand response programs</td>
+<td>All customers</td>
+<td>~$0.50/month</td>
+</tr>
+<tr>
+<td>CBC</td>
+<td>Solar customer grid costs</td>
+<td>Solar customers only</td>
+<td>$1.84/kW/month</td>
+</tr>
+<tr>
+<td>EV Make Ready</td>
+<td>EV charging infrastructure</td>
+<td>All customers</td>
+<td>~$0.40/month</td>
+</tr>
+<tr>
+<td>Arrears Management</td>
+<td>COVID debt forgiveness</td>
+<td>All customers</td>
+<td>~$0.60/month</td>
+</tr>
+<tr>
+<td>GRT</td>
+<td>Municipal gross receipts taxes</td>
+<td>All customers</td>
+<td>4-9% of bill</td>
+</tr>
+<tr>
+<td>VDER Cost Recovery</td>
+<td>Solar compensation payments</td>
+<td>All customers</td>
+<td>~$0.55/month</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tax-sur-credit">Tax Sur-Credit</h2>
+<h3 id="the-problem-it-solves">The Problem It Solves</h3>
+<p>Utility rates include assumptions about tax costs (property taxes, federal income taxes, etc.). When actual taxes differ from what's embedded in rates, this rider trues up the difference.</p>
+<h3 id="origin-story">Origin Story</h3>
+<p><strong>2017: Federal Tax Reform</strong></p>
+<p>The Tax Cuts and Jobs Act of 2017 slashed the corporate tax rate from 35% to 21%. ConEd's rates had been set assuming 35%, meaning:</p>
+<ul>
+<li>Customers were overpaying for taxes ConEd no longer owed</li>
+<li>PSC ordered utilities to pass savings back to customers</li>
+<li>Tax Sur-Credit rider was created/expanded to handle this</li>
+</ul>
+<p><strong>Ongoing: Property Tax Fluctuations</strong></p>
+<p>Property taxes on ConEd's infrastructure (substations, poles, etc.) change annually. The rider captures variances from rate case assumptions.</p>
+<h3 id="how-it-works">How It Works</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Tax Sur-Credit = (Taxes Embedded in Rates - Actual Taxes Paid) / kWh Sales
+</span></code></pre></div>
+<ul>
+<li><strong>Positive value</strong> = Surcharge (ConEd under-collected)</li>
+<li><strong>Negative value</strong> = Credit (ConEd over-collected, you get money back)</li>
+</ul>
+<h3 id="example">Example</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Rate case assumed: $500 million in taxes
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Actual taxes paid: $450 million (federal rate cut)
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Over-collection: $50 million
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Tax Sur-Credit = -$50 million / 40 billion kWh = -$0.00125/kWh (CREDIT)
+</span></code></pre></div>
+<p>For a 500 kWh/month customer: <strong>-$0.63/month credit</strong></p>
+<h3 id="current-status">Current Status</h3>
+<p>Post-2017, customers received significant credits. As rate cases catch up to the new tax reality, this rider trends toward zero but still captures ongoing property tax variances.</p>
+<h3 id="variable-rate-key">Variable Rate Key</h3>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">&quot;variableRateKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;taxSurCreditSC1&quot;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="dynamic-load-management-dlm-surcharge">Dynamic Load Management (DLM) Surcharge</h2>
+<h3 id="the-problem-it-solves_1">The Problem It Solves</h3>
+<p>New York's grid faces growing peak demand, especially on hot summer days. Building new power plants and transmission lines is expensive and carbon-intensive. <strong>Demand response</strong> is cheaper: pay customers to reduce usage during peaks instead of building more infrastructure.</p>
+<h3 id="origin-story_1">Origin Story</h3>
+<p><strong>2014: Reforming the Energy Vision (REV)</strong></p>
+<p>NY launched REV to modernize the grid and integrate distributed resources. Demand response became a key pillar.</p>
+<p><strong>2018: ConEd's Brooklyn-Queens Demand Management Program</strong></p>
+<p>Rather than build a $1 billion substation in Brooklyn, ConEd invested $200 million in:</p>
+<ul>
+<li>Battery storage</li>
+<li>Demand response programs</li>
+<li>Distributed solar</li>
+<li>Energy efficiency</li>
+</ul>
+<p>The program proved demand-side solutions could defer infrastructure investment.</p>
+<p><strong>2019+: DLM Programs Expanded</strong></p>
+<p>ConEd now runs multiple demand response programs:</p>
+<ul>
+<li><strong>Commercial System Relief Program (CSRP)</strong>: Large customers curtail during emergencies</li>
+<li><strong>Distribution Load Relief Program (DLRP)</strong>: Targeted local relief</li>
+<li><strong>Smart AC Program</strong>: Residential AC cycling</li>
+<li><strong>Battery storage incentives</strong>: Behind-the-meter batteries discharge during peaks</li>
+</ul>
+<h3 id="what-the-surcharge-funds">What the Surcharge Funds</h3>
+<table>
+<thead>
+<tr>
+<th>Program Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Customer incentive payments</td>
+<td>Pay participants to reduce load</td>
+</tr>
+<tr>
+<td>Battery dispatch payments</td>
+<td>Compensate storage for discharging</td>
+</tr>
+<tr>
+<td>Program administration</td>
+<td>ConEd staff, technology platforms</td>
+</tr>
+<tr>
+<td>Evaluation &amp; measurement</td>
+<td>Verify demand reductions actually occurred</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-it-works_1">How It Works</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>DLM Surcharge = Annual DLM Program Costs / Annual kWh Sales
+</span></code></pre></div>
+<p>The surcharge is per-kWh because:</p>
+<ol>
+<li>All customers benefit from avoided infrastructure</li>
+<li>Larger users (more kWh) benefit proportionally more</li>
+</ol>
+<h3 id="example-why-this-makes-economic-sense">Example: Why This Makes Economic Sense</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Without DLM:
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>- Build new peaker plant: $300 million capital cost
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>- 30-year life → $10 million/year (plus fuel, O&amp;M)
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>- Runs 100 hours/year during peaks
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>- Cost per peak kWh: Very high
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>With DLM:
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>- Pay customers $1/kWh to reduce 100,000 kWh during peaks
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>- Annual cost: $100,000
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>- No capital investment, no emissions
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>- All ratepayers share $100,000 cost
+</span></code></pre></div>
+<p>The surcharge exists because demand response creates <strong>system-wide benefits</strong> (lower costs, fewer emissions, more reliability) that all customers share.</p>
+<h3 id="current-typical-value">Current Typical Value</h3>
+<p>~$0.001/kWh → ~$0.50/month for typical residential customer</p>
+<h3 id="variable-rate-key_1">Variable Rate Key</h3>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">&quot;variableRateKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dynamicLoadManagementSurcharge2252SC1&quot;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="customer-benefit-contribution-cbc">Customer Benefit Contribution (CBC)</h2>
+<h3 id="the-problem-it-solves_2">The Problem It Solves</h3>
+<p>Solar customers use the grid differently than non-solar customers:</p>
+<ul>
+<li>They export power during the day (grid must absorb it)</li>
+<li>They draw power at night and cloudy times (grid must serve them)</li>
+<li>They still need the grid as backup (full capacity must be maintained)</li>
+</ul>
+<p>Under old net metering, solar customers avoided paying most delivery charges but still relied on the grid. This shifted costs to non-solar customers—the "cost shift" debate.</p>
+<h3 id="origin-story_2">Origin Story</h3>
+<p><strong>2017: Value of Distributed Energy Resources (VDER) Order</strong></p>
+<p>The NY PSC overhauled solar compensation:</p>
+<ul>
+<li>Replaced retail net metering with "Value Stack" compensation</li>
+<li>Solar exports are valued based on actual grid benefits (energy, capacity, environmental)</li>
+<li>Created the CBC to ensure solar customers pay for grid services they use</li>
+</ul>
+<p><strong>The Compromise</strong></p>
+<ul>
+<li><strong>Solar advocates</strong> wanted continued strong incentives</li>
+<li><strong>Utilities</strong> wanted solar customers to pay grid costs</li>
+<li><strong>Result</strong>: CBC charges solar customers a modest fee based on system size</li>
+</ul>
+<h3 id="how-it-works_2">How It Works</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Monthly CBC = Solar System Size (kW) × CBC Rate ($/kW)
+</span></code></pre></div>
+<p>Current rate: <strong>$1.84/kW/month</strong></p>
+<h3 id="example_1">Example</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Customer with 8 kW rooftop solar system:
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>CBC = 8 kW × $1.84/kW = $14.72/month
+</span></code></pre></div>
+<h3 id="who-pays">Who Pays</h3>
+<p><strong>Only customers with solar</strong> (or other distributed generation). If <code>systemSize = 0</code> in the calculation inputs, CBC = $0.</p>
+<h3 id="the-intuition">The Intuition</h3>
+<p>Think of CBC as a <strong>"grid access fee"</strong> for solar customers:</p>
+<ul>
+<li>You're using the grid as a giant battery (export midday, import evening)</li>
+<li>You need grid capacity for cloudy days and nights</li>
+<li>The fee ensures you pay something toward that infrastructure</li>
+</ul>
+<h3 id="why-its-based-on-system-size-kw-not-usage-kwh">Why It's Based on System Size (kW), Not Usage (kWh)</h3>
+<p>The grid must be sized to handle your <strong>maximum possible export or import</strong>, which correlates with system size:</p>
+<ul>
+<li>4 kW system → grid must handle 4 kW flows</li>
+<li>12 kW system → grid must handle 12 kW flows</li>
+</ul>
+<p>Larger systems create more grid capacity needs, hence the $/kW structure.</p>
+<h3 id="fixed-rate-not-variable">Fixed Rate (Not Variable)</h3>
+<p>Unlike most riders, CBC has a fixed rate in the tariff:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">&quot;rateAmount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.84</span><span class="p">,</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">&quot;rateUnit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COST_PER_UNIT&quot;</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nt">&quot;quantityKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;systemSize&quot;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="electric-vehicle-make-ready-surcharge">Electric Vehicle Make Ready Surcharge</h2>
+<h3 id="the-problem-it-solves_3">The Problem It Solves</h3>
+<p>New York is pushing aggressive EV adoption to meet climate goals. EVs need charging infrastructure. The "make-ready" work—installing conduit, wiring, transformers, and panels up to the charger—is expensive and slows deployment.</p>
+<h3 id="origin-story_3">Origin Story</h3>
+<p><strong>2020: NY PSC EV Make-Ready Order</strong></p>
+<p>The PSC ordered utilities to fund "make-ready" infrastructure for EV charging:</p>
+<ul>
+<li>ConEd must spend ~$300 million over several years</li>
+<li>Covers costs up to the charger (not the charger itself)</li>
+<li>Targets public charging, fleet depots, and multi-family buildings</li>
+</ul>
+<p><strong>The Goal</strong></p>
+<p>Remove infrastructure as a barrier to EV adoption. Property owners install chargers more readily if ConEd covers the electrical upgrades.</p>
+<h3 id="what-it-funds">What It Funds</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>What ConEd Pays For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Utility-side work</td>
+<td>Transformer upgrades, new service drops</td>
+</tr>
+<tr>
+<td>Customer-side work</td>
+<td>Conduit, wiring, panels (to the charger location)</td>
+</tr>
+<tr>
+<td>Program administration</td>
+<td>Application processing, inspections</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-it-works_3">How It Works</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>EV Make Ready Surcharge = Annual Program Costs / Annual kWh Sales
+</span></code></pre></div>
+<h3 id="example-why-socializing-costs-makes-sense">Example: Why Socializing Costs Makes Sense</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Individual approach:
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>- Property owner wants to install 10 EV chargers
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>- Electrical upgrades cost $150,000
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>- Project abandoned—too expensive
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>Make-ready approach:
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>- ConEd covers $150,000 in make-ready costs
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>- Property owner pays only for chargers (~$30,000)
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>- Project proceeds
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>- Cost spread across all ratepayers: $0.0008/kWh
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>- For 500 kWh customer: ~$0.40/month
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>- Society gets EV infrastructure, reduced emissions
+</span></code></pre></div>
+<h3 id="current-rate">Current Rate</h3>
+<p><strong>$0.0008/kWh</strong> → ~$0.40/month for typical residential customer</p>
+<h3 id="why-all-customers-pay">Why All Customers Pay</h3>
+<ol>
+<li><strong>Climate benefits</strong>: Less transportation emissions benefits everyone</li>
+<li><strong>Grid benefits</strong>: EVs can eventually provide grid services (V2G)</li>
+<li><strong>Economic development</strong>: Charging infrastructure attracts businesses</li>
+<li><strong>Precedent</strong>: Similar to how all ratepayers funded the original electric grid</li>
+</ol>
+<hr />
+<h2 id="arrears-management-program-recovery-surcharge">Arrears Management Program Recovery Surcharge</h2>
+<h3 id="the-problem-it-solves_4">The Problem It Solves</h3>
+<p>During COVID-19, millions of New Yorkers fell behind on utility bills. NY imposed a moratorium on shutoffs, and debt accumulated. When moratoriums lifted, utilities faced:</p>
+<ul>
+<li>Massive unpaid balances</li>
+<li>Customers who couldn't pay without hardship</li>
+<li>Need to maintain service while recovering costs</li>
+</ul>
+<h3 id="origin-story_4">Origin Story</h3>
+<p><strong>March 2020: COVID Shutoff Moratorium</strong></p>
+<p>NY banned utility disconnections during the pandemic. Customers who couldn't pay accumulated arrears.</p>
+<p><strong>2021-2022: Arrears Forgiveness Programs</strong></p>
+<p>The PSC and legislature created programs to:</p>
+<ul>
+<li>Forgive portions of low-income customer debt</li>
+<li>Create extended payment plans for others</li>
+<li>Provide state/federal funds to cover some arrears</li>
+</ul>
+<p><strong>The Gap</strong></p>
+<p>Even with assistance programs, utilities were left with unrecoverable debt beyond normal "uncollectible bill expense" levels. This surcharge recovers the extraordinary COVID-era shortfall.</p>
+<h3 id="what-it-funds_1">What It Funds</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Forgiven debt</td>
+<td>Balances written off under hardship programs</td>
+</tr>
+<tr>
+<td>State program administration</td>
+<td>Processing assistance applications</td>
+</tr>
+<tr>
+<td>Extended payment plan losses</td>
+<td>Time value of money on payment plans</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-it-works_4">How It Works</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Arrears Recovery Surcharge = COVID-Era Uncollectible Amount / kWh Sales Over Recovery Period
+</span></code></pre></div>
+<h3 id="the-scale">The Scale</h3>
+<p>ConEd accumulated hundreds of millions in COVID-era arrears. The surcharge spreads recovery over several years to minimize bill impact.</p>
+<h3 id="example_2">Example</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>COVID arrears to recover: $200 million
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Recovery period: 5 years → $40 million/year
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>Annual sales: 40 billion kWh
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>Surcharge = $40 million / 40 billion kWh = $0.001/kWh
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>For 500 kWh customer: ~$0.50/month
+</span></code></pre></div>
+<h3 id="current-rate_1">Current Rate</h3>
+<p><strong>$0.0012/kWh</strong> → ~$0.60/month for typical residential customer</p>
+<h3 id="why-its-separate-from-uncollectible-bill-expense">Why It's Separate from Uncollectible Bill Expense</h3>
+<p>The regular "Uncollectible Bill Expense" adjustment handles <strong>normal</strong> bad debt (typically 1-2% of bills). COVID created <strong>extraordinary</strong> bad debt that would distort the normal mechanism. A separate rider provides:</p>
+<ul>
+<li>Transparency (customers see it as a distinct line item)</li>
+<li>Time-limited recovery (will eventually sunset)</li>
+<li>Regulatory accountability (PSC monitors specifically)</li>
+</ul>
+<hr />
+<h2 id="gross-receipts-tax-grt">Gross Receipts Tax (GRT)</h2>
+<h3 id="the-problem-it-solves_5">The Problem It Solves</h3>
+<p>New York municipalities levy taxes on utilities based on their gross receipts (revenue). These taxes fund local government services. The GRT rider passes these taxes through to customers transparently.</p>
+<h3 id="origin-story_5">Origin Story</h3>
+<p><strong>Long-standing municipal tax authority</strong></p>
+<p>NY municipalities have taxed utilities for decades. Rates vary by jurisdiction based on local government decisions.</p>
+<p><strong>Why It Varies by Zone</strong></p>
+<p>ConEd serves three distinct areas with different tax authorities:</p>
+<ul>
+<li><strong>Zone J (NYC)</strong>: NYC's tax rates</li>
+<li><strong>Zone I (Lower Westchester)</strong>: Various Westchester municipalities</li>
+<li><strong>Zone H (Upper Westchester)</strong>: Different Westchester municipalities</li>
+</ul>
+<h3 id="how-it-works_5">How It Works</h3>
+<p>GRT is applied as a <strong>percentage of your charges</strong>, not per-kWh:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>GRT = (Applicable Charges) × GRT Rate
+</span></code></pre></div>
+<p>It's split into two components:</p>
+<ul>
+<li><strong>GRT Distribution</strong>: Applied to delivery charges</li>
+<li><strong>GRT Supply</strong>: Applied to supply charges (if using ConEd supply)</li>
+</ul>
+<h3 id="current-rates">Current Rates</h3>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>GRT Distribution</th>
+<th>GRT Supply</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H (Upper Westchester)</td>
+<td>3.3322%</td>
+<td>1.0101%</td>
+<td>4.34%</td>
+</tr>
+<tr>
+<td>I (Lower Westchester)</td>
+<td>5.5127%</td>
+<td>3.0928%</td>
+<td>8.61%</td>
+</tr>
+<tr>
+<td>J (NYC)</td>
+<td>4.7940%</td>
+<td>2.4066%</td>
+<td>7.20%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_3">Example</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Zone J (NYC) customer:
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>- Delivery charges: $80
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>- Supply charges: $50
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>GRT Distribution = $80 × 4.794% = $3.84
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>GRT Supply = $50 × 2.4066% = $1.20
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>Total GRT = $5.04
+</span></code></pre></div>
+<h3 id="why-separate-distribution-and-supply">Why Separate Distribution and Supply?</h3>
+<p>Different tax rules may apply to:</p>
+<ul>
+<li><strong>Distribution</strong>: Charges for using ConEd's wires (always ConEd)</li>
+<li><strong>Supply</strong>: Charges for electricity commodity (ConEd or ESCO)</li>
+</ul>
+<p>If you use an ESCO, you don't pay ConEd's supply charges, so GRT Supply doesn't apply to ConEd portion.</p>
+<h3 id="the-quantity-charge-type">The QUANTITY Charge Type</h3>
+<p>In the JSON, GRT uses <code>chargeType: "QUANTITY"</code> with <code>rateUnit: "PERCENTAGE"</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="nt">&quot;rateName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GRT Distribution - Zone J&quot;</span><span class="p">,</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="nt">&quot;chargeType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;QUANTITY&quot;</span><span class="p">,</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="nt">&quot;rateBands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="nt">&quot;rateAmount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">4.794</span><span class="p">,</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="nt">&quot;rateUnit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PERCENTAGE&quot;</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="p">}]</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The "quantity" here is the dollar amount of applicable charges, and the rate is a percentage.</p>
+<hr />
+<h2 id="value-of-distributed-energy-resources-vder-cost-recovery">Value of Distributed Energy Resources (VDER) Cost Recovery</h2>
+<h3 id="the-problem-it-solves_6">The Problem It Solves</h3>
+<p>When solar systems (and other distributed generation) export power to the grid, ConEd must compensate them. Under NY's Value Stack tariff, these payments can be substantial. This surcharge recovers those costs from all ratepayers.</p>
+<h3 id="origin-story_6">Origin Story</h3>
+<p><strong>2017: The End of Net Metering</strong></p>
+<p>Traditional net metering gave solar customers retail-rate credit for exports—often $0.20+/kWh. Critics argued this overvalued solar and shifted costs to non-solar customers.</p>
+<p><strong>2017: Value of Distributed Energy Resources (VDER) Order</strong></p>
+<p>The PSC replaced net metering with the "Value Stack":</p>
+<ul>
+<li>Solar exports are valued based on actual grid benefits</li>
+<li>Components: Energy, Capacity, Environmental, Demand Reduction, Locational</li>
+</ul>
+<p><strong>The Value Stack Components</strong></p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>What It Values</th>
+<th>Typical Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energy</td>
+<td>Avoided wholesale energy cost</td>
+<td>~$0.03-0.08/kWh</td>
+</tr>
+<tr>
+<td>Capacity</td>
+<td>Avoided generation capacity</td>
+<td>~$0.02-0.04/kWh</td>
+</tr>
+<tr>
+<td>Environmental (E)</td>
+<td>Social cost of carbon</td>
+<td>~$0.02-0.03/kWh</td>
+</tr>
+<tr>
+<td>Demand Reduction (DRV)</td>
+<td>Avoided distribution investment</td>
+<td>$0.00-0.10/kWh</td>
+</tr>
+<tr>
+<td>Locational (LSRV)</td>
+<td>Avoided transmission/local distribution</td>
+<td>$0.00-0.05/kWh</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-vder-costs-arise">How VDER Costs Arise</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>1. Solar system exports 1,000 kWh to grid
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>2. ConEd calculates Value Stack: $0.12/kWh average
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>3. ConEd pays solar owner: $120
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>4. ConEd needs to recover $120 from ratepayers
+</span></code></pre></div>
+<h3 id="how-the-surcharge-works">How the Surcharge Works</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>VDER Cost Recovery = Total VDER Payments to DG Owners / Total kWh Sales
+</span></code></pre></div>
+<h3 id="example-system-wide-math">Example: System-Wide Math</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Annual VDER payments to solar owners: $50 million
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>Annual ConEd sales: 40 billion kWh
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>VDER Surcharge = $50 million / 40 billion kWh = $0.00125/kWh
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>For 500 kWh customer: ~$0.63/month
+</span></code></pre></div>
+<h3 id="why-all-customers-pay_1">Why All Customers Pay</h3>
+<ol>
+<li><strong>Grid benefit</strong>: Solar reduces need for central generation and transmission</li>
+<li><strong>Environmental benefit</strong>: Lower emissions benefit everyone</li>
+<li><strong>Policy decision</strong>: NY chose to socialize DER costs to accelerate clean energy</li>
+</ol>
+<h3 id="relationship-to-cbc">Relationship to CBC</h3>
+<p>These two riders are <strong>complementary</strong>:</p>
+<ul>
+<li><strong>CBC</strong>: Solar customers pay for using the grid</li>
+<li><strong>VDER Cost Recovery</strong>: All customers pay for solar exports to the grid</li>
+</ul>
+<p>Together, they create a balanced framework where:</p>
+<ul>
+<li>Solar is fairly compensated for grid benefits</li>
+<li>Solar pays for grid services it uses</li>
+<li>Non-solar customers share clean energy transition costs</li>
+</ul>
+<h3 id="current-rate_2">Current Rate</h3>
+<p><strong>$0.0011/kWh</strong> → ~$0.55/month for typical residential customer</p>
+<hr />
+<h2 id="summary-the-policy-story-behind-each-rider">Summary: The Policy Story Behind Each Rider</h2>
+<table>
+<thead>
+<tr>
+<th>Rider</th>
+<th>Era</th>
+<th>Policy Driver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tax Sur-Credit</td>
+<td>2017+</td>
+<td>Federal tax reform, ongoing property tax changes</td>
+</tr>
+<tr>
+<td>DLM Surcharge</td>
+<td>2014+</td>
+<td>REV grid modernization, demand response over generation</td>
+</tr>
+<tr>
+<td>CBC</td>
+<td>2017+</td>
+<td>VDER solar reform, ensuring solar pays for grid use</td>
+</tr>
+<tr>
+<td>EV Make Ready</td>
+<td>2020+</td>
+<td>Transportation electrification, climate goals</td>
+</tr>
+<tr>
+<td>Arrears Management</td>
+<td>2020+</td>
+<td>COVID pandemic response, utility customer protection</td>
+</tr>
+<tr>
+<td>GRT</td>
+<td>Long-standing</td>
+<td>Municipal taxation authority</td>
+</tr>
+<tr>
+<td>VDER Cost Recovery</td>
+<td>2017+</td>
+<td>VDER solar reform, compensating distributed generation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="how-riders-appear-in-the-json_1">How Riders Appear in the JSON</h2>
+<p>Riders have a two-part structure:</p>
+<p><strong>1. Rider Reference (in main tariff)</strong></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="nt">&quot;tariffRateId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20389577</span><span class="p">,</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nt">&quot;riderId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3399165</span><span class="p">,</span><span class="w">  </span><span class="c1">// ← Links to rider tariff</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nt">&quot;rateGroupName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CBC Rider&quot;</span><span class="p">,</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="nt">&quot;rateName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CBC Rider&quot;</span><span class="p">,</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span><span class="nt">&quot;chargeType&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">  </span><span class="c1">// ← No charge info here</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span><span class="nt">&quot;rateBands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">      </span><span class="c1">// ← Empty, details in rider</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>2. Rider Implementation (detailed rate)</strong></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">{</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nt">&quot;tariffRateId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20443074</span><span class="p">,</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="nt">&quot;riderTariffId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3495063</span><span class="p">,</span><span class="w">  </span><span class="c1">// ← This IS the rider tariff</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="nt">&quot;rateGroupName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Customer Benefit Contribution&quot;</span><span class="p">,</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">  </span><span class="nt">&quot;rateName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Customer Benefit Contribution&quot;</span><span class="p">,</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">  </span><span class="nt">&quot;chargeType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;QUANTITY&quot;</span><span class="p">,</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">  </span><span class="nt">&quot;quantityKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;systemSize&quot;</span><span class="p">,</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">  </span><span class="nt">&quot;rateBands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">    </span><span class="nt">&quot;rateAmount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.84</span><span class="p">,</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">    </span><span class="nt">&quot;rateUnit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COST_PER_UNIT&quot;</span>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">  </span><span class="p">}]</span>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>When processing the JSON, look for both:</p>
+<ul>
+<li>Rates with <code>riderId</code> (reference to rider)</li>
+<li>Rates with <code>riderTariffId</code> (implementation details)</li>
+</ul>
+<hr />
+<h2 id="quick-reference-rider-calculation-methods">Quick Reference: Rider Calculation Methods</h2>
+<table>
+<thead>
+<tr>
+<th>Rider</th>
+<th>Charge Type</th>
+<th>Basis</th>
+<th>Rate Structure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tax Sur-Credit</td>
+<td>CONSUMPTION_BASED</td>
+<td>Per kWh</td>
+<td>Variable (lookup)</td>
+</tr>
+<tr>
+<td>DLM Surcharge</td>
+<td>CONSUMPTION_BASED</td>
+<td>Per kWh</td>
+<td>Variable (lookup)</td>
+</tr>
+<tr>
+<td>CBC</td>
+<td>QUANTITY</td>
+<td>Per kW of solar</td>
+<td>Fixed ($1.84/kW)</td>
+</tr>
+<tr>
+<td>EV Make Ready</td>
+<td>CONSUMPTION_BASED</td>
+<td>Per kWh</td>
+<td>Fixed ($0.0008)</td>
+</tr>
+<tr>
+<td>Arrears Management</td>
+<td>CONSUMPTION_BASED</td>
+<td>Per kWh</td>
+<td>Fixed ($0.0012)</td>
+</tr>
+<tr>
+<td>GRT Distribution</td>
+<td>QUANTITY</td>
+<td>% of delivery charges</td>
+<td>Fixed by zone</td>
+</tr>
+<tr>
+<td>GRT Supply</td>
+<td>QUANTITY</td>
+<td>% of supply charges</td>
+<td>Fixed by zone</td>
+</tr>
+<tr>
+<td>VDER Cost Recovery</td>
+<td>CONSUMPTION_BASED</td>
+<td>Per kWh</td>
+<td>Fixed ($0.0011)</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.indexes"], "search": "../../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
