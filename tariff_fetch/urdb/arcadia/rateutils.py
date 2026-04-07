@@ -271,5 +271,5 @@ def season_is_datetime_within(
     start_date = date(dt.year, start_month, start_day)
     end_date = date(dt.year, end_month, end_day)
     if start_date < end_date:
-        return start_date <= dt < end_date
-    return start_date <= dt or dt < end_date
+        return start_date <= dt <= end_date
+    return start_date <= dt or dt <= end_date

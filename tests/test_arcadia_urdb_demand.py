@@ -242,8 +242,8 @@ def test_build_demand_schedule_averages_sampled_datetimes():
 
     assert result.get("demandratestructure") == [
         [{"rate": 5.0}],
-        [{"rate": 10.0}],
-        [{"rate": 9.444444}],
+        [{"rate": pytest.approx(10.454545)}],
+        [{"rate": pytest.approx(9.444444)}],
     ]
     assert result.get("demandweekdayschedule") == schedule_lists_to_tuples(
         [base_schedule] * 4 + [may_weekday_schedule] + [base_schedule] * 7

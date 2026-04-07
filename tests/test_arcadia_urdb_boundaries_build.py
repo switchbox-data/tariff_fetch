@@ -7,7 +7,7 @@ from tariff_fetch.urdb.arcadia import rateutils as ru
 from tariff_fetch.urdb.arcadia.scenario import Scenario
 
 
-def test_season_is_datetime_within_respects_start_inclusive_end_exclusive():
+def test_season_is_datetime_within_respects_inclusive_start_and_end():
     season = {
         "season_from_month": 6,
         "season_from_day": 1,
@@ -17,7 +17,8 @@ def test_season_is_datetime_within_respects_start_inclusive_end_exclusive():
 
     assert ru.season_is_datetime_within(season, date(2025, 6, 1)) is True  # type: ignore[arg-type]
     assert ru.season_is_datetime_within(season, date(2025, 8, 31)) is True  # type: ignore[arg-type]
-    assert ru.season_is_datetime_within(season, date(2025, 9, 1)) is False  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 9, 1)) is True  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 9, 2)) is False  # type: ignore[arg-type]
 
 
 def test_season_is_datetime_within_handles_wraparound_year():
@@ -30,6 +31,8 @@ def test_season_is_datetime_within_handles_wraparound_year():
 
     assert ru.season_is_datetime_within(season, date(2025, 12, 15)) is True  # type: ignore[arg-type]
     assert ru.season_is_datetime_within(season, date(2025, 2, 15)) is True  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 3, 1)) is True  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 3, 2)) is False  # type: ignore[arg-type]
     assert ru.season_is_datetime_within(season, date(2025, 5, 1)) is False  # type: ignore[arg-type]
 
 
