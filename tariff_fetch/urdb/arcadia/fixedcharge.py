@@ -26,7 +26,16 @@ def build_fixed_charge(scenario: Scenario, library: Library) -> URDBRate:
 def get_fixed_charge_value(scenario: Scenario, library: Library) -> float:
     """Average the sampled fixed charge across the target year."""
 
-    return mean(get_fixed_charge_at_dt(scenario, library, dt) for dt in _iter_year(scenario.year, timedelta(hours=12)))
+    return (
+        sum(
+            mean(
+                get_fixed_charge_at_dt(scenario, library, dt)
+                for dt in _iter_month(scenario.year, month, timedelta(hours=8))
+            )
+            for month in range(1, 13)
+        )
+        / 12
+    )
 
 
 def get_fixed_charge_at_dt(scenario: Scenario, library: Library, dt: datetime) -> float:
@@ -44,6 +53,10 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
     bands = ru.rate_filter_bands(rate, scenario, library)
     if rate["charge_type"] != "FIXED_PRICE":
         return 0
+    if (variable_factor_key := rate.get("variable_factor_key")) is not None and not (
+        rate["charge_period"] == "MONTHLY" and variable_factor_key == "billingPeriodProrationFactor"
+    ):
+        raise RateConversionError(rate, "Fixed charges cannot have variable factors")
     if rate.get("quantity_key") is not None:
         raise RateConversionError(rate, "Rates with quantity_key are not supported for fixed charge conversion")
     if not bands:
@@ -77,6 +90,11 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
 
     rate_amount = ru.rate_band_get_amount_at_datetime(band, library, dt)
     rate_amount = normalize_fixed_charge_amount(rate_amount, charge_period, dt)
+    if variable_factor_key == "billingPeriodProrationFactor":
+        _, days = calendar.monthrange(dt.year, dt.month)
+        multiplier = days / 30
+        rate_amount *= multiplier
+
     return rate_amount
 
 
@@ -90,11 +108,9 @@ def normalize_fixed_charge_amount(rate_amount: float, charge_period: str, dt: da
     raise ValueError(f"Unsupported fixed charge period: {charge_period}")
 
 
-def _iter_year(year: int, delta: timedelta) -> Iterator[datetime]:
-    """Yield evenly spaced sample datetimes across a calendar year."""
-
-    dt = datetime(year, 1, 1, 0, 30, 0)
-    max_dt = datetime(year + 1, 1, 1, 0, 0, 0)
+def _iter_month(year: int, month: int, delta: timedelta) -> Iterator[datetime]:
+    dt = datetime(year, month, 1, hour=0, minute=30, second=0)
+    max_dt = datetime(year + 1, 1, 1, 0, 0, 0) if month == 12 else datetime(year, month + 1, 1, 0, 0, 0)
     while dt < max_dt:
         yield dt
         dt += delta

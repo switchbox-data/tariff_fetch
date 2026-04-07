@@ -28,6 +28,7 @@ from .prompts import (
 from .shared import as_naive_datetime
 
 PropertyValue = str | list[str] | bool | date | float | int
+PropertyTimeSeries = dict[tuple[str, int], list[Lookup]]
 _DEFAULT_DEBUG_ROOT = Path("./outputs/arcadia_library")
 
 
@@ -81,10 +82,12 @@ class LibraryDebugStore:
 class TariffLibrary:
     """Fetch and cache Arcadia tariff versions and related tariff metadata."""
 
-    def __init__(self, api: ArcadiaSignalAPI, debug_store: LibraryDebugStore) -> None:
+    def __init__(
+        self, api: ArcadiaSignalAPI, debug_store: LibraryDebugStore | None, tariffs: list[TariffExtended] | None = None
+    ) -> None:
         self.api = api
         self.debug_store = debug_store
-        self.tariffs: list[TariffExtended] = []
+        self.tariffs: list[TariffExtended] = tariffs or []
         self._access_denied_tariff_ids: set[int] = set()
 
     def get_tariff_at_date(self, master_tariff_id: int, dt: date) -> TariffExtended:
@@ -139,7 +142,8 @@ class TariffLibrary:
         """Add a fetched tariff to the cache and write its debug dump."""
 
         self.tariffs.append(tariff)
-        self.debug_store.save_tariff(tariff)
+        if self.debug_store:
+            self.debug_store.save_tariff(tariff)
 
     def _fetch_tariff(self, tariff_id: int) -> TariffExtended:
         """Fetch one tariff version from Arcadia by tariff id."""
@@ -187,10 +191,15 @@ class TariffLibrary:
 class VariablePropertyLibrary:
     """Fetch and cache Arcadia variable lookup timeseries by property key and year."""
 
-    def __init__(self, api: ArcadiaSignalAPI, debug_store: LibraryDebugStore):
+    def __init__(
+        self,
+        api: ArcadiaSignalAPI,
+        debug_store: LibraryDebugStore | None = None,
+        property_timeseries: PropertyTimeSeries | None = None,
+    ):
         self.api = api
         self.debug_store = debug_store
-        self.property_timeseries: dict[tuple[str, int], list[Lookup]] = {}
+        self.property_timeseries = property_timeseries or {}
 
     def lookup(self, key: str, dt: datetime) -> float:
         """Return the best available lookup value for a property at a datetime."""
@@ -198,7 +207,8 @@ class VariablePropertyLibrary:
         if (lookups := self.property_timeseries.get((key, dt.year))) is None:
             lookups = self._lookup_property_timeseries(key, dt.year)
             self.property_timeseries[(key, dt.year)] = lookups
-            self.debug_store.save_lookups(key, dt.year, lookups)
+            if self.debug_store:
+                self.debug_store.save_lookups(key, dt.year, lookups)
 
         for row in lookups:
             if (
@@ -235,12 +245,17 @@ class Library:
         self,
         api: ArcadiaSignalAPI,
         properties: dict[str, PropertyValue] | None = None,
-        debug_root: Path = _DEFAULT_DEBUG_ROOT,
+        debug_root: Path | None = _DEFAULT_DEBUG_ROOT,
+        tariff_library: TariffLibrary | None = None,
+        variables_library: VariablePropertyLibrary | None = None,
     ):
         self.api = api
-        self.debug_store = LibraryDebugStore(debug_root)
-        self.tariffs = TariffLibrary(api, self.debug_store)
-        self.variables = VariablePropertyLibrary(api, self.debug_store)
+        if debug_root is None:
+            self.debug_store = None
+        else:
+            self.debug_store = LibraryDebugStore(debug_root)
+        self.tariffs = tariff_library or TariffLibrary(api, self.debug_store)
+        self.variables = variables_library or VariablePropertyLibrary(api, self.debug_store)
         self._properies: dict[str, PropertyValue] = properties if properties is not None else {}
         self._issues: dict[tuple[object, ...], str] = {}
 
@@ -295,7 +310,8 @@ class Library:
         if result is None:
             raise ConversionError("Property not set")
         self._properies[tariff_property["key_name"]] = result
-        self.debug_store.save_property_value(key, result)
+        if self.debug_store:
+            self.debug_store.save_property_value(key, result)
         return result
 
     @overload

@@ -315,6 +315,11 @@ def test_build_urdb_merges_converter_chunks(monkeypatch):
     )
     monkeypatch.setattr(
         build_mod,
+        "build_demand_schedule",
+        lambda scenario, library: {"demandratestructure": [[{"rate": 2.0}]]},
+    )
+    monkeypatch.setattr(
+        build_mod,
         "build_fixed_charge",
         lambda scenario, library: {"fixedchargefirstmeter": 12.0, "fixedchargeunits": "$/month"},
     )
@@ -328,6 +333,7 @@ def test_build_urdb_merges_converter_chunks(monkeypatch):
 
     assert result == {
         "energyratestructure": [[{"rate": 1.0, "unit": "kWh"}]],
+        "demandratestructure": [[{"rate": 2.0}]],
         "fixedchargefirstmeter": 12.0,
         "fixedchargeunits": "$/month",
         "label": "UTIL",

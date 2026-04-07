@@ -1,12 +1,17 @@
 """Small shared helpers for Arcadia schedule sampling and date classification."""
 
 import calendar
+import itertools
+from collections.abc import Collection
 from datetime import date, datetime
 from functools import lru_cache
+from statistics import mean
 
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 
-from .types import DayPredicate
+from .types import BandSet, DayPredicate
+
+_RATE_PRECISION = 6
 
 
 def as_naive_datetime(dt: datetime) -> datetime:
@@ -88,3 +93,51 @@ def lookup_property_timeseries(api: ArcadiaSignalAPI, key: str, year: int):
             to_date_time=date(year + 1, 1, 1),
         )
     )
+
+
+def sum_piecewise_bands(inputs: Collection[BandSet]) -> BandSet:
+    """Sum multiple piecewise band sets over their combined breakpoints."""
+
+    if not inputs:
+        return []
+
+    normalized = [sorted(bands, key=lambda b: b[0]) for bands in inputs]
+    limits = sorted({limit for bands in normalized for limit, _ in bands})
+
+    def value_at(bands: BandSet, limit: float) -> float:
+        for band_limit, value in bands:
+            if limit <= band_limit:
+                return value
+        return 0.0
+
+    summed = [(limit, sum(value_at(bands, limit) for bands in normalized)) for limit in limits]
+
+    return [a for a, b in itertools.pairwise(summed) if a[1] != b[1]] + [summed[-1]]
+
+
+def average_aligned_bands(inputs: list[BandSet]) -> BandSet:
+    """Average multiple band sets after aligning them to common tier limits."""
+
+    if not inputs:
+        return []
+
+    normalized = [sorted(bands, key=lambda b: b[0]) for bands in inputs]
+    limits = sorted({limit for bands in normalized for limit, _ in bands})
+
+    def value_at(bands: BandSet, limit: float) -> float:
+        for band_limit, value in bands:
+            if limit <= band_limit:
+                return value
+        return 0.0
+
+    averaged = [
+        (limit, round(mean(value_at(bands, limit) for bands in normalized), _RATE_PRECISION)) for limit in limits
+    ]
+
+    # Collapse consecutive identical values
+    result = [averaged[0]]
+    for limit, value in averaged[1:]:
+        if value != result[-1][1]:
+            result.append((limit, value))
+
+    return result

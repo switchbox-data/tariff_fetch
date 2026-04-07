@@ -17,5 +17,5 @@ class Scenario:
     master_tariff_id: int
     year: int
     apply_percentages: bool
-    charge_classes: set[RateChargeClass] = field(default_factory=set)
+    charge_classes: set[RateChargeClass] = field(default_factory=lambda: set(_CHARGE_CLASSES))
     properties: dict[str, ScenarioPropertyValue] = field(default_factory=dict)

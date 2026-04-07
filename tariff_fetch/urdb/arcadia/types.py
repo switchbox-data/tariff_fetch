@@ -5,7 +5,7 @@ from datetime import datetime
 
 from tariff_fetch.arcadia.schema.common import RateChargeClass
 
-ConsumptionBand = tuple[float, float]  # (upper_limit, value)
-ConsumptionBandSet = list[ConsumptionBand]
+Band = tuple[float, float]  # (upper_limit, value)
+BandSet = list[Band]
 DayPredicate = Callable[[datetime], bool]
 PercentageModifiers = list[tuple[set[RateChargeClass], float]]
