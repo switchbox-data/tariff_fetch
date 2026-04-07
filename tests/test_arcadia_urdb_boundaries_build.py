@@ -7,7 +7,7 @@ from tariff_fetch.urdb.arcadia import rateutils as ru
 from tariff_fetch.urdb.arcadia.scenario import Scenario
 
 
-def test_season_is_datetime_within_respects_start_inclusive_end_exclusive():
+def test_season_is_datetime_within_respects_inclusive_start_and_end():
     season = {
         "season_from_month": 6,
         "season_from_day": 1,
@@ -17,7 +17,8 @@ def test_season_is_datetime_within_respects_start_inclusive_end_exclusive():
 
     assert ru.season_is_datetime_within(season, date(2025, 6, 1)) is True  # type: ignore[arg-type]
     assert ru.season_is_datetime_within(season, date(2025, 8, 31)) is True  # type: ignore[arg-type]
-    assert ru.season_is_datetime_within(season, date(2025, 9, 1)) is False  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 9, 1)) is True  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 9, 2)) is False  # type: ignore[arg-type]
 
 
 def test_season_is_datetime_within_handles_wraparound_year():
@@ -30,7 +31,22 @@ def test_season_is_datetime_within_handles_wraparound_year():
 
     assert ru.season_is_datetime_within(season, date(2025, 12, 15)) is True  # type: ignore[arg-type]
     assert ru.season_is_datetime_within(season, date(2025, 2, 15)) is True  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 3, 1)) is True  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 3, 2)) is False  # type: ignore[arg-type]
     assert ru.season_is_datetime_within(season, date(2025, 5, 1)) is False  # type: ignore[arg-type]
+
+
+def test_season_is_datetime_within_treats_same_start_and_end_as_single_day():
+    season = {
+        "season_from_month": 6,
+        "season_from_day": 1,
+        "season_to_month": 6,
+        "season_to_day": 1,
+    }
+
+    assert ru.season_is_datetime_within(season, date(2025, 6, 1)) is True  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 5, 31)) is False  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 6, 2)) is False  # type: ignore[arg-type]
 
 
 def test_period_is_datetime_within_respects_exclusive_to_portion():
@@ -301,6 +317,51 @@ def test_tariff_iter_rates_for_dt_records_ignored_calendar_issues_once():
             ("ignored_tou_period_calendar", 10, 33, 11),
             "Ignoring TOU period calendar_id 11 for rate 10 (TOU Charge)",
         ),
+    ]
+
+
+def test_tariff_iter_rates_for_dt_records_ignored_season_edge_predominance_once():
+    rate = {
+        "tariff_rate_id": 10,
+        "rate_name": "Seasonal Charge",
+        "charge_class": ["SUPPLY"],
+        "rate_bands": [{"rate_unit": "COST_PER_UNIT"}],
+        "season": {
+            "season_id": 22,
+            "season_from_month": 6,
+            "season_from_day": 1,
+            "season_to_month": 9,
+            "season_to_day": 30,
+            "from_edge_predominance": "PREDOMINANT",
+            "to_edge_predominance": "SUBSERVIENT",
+        },
+    }
+    messages: list[tuple[tuple[object, ...], str]] = []
+    library = SimpleNamespace(
+        record_issue=lambda key, message: messages.append((key, message)),
+        get_choice_property_as_ints=lambda key: [1],
+    )
+    tariff = {"rates": [rate]}
+    scenario = Scenario(1, 2025, False, {"SUPPLY"})
+
+    _ = list(
+        ru.tariff_iter_rates_for_dt(
+            tariff,  # type: ignore[arg-type]
+            scenario,
+            library,  # type: ignore[arg-type]
+            datetime(2025, 7, 10, 15, 30),
+        )
+    )
+
+    assert messages == [
+        (
+            ("ignored_season_edge_predominance", 10, 22, "PREDOMINANT", "SUBSERVIENT"),
+            (
+                "Ignoring season edge predominance for rate 10 (Seasonal Charge) "
+                "(season=Jun 1-Sep 30, from=PREDOMINANT, to=SUBSERVIENT); using inclusive calendar dates "
+                "with inclusive start and end instead"
+            ),
+        )
     ]
 
 

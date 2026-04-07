@@ -2,9 +2,10 @@
 
 import calendar
 import itertools
-from collections.abc import Collection
-from datetime import date, datetime
+from collections.abc import Collection, Iterator
+from datetime import date, datetime, timedelta
 from functools import lru_cache
+from math import inf
 from statistics import mean
 
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
@@ -134,6 +135,9 @@ def average_aligned_bands(inputs: list[BandSet]) -> BandSet:
         (limit, round(mean(value_at(bands, limit) for bands in normalized), _RATE_PRECISION)) for limit in limits
     ]
 
+    if not averaged:
+        return [(inf, 0)]
+
     # Collapse consecutive identical values
     result = [averaged[0]]
     for limit, value in averaged[1:]:
@@ -141,3 +145,11 @@ def average_aligned_bands(inputs: list[BandSet]) -> BandSet:
             result.append((limit, value))
 
     return result
+
+
+def iter_year(year: int, delta: timedelta) -> Iterator[datetime]:
+    dt = datetime(year, 1, 1)
+    end_dt = datetime(year + 1, 1, 1)
+    while dt < end_dt:
+        yield dt
+        dt += delta

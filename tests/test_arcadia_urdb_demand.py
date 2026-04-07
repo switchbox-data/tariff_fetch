@@ -4,6 +4,7 @@ import pytest
 
 from tariff_fetch.arcadia.schema.lookup import Lookup
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
+from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyStandard
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExtended
 from tariff_fetch.urdb.arcadia.demandschedule import (
     build_demand_schedule,
@@ -26,9 +27,17 @@ DEMAND_RATE: TariffRateExtended = {
     "quantity_key": DEFAULT_QUANTITY_KEY,
     "charge_type": "DEMAND_BASED",
 }
+
+KW_PROPERTY: TariffPropertyStandard = {
+    **PROPERTY,
+    "quantity_key": DEFAULT_QUANTITY_KEY,
+    "quantity_unit": "kW",
+    "lookback_interval_quantity": 60,
+}
+
 KW_TARIFF: TariffExtended = {
     **TARIFF,
-    "properties": [{**PROPERTY, "quantity_key": DEFAULT_QUANTITY_KEY, "quantity_unit": "kW"}],
+    "properties": [KW_PROPERTY],
 }
 
 
@@ -194,8 +203,8 @@ def test_build_demand_schedule_averages_sampled_datetimes():
         "effective_date": date(2024, 6, 6),
         "end_date": date(2026, 6, 6),
         "properties": [
-            {**PROPERTY, "quantity_key": "base_kw", "quantity_unit": "kW"},
-            {**PROPERTY, "quantity_key": "seasonal_kw", "quantity_unit": "kW"},
+            {**KW_PROPERTY, "quantity_key": "base_kw", "quantity_unit": "kW"},
+            {**KW_PROPERTY, "quantity_key": "seasonal_kw", "quantity_unit": "kW"},
         ],
         "rates": [
             {
@@ -233,8 +242,8 @@ def test_build_demand_schedule_averages_sampled_datetimes():
 
     assert result.get("demandratestructure") == [
         [{"rate": 5.0}],
-        [{"rate": 10.0}],
-        [{"rate": 9.444444}],
+        [{"rate": pytest.approx(10.454545)}],
+        [{"rate": pytest.approx(9.444444)}],
     ]
     assert result.get("demandweekdayschedule") == schedule_lists_to_tuples(
         [base_schedule] * 4 + [may_weekday_schedule] + [base_schedule] * 7
@@ -242,3 +251,29 @@ def test_build_demand_schedule_averages_sampled_datetimes():
     assert result.get("demandweekendschedule") == schedule_lists_to_tuples(
         [base_schedule] * 4 + [may_weekend_schedule] + [base_schedule] * 7
     )
+
+
+def test_build_demand_schedule_infers_demandwindow():
+    tariff: TariffExtended = {**KW_TARIFF, "rates": [DEMAND_RATE]}
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    result = build_demand_schedule(scenario, library)
+    assert result.get("demandwindow") == 60
+
+
+def test_build_demand_schedule_returns_nothing_without_demand_rates():
+    tariff: TariffExtended = {**TARIFF, "rates": [{**RATE, "charge_type": "CONSUMPTION_BASED", "rate_bands": [BAND]}]}
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    result = build_demand_schedule(scenario, library)
+    assert "demandratestructure" not in result
+    assert "demandweekdayschedule" not in result
+    assert "demandweekendschedule" not in result
+
+
+def test_build_demand_schedule_returns_demand_rate_unit():
+    tariff: TariffExtended = {**KW_TARIFF, "rates": [DEMAND_RATE]}
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    result = build_demand_schedule(scenario, library)
+    assert result.get("demandrateunit") == "kW"

@@ -1,5 +1,6 @@
 """Shared Arcadia tariff filtering and time applicability helpers."""
 
+import calendar
 from collections.abc import Collection, Iterator
 from datetime import date, datetime
 from math import inf
@@ -33,6 +34,8 @@ def tariff_iter_rates_for_dt(
         if not rate_is_applied_to_scenario(rate, scenario, library):
             continue
         _record_calendar_issues(rate, library)
+        if season := rate.get("season"):
+            _record_season_edge_issue(rate, season, library)
         if not rate_is_applied_to_datetime(rate, dt):
             continue
         if rate["rate_bands"]:
@@ -254,6 +257,29 @@ def _record_calendar_issues(rate: TariffRateExtended, library: Library) -> None:
         )
 
 
+def _record_season_edge_issue(rate: TariffRateExtended, season: SeasonExtended, library: Library) -> None:
+    """Record ignored Arcadia season edge predominance once per conversion run."""
+
+    from_edge = season.get("from_edge_predominance")
+    to_edge = season.get("to_edge_predominance")
+    if from_edge is None and to_edge is None:
+        return
+    season_id = season.get("season_id", "unknown")
+    season_window = (
+        f"{calendar.month_abbr[season['season_from_month']]} {season['season_from_day']}-"
+        f"{calendar.month_abbr[season['season_to_month']]} {season['season_to_day']}"
+    )
+    library.record_issue(
+        ("ignored_season_edge_predominance", rate["tariff_rate_id"], season_id, from_edge, to_edge),
+        (
+            f"Ignoring season edge predominance for rate {rate['tariff_rate_id']} "
+            f"({rate['rate_name']}) "
+            f"(season={season_window}, from={from_edge}, to={to_edge}); using inclusive calendar dates "
+            "with inclusive start and end instead"
+        ),
+    )
+
+
 # ================================
 # Season
 # ================================
@@ -270,6 +296,8 @@ def season_is_datetime_within(
     start_day, end_day = season["season_from_day"], season["season_to_day"]
     start_date = date(dt.year, start_month, start_day)
     end_date = date(dt.year, end_month, end_day)
+    if start_date == end_date:
+        return dt == start_date
     if start_date < end_date:
-        return start_date <= dt < end_date
-    return start_date <= dt or dt < end_date
+        return start_date <= dt <= end_date
+    return start_date <= dt or dt <= end_date

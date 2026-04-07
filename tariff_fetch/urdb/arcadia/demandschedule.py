@@ -1,7 +1,8 @@
 from collections.abc import Iterator
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import inf
 
+from tariff_fetch.arcadia.schema.tariffproperty import TariffPropertyStandard
 from tariff_fetch.arcadia.schema.tariffrate import TariffRateBand, TariffRateExtended
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
 from tariff_fetch.urdb.schema import DemandTier, URDBRate
@@ -9,7 +10,14 @@ from tariff_fetch.urdb.schema import DemandTier, URDBRate
 from . import rateutils as ru
 from .library import Library
 from .scenario import Scenario
-from .shared import average_aligned_bands, is_weekday, is_weekend, iter_sampled_datetimes, sum_piecewise_bands
+from .shared import (
+    average_aligned_bands,
+    is_weekday,
+    is_weekend,
+    iter_sampled_datetimes,
+    iter_year,
+    sum_piecewise_bands,
+)
 from .types import Band, BandSet, DayPredicate
 
 _SUPPORTED_QUANTITY_KEY = "kW"
@@ -42,11 +50,42 @@ def build_demand_schedule(scenario: Scenario, library: Library) -> URDBRate:
 
     demand_rates_structure = [[_demand_band_to_tier(band) for band in bands] for bands in band_sets]
 
-    return {
+    if demand_rates_structure == [[{"rate": 0}]]:
+        return {}
+
+    result: URDBRate = {
         "demandratestructure": demand_rates_structure,
         "demandweekdayschedule": demand_weekday_schedule,
         "demandweekendschedule": demand_weekend_schedule,
+        "demandrateunit": "kW",
     }
+    if (demand_window := build_demand_window(scenario, library)) is not None:
+        result["demandwindow"] = demand_window
+    return result
+
+
+def build_demand_window(scenario: Scenario, library: Library) -> int | None:
+    rates = []
+    windows: set[int] = set()
+    for dt in iter_year(scenario.year, timedelta(days=1)):
+        tariff = library.tariffs.get_tariff_at_date(scenario.master_tariff_id, dt)
+        rates = [
+            rate for rate in ru.tariff_iter_rates_for_dt(tariff, scenario, library, dt) if filter_demand_rates(rate)
+        ]
+        for rate in rates:
+            quantity_key = rate.get("quantity_key")
+            if quantity_key is None:
+                raise RateConversionError(rate, "Demand-based rates must include quantity_key")
+            quantity = _get_quantity_property(library, quantity_key)
+            lookback_interval = quantity.get("lookback_interval_quantity")
+            if lookback_interval is None:
+                raise RateConversionError(rate, "Quantity key must have lookback interval value")
+            windows.add(lookback_interval)
+
+    if len(windows) == 1:
+        return sum(windows)
+    library.record_issue(("demand_window_uncertain",), "Could not determine demand window")
+    return None
 
 
 def get_month_hour_bands(
@@ -62,12 +101,10 @@ def get_month_hour_bands(
 def get_raw_bands_at_datetime(scenario: Scenario, library: Library, dt: datetime) -> BandSet:
     """Return the combined demand bands that apply at one instant."""
     tariff = library.tariffs.get_tariff_at_date(scenario.master_tariff_id, dt)
-    rates = list(ru.tariff_iter_rates_for_dt(tariff, scenario, library, dt))
+    rates = [rate for rate in ru.tariff_iter_rates_for_dt(tariff, scenario, library, dt) if filter_demand_rates(rate)]
     piecewise_bands: list[BandSet] = []
     for rate in rates:
         bands = get_rate_demand_bands_at_datetime(rate, scenario, library, dt)
-        if bands is None:
-            continue
         piecewise_bands.append(bands)
     return sum_piecewise_bands(piecewise_bands)
 
@@ -77,9 +114,7 @@ def get_rate_demand_bands_at_datetime(
     _scenario: Scenario,
     library: Library,
     dt: datetime,
-) -> BandSet | None:
-    if rate["charge_type"] != "DEMAND_BASED":
-        return None
+) -> BandSet:
     if rate.get("variable_factor_key") is not None:
         raise RateConversionError(rate, "Demand-based rates cannot have variable factors")
     quantity_key = rate.get("quantity_key")
@@ -103,6 +138,10 @@ def get_rate_demand_bands_at_datetime(
     return bands_set
 
 
+def filter_demand_rates(rate: TariffRateExtended) -> bool:
+    return rate["charge_type"] == "DEMAND_BASED"
+
+
 def _filter_demand_bands(rate: TariffRateExtended) -> Iterator[TariffRateBand]:
     bands = rate["rate_bands"]
     if not bands:
@@ -120,8 +159,12 @@ def _filter_demand_bands(rate: TariffRateExtended) -> Iterator[TariffRateBand]:
 
 
 def _get_quantity_unit(library: Library, quantity_key: str) -> str | None:
+    return _get_quantity_property(library, quantity_key).get("quantity_unit")
+
+
+def _get_quantity_property(library: Library, quantity_key: str) -> TariffPropertyStandard:
     return next(
-        p.get("quantity_unit")
+        p
         for tariff in library.tariffs.tariffs
         for p in tariff.get("properties", [])
         if p.get("quantity_key") == quantity_key
