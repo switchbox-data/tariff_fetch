@@ -71,6 +71,10 @@ class TariffPropertyStandardFields(TypedDict):
     formula_detail: NotRequired[str]
     is_default: bool
 
+    lookback_quantity: NotRequired[int]
+    lookback_period: NotRequired[str]
+    lookback_interval_quantity: NotRequired[int]
+
 
 class TariffPropertyMinimal(TariffPropertyMinimalFields):
     __pydantic_config__ = {"alias_generator": to_camel, "extra": "allow"}  # pyright: ignore[reportGeneralTypeIssues, reportUnannotatedClassAttribute]  # noqa
