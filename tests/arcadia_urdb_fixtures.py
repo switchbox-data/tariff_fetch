@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import UTC, date, datetime, timezone
+from datetime import UTC, date, datetime
 from math import inf
 from types import SimpleNamespace
 from typing import Any

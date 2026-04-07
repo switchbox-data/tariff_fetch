@@ -37,8 +37,6 @@ def get_fixed_charge_value(scenario: Scenario, library: Library) -> float:
         / 12
     )
 
-    return mean(get_fixed_charge_at_dt(scenario, library, dt) for dt in _iter_year(scenario.year, timedelta(hours=1)))
-
 
 def get_fixed_charge_at_dt(scenario: Scenario, library: Library, dt: datetime) -> float:
     """Sum all applicable fixed-price rates at one sampled instant."""

@@ -1,15 +1,15 @@
 """Small shared helpers for Arcadia schedule sampling and date classification."""
 
 import calendar
+import itertools
 from collections.abc import Collection
 from datetime import date, datetime
 from functools import lru_cache
-import itertools
 from statistics import mean
 
 from tariff_fetch.arcadia.api import ArcadiaSignalAPI
 
-from .types import DayPredicate, Band, BandSet
+from .types import BandSet, DayPredicate
 
 _RATE_PRECISION = 6
 

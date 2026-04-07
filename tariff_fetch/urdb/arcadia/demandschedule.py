@@ -16,7 +16,6 @@ _SUPPORTED_QUANTITY_KEY = "kW"
 
 
 def build_demand_schedule(scenario: Scenario, library: Library) -> URDBRate:
-
     weekday_schedule_raw = [
         [get_month_hour_bands(scenario, library, month, hour, is_weekday) for hour in range(24)]
         for month in range(1, 13)
@@ -75,11 +74,10 @@ def get_raw_bands_at_datetime(scenario: Scenario, library: Library, dt: datetime
 
 def get_rate_demand_bands_at_datetime(
     rate: TariffRateExtended,
-    scenario: Scenario,
+    _scenario: Scenario,
     library: Library,
     dt: datetime,
 ) -> BandSet | None:
-
     if rate["charge_type"] != "DEMAND_BASED":
         return None
     if rate.get("variable_factor_key") is not None:

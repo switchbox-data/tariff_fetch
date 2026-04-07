@@ -5,7 +5,7 @@ import pytest
 
 from tariff_fetch.urdb.arcadia import energyschedule as es
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
-from tariff_fetch.urdb.arcadia.shared import is_weekday
+from tariff_fetch.urdb.arcadia.shared import average_aligned_bands, is_weekday, sum_piecewise_bands
 
 
 def test_build_energy_schedule_keeps_weekday_and_weekend_distinct(monkeypatch):
@@ -29,7 +29,7 @@ def test_build_energy_schedule_keeps_weekday_and_weekend_distinct(monkeypatch):
 
 
 def test_sum_piecewise_bands_aligns_and_collapses_values():
-    result = es.sum_piecewise_bands(
+    result = sum_piecewise_bands(
         [
             [(100.0, 1.0), (inf, 2.0)],
             [(200.0, 0.5), (inf, 1.5)],
@@ -40,7 +40,7 @@ def test_sum_piecewise_bands_aligns_and_collapses_values():
 
 
 def test_average_aligned_bands_averages_inputs_and_collapses_duplicates():
-    result = es.average_aligned_bands(
+    result = average_aligned_bands(
         [
             [(100.0, 1.0), (inf, 3.0)],
             [(100.0, 3.0), (inf, 3.0)],

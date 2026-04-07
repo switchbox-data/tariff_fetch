@@ -181,8 +181,7 @@ def rate_band_get_amount_at_datetime(band: TariffRateBand, library: Library, dt:
     else:
         raw_result = library.variables.lookup(variable_rate_key, dt) * mp
 
-    calculation_factor = band.get("calculation_factor", 1.0)
-    calculation_factor = 1.0 if calculation_factor is None else calculation_factor
+    calculation_factor = band.get("calculation_factor") or 1.0
     return raw_result * calculation_factor
 
 
