@@ -1,5 +1,6 @@
 """Shared Arcadia tariff filtering and time applicability helpers."""
 
+import calendar
 from collections.abc import Collection, Iterator
 from datetime import date, datetime
 from math import inf
@@ -264,11 +265,17 @@ def _record_season_edge_issue(rate: TariffRateExtended, season: SeasonExtended, 
     if from_edge is None and to_edge is None:
         return
     season_id = season.get("season_id", "unknown")
+    season_window = (
+        f"{calendar.month_abbr[season['season_from_month']]} {season['season_from_day']}-"
+        f"{calendar.month_abbr[season['season_to_month']]} {season['season_to_day']}"
+    )
     library.record_issue(
         ("ignored_season_edge_predominance", rate["tariff_rate_id"], season_id, from_edge, to_edge),
         (
             f"Ignoring season edge predominance for rate {rate['tariff_rate_id']} "
-            f"({rate['rate_name']}); using inclusive calendar dates instead"
+            f"({rate['rate_name']}) "
+            f"(season={season_window}, from={from_edge}, to={to_edge}); using inclusive calendar dates "
+            "with inclusive start and end instead"
         ),
     )
 

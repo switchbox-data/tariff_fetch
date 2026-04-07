@@ -356,7 +356,11 @@ def test_tariff_iter_rates_for_dt_records_ignored_season_edge_predominance_once(
     assert messages == [
         (
             ("ignored_season_edge_predominance", 10, 22, "PREDOMINANT", "SUBSERVIENT"),
-            "Ignoring season edge predominance for rate 10 (Seasonal Charge); using inclusive calendar dates instead",
+            (
+                "Ignoring season edge predominance for rate 10 (Seasonal Charge) "
+                "(season=Jun 1-Sep 30, from=PREDOMINANT, to=SUBSERVIENT); using inclusive calendar dates "
+                "with inclusive start and end instead"
+            ),
         )
     ]
 
