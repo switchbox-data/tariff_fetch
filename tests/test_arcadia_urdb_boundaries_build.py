@@ -36,6 +36,19 @@ def test_season_is_datetime_within_handles_wraparound_year():
     assert ru.season_is_datetime_within(season, date(2025, 5, 1)) is False  # type: ignore[arg-type]
 
 
+def test_season_is_datetime_within_treats_same_start_and_end_as_single_day():
+    season = {
+        "season_from_month": 6,
+        "season_from_day": 1,
+        "season_to_month": 6,
+        "season_to_day": 1,
+    }
+
+    assert ru.season_is_datetime_within(season, date(2025, 6, 1)) is True  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 5, 31)) is False  # type: ignore[arg-type]
+    assert ru.season_is_datetime_within(season, date(2025, 6, 2)) is False  # type: ignore[arg-type]
+
+
 def test_period_is_datetime_within_respects_exclusive_to_portion():
     period = {
         "from_day_of_week": 0,
