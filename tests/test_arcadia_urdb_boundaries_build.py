@@ -320,6 +320,47 @@ def test_tariff_iter_rates_for_dt_records_ignored_calendar_issues_once():
     ]
 
 
+def test_tariff_iter_rates_for_dt_records_ignored_season_edge_predominance_once():
+    rate = {
+        "tariff_rate_id": 10,
+        "rate_name": "Seasonal Charge",
+        "charge_class": ["SUPPLY"],
+        "rate_bands": [{"rate_unit": "COST_PER_UNIT"}],
+        "season": {
+            "season_id": 22,
+            "season_from_month": 6,
+            "season_from_day": 1,
+            "season_to_month": 9,
+            "season_to_day": 30,
+            "from_edge_predominance": "PREDOMINANT",
+            "to_edge_predominance": "SUBSERVIENT",
+        },
+    }
+    messages: list[tuple[tuple[object, ...], str]] = []
+    library = SimpleNamespace(
+        record_issue=lambda key, message: messages.append((key, message)),
+        get_choice_property_as_ints=lambda key: [1],
+    )
+    tariff = {"rates": [rate]}
+    scenario = Scenario(1, 2025, False, {"SUPPLY"})
+
+    _ = list(
+        ru.tariff_iter_rates_for_dt(
+            tariff,  # type: ignore[arg-type]
+            scenario,
+            library,  # type: ignore[arg-type]
+            datetime(2025, 7, 10, 15, 30),
+        )
+    )
+
+    assert messages == [
+        (
+            ("ignored_season_edge_predominance", 10, 22, "PREDOMINANT", "SUBSERVIENT"),
+            "Ignoring season edge predominance for rate 10 (Seasonal Charge); using inclusive calendar dates instead",
+        )
+    ]
+
+
 def test_build_urdb_merges_converter_chunks(monkeypatch):
     scenario = Scenario(123, 2025, apply_percentages=True, charge_classes={"SUPPLY"})
 
