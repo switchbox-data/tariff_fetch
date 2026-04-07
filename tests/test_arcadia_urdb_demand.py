@@ -269,3 +269,11 @@ def test_build_demand_schedule_returns_nothing_without_demand_rates():
     assert "demandratestructure" not in result
     assert "demandweekdayschedule" not in result
     assert "demandweekendschedule" not in result
+
+
+def test_build_demand_schedule_returns_demand_rate_unit():
+    tariff: TariffExtended = {**KW_TARIFF, "rates": [DEMAND_RATE]}
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff])
+    result = build_demand_schedule(scenario, library)
+    assert result.get("demandrateunit") == "kW"

@@ -57,6 +57,7 @@ def build_demand_schedule(scenario: Scenario, library: Library) -> URDBRate:
         "demandratestructure": demand_rates_structure,
         "demandweekdayschedule": demand_weekday_schedule,
         "demandweekendschedule": demand_weekend_schedule,
+        "demandrateunit": "kW",
     }
     if (demand_window := build_demand_window(scenario, library)) is not None:
         result["demandwindow"] = demand_window
