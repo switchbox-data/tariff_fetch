@@ -5,7 +5,7 @@ from tariff_fetch.urdb.arcadia.exception import RateConversionError
 from tariff_fetch.urdb.arcadia.fixedcharge import build_fixed_charge
 from tariff_fetch.urdb.arcadia.library import Library, PropertyValue, TariffLibrary, VariablePropertyLibrary
 from tariff_fetch.urdb.arcadia.scenario import Scenario
-from tests.arcadia_urdb_fixtures import BAND, PROPERTY, RATE, TARIFF
+from tests.arcadia_urdb_fixtures import BAND, RATE, TARIFF
 
 
 def make_stub_library(tariffs: list[TariffExtended], properties: dict[str, PropertyValue] | None = None) -> Library:
