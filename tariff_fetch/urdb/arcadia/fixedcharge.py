@@ -44,6 +44,7 @@ def get_fixed_charge_at_dt(scenario: Scenario, library: Library, dt: datetime) -
     master_tariff_id = scenario.master_tariff_id
     tariff = library.tariffs.get_tariff_at_date(master_tariff_id, dt.date())
     rates = ru.tariff_iter_rates_for_dt(tariff, scenario, library, dt)
+    rates = list(rates)
     return sum(get_rate_fixed_charge_at_dt(scenario, library, rate, dt) for rate in rates)
 
 
@@ -53,14 +54,14 @@ def get_rate_fixed_charge_at_dt(scenario: Scenario, library: Library, rate: Tari
     bands = ru.rate_filter_bands(rate, scenario, library)
     if rate["charge_type"] != "FIXED_PRICE":
         return 0
+    if not bands:
+        return 0
     if (variable_factor_key := rate.get("variable_factor_key")) is not None and not (
         rate["charge_period"] == "MONTHLY" and variable_factor_key == "billingPeriodProrationFactor"
     ):
         raise RateConversionError(rate, "Fixed charges cannot have variable factors")
     if rate.get("quantity_key") is not None:
         raise RateConversionError(rate, "Rates with quantity_key are not supported for fixed charge conversion")
-    if not bands:
-        return 0
     band_rate_units = {band["rate_unit"] for band in bands}
     if (transaction_type := rate["transaction_type"]) != "BUY":
         raise RateConversionError(
