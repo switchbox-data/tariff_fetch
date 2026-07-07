@@ -3,19 +3,58 @@ import pytest
 from tariff_fetch.arcadia.schema.tariff import TariffExtended
 from tariff_fetch.urdb.arcadia.exception import RateConversionError
 from tariff_fetch.urdb.arcadia.fixedcharge import build_fixed_charge
-from tariff_fetch.urdb.arcadia.library import Library, TariffLibrary, VariablePropertyLibrary
+from tariff_fetch.urdb.arcadia.library import Library, PropertyValue, TariffLibrary, VariablePropertyLibrary
 from tariff_fetch.urdb.arcadia.scenario import Scenario
-from tests.arcadia_urdb_fixtures import BAND, RATE, TARIFF
+from tests.arcadia_urdb_fixtures import BAND, PROPERTY, RATE, TARIFF
 
 
-def make_stub_library(tariffs: list[TariffExtended]) -> Library:
+def make_stub_library(tariffs: list[TariffExtended], properties: dict[str, PropertyValue] | None = None) -> Library:
     tariff_library = TariffLibrary(None, None, tariffs)
     variables_library = VariablePropertyLibrary(None, None, None)
-    return Library(None, None, None, tariff_library=tariff_library, variables_library=variables_library)
+    return Library(None, properties, None, tariff_library=tariff_library, variables_library=variables_library)
 
 
 def make_stub_scenario(tariff: TariffExtended) -> Scenario:
     return Scenario(tariff["master_tariff_id"], 2025, False)
+
+
+def test_build_fixed_charge_inapplicable_bands_does_not_fail():
+    tariff: TariffExtended = {
+        **TARIFF,
+        "rates": [
+            {
+                **RATE,
+                "charge_type": "FIXED_PRICE",
+                "applicability_key": "APPLICABLE",
+                "charge_period": "MONTHLY",
+                "rate_bands": [
+                    {
+                        **BAND,
+                        "applicability_value": "true",
+                        "rate_amount": 2.0,
+                    }
+                ],
+                "quantity_key": "some_key",
+            }
+        ],
+        "properties": [
+            {
+                "key_name": "APPLICABLE",
+                "display_name": "applicable",
+                "data_type": "BOOLEAN",
+                "operator": "=",
+                "keyspace": "tariff",
+                "family": "service",
+                "description": "applicability",
+                "property_types": "APPLICABILITY",
+                "is_default": False,
+            }
+        ],
+    }
+    scenario = make_stub_scenario(tariff)
+    library = make_stub_library([tariff], properties={"APPLICABLE": "false"})
+    result = build_fixed_charge(scenario, library)
+    assert result.get("fixedchargefirstmeter") == 0
 
 
 def test_build_fixed_charge_returns_zero_when_no_fixed_rates_apply():
