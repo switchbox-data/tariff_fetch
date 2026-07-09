@@ -153,8 +153,8 @@ def test_build_schedule_must_be_demand_based():
     tariff: TariffExtended = {
         **KW_TARIFF,
         "rates": [
-            {**RATE, "rate_bands": [{**BAND, "rate_amount": 15.0}]},
-            {**DEMAND_RATE, "rate_bands": [{**BAND, "rate_amount": 10.0}]},
+            {**RATE, "tariff_rate_id": 10000, "rate_bands": [{**BAND, "rate_amount": 15.0}]},
+            {**DEMAND_RATE, "tariff_rate_id": 20000, "rate_bands": [{**BAND, "rate_amount": 10.0}]},
         ],
     }
     scenario = make_stub_scenario(tariff)
@@ -209,12 +209,14 @@ def test_build_demand_schedule_averages_sampled_datetimes():
         "rates": [
             {
                 **RATE,
+                "tariff_rate_id": 10000,
                 "charge_type": "DEMAND_BASED",
                 "quantity_key": "base_kw",
                 "rate_bands": [{**BAND, "rate_amount": 5.0}],
             },
             {
                 **RATE,
+                "tariff_rate_id": 20000,
                 "charge_type": "DEMAND_BASED",
                 "quantity_key": "seasonal_kw",
                 "rate_bands": [{**BAND, "rate_amount": 10.0}],

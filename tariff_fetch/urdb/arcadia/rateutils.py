@@ -26,8 +26,10 @@ def tariff_iter_rates_for_dt(
     scenario: Scenario,
     library: Library,
     dt: datetime,
+    _seen: set[int] | None = None,
 ) -> Iterator[TariffRateExtended]:
     """Yield all rate entries that apply for a scenario at a given datetime."""
+    _seen = _seen or set()
 
     rates = tariff.get("rates", [])
     for rate in rates:
@@ -39,6 +41,10 @@ def tariff_iter_rates_for_dt(
         if not rate_is_applied_to_datetime(rate, dt):
             continue
         if rate["rate_bands"]:
+            rate_id = rate["tariff_rate_id"]
+            if rate_id in _seen:
+                continue
+            _seen.add(rate_id)
             yield rate
         elif rider_id := rate.get("rider_id"):
             try:
@@ -49,7 +55,7 @@ def tariff_iter_rates_for_dt(
                     f"Skipping inaccessible rider {rider_id} attached to rate {rate['tariff_rate_id']} ({rate['rate_name']})",
                 )
                 continue
-            yield from tariff_iter_rates_for_dt(rider_tariff, scenario, library, dt)
+            yield from tariff_iter_rates_for_dt(rider_tariff, scenario, library, dt, _seen)
 
 
 # ================================

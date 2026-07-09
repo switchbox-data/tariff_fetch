@@ -10,7 +10,16 @@ from tariff_fetch.urdb.arcadia import rateutils as ru
 from tariff_fetch.urdb.arcadia.exception import RateConversionError, TariffAccessDenied
 from tariff_fetch.urdb.arcadia.library import LibraryDebugStore, TariffLibrary
 from tariff_fetch.urdb.arcadia.scenario import Scenario
-from tests.arcadia_urdb_fixtures import StubLibrary, make_band, make_consumption_rate, make_percentage_rate, make_rate
+from tests.arcadia_urdb_fixtures import (
+    BAND,
+    RATE,
+    TARIFF,
+    StubLibrary,
+    make_band,
+    make_consumption_rate,
+    make_percentage_rate,
+    make_rate,
+)
 
 
 def test_rate_filter_bands_excludes_non_matching_choice_band():
@@ -272,3 +281,43 @@ def test_tariff_library_caches_access_denied_tariff_ids():
         library.get_tariff(77)
 
     assert calls == [77]
+
+
+def test_tariff_iter_rates_for_dt_deduplicates():
+    duplicated_rate = {
+        **RATE,
+        "tariff_rate_id": 18603035,
+        "rate_name": "Universal Service Charge",
+        "rate_bands": [{**BAND, "tariff_rate_id": 18603035, "rate_amount": 0.32}],
+    }
+    rider_pointer_rate = {
+        **RATE,
+        "tariff_rate_id": 18603036,
+        "rate_name": "Universal Service Charge Rider",
+        "rate_bands": [],
+        "rider_id": 669,
+    }
+    parent_tariff = {**TARIFF, "rates": [duplicated_rate, rider_pointer_rate]}
+    rider_tariff = {**TARIFF, "tariff_id": 669, "master_tariff_id": 669, "rates": [duplicated_rate]}
+    rider_calls: list[int] = []
+
+    def get_tariff(tariff_id: int):
+        rider_calls.append(tariff_id)
+        return rider_tariff
+
+    library = SimpleNamespace(
+        tariffs=SimpleNamespace(get_tariff=get_tariff),
+        record_issue=lambda key, message: None,
+    )
+
+    result = list(
+        ru.tariff_iter_rates_for_dt(
+            parent_tariff,  # type: ignore[arg-type]
+            Scenario(1, 2025, False, {"SUPPLY"}),
+            library,  # type: ignore[arg-type]
+            datetime(2025, 1, 1, 0, 30),
+        )
+    )
+
+    assert result == [duplicated_rate]
+    assert rider_calls == [669]
